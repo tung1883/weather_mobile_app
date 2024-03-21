@@ -13,16 +13,12 @@ const Stack = createStackNavigator();
 const App = () => {
   const [locationStatus, setLocationStatus] = useState()
   const [location, setLocation] = useState(null);
-  const [firstTimeUser, setFirstTimeUser] = useState(null)
 
   useEffect(() => {
     const checkUser = async () => {
-      const isFirstTime = await checkFirstTimeUser();
-      if (isFirstTime) {
-        setFirstTimeUser(true)
-        AsyncStorage.setItem('isFirstTime', 'false');
-      } else {
-        setFirstTimeUser(false)
+      const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
+      if (notFirstTime === null) {
+        AsyncStorage.setItem('notFirstTime', "true");
       }
     };
 
@@ -34,7 +30,6 @@ const App = () => {
       try {
         const { status } = await Location.getForegroundPermissionsAsync();
         setLocationStatus(status)
-        console.log(status)
 
         if (status !== 'granted') {
           console.log('Permission to access location was denied');
@@ -53,7 +48,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Loading">
-        <Stack.Screen name="Loading" component={LoadingPage} initialParams={{firstTimeUser}} options={{ headerShown: false }} />
+        <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
         <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
         <Stack.Screen name="Main" component={MainPage} initialParams={{location}} options={{ headerShown: false }} />
       </Stack.Navigator>
@@ -61,14 +56,5 @@ const App = () => {
   );
 };
 
-const checkFirstTimeUser = async () => {
-  try {
-    const isFirstTime = await AsyncStorage.getItem('isFirstTime');
-    return isFirstTime === null; // Returns true if it's the first time, false otherwise
-  } catch (error) {
-    console.error('Error checking first time user:', error);
-    return false; // Assume it's not the first time if there's an error
-  }
-};
 
 export default App;

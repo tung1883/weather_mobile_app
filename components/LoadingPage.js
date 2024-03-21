@@ -2,11 +2,14 @@ import React, { useEffect } from "react";
 import { Image, StyleSheet} from "react-native";
 import styled from "styled-components/native";
 import logoImg from "../assets/logo.png"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const LoadingPage = ({navigation, route}) => {
+export const LoadingPage = ({navigation}) => {
   useEffect(() => {
-      const timer = setTimeout(() => {
-          navigation.replace((route?.params?.firstTimeUser) ? 'LocationPermission' : "Main"); // Replace the loading screen with the menu screen
+      const timer = setTimeout(async () => {
+          const notFirstTime = await AsyncStorage.getItem('notFirstTime') 
+          console.log(notFirstTime)
+          navigation.replace((notFirstTime === 'true') ? 'Main' : 'LocationPermission'); // Replace the loading screen with the menu screen
       }, 2000); // Wait for 2 seconds before navigating to the menu
       return () => clearTimeout(timer); // Cleanup function to clear the timer
   }, [navigation]);
