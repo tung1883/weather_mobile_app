@@ -3,7 +3,7 @@ import { Text } from "react-native";
 import styled from "styled-components/native";
 import moment from "moment";
 
-const DailyForecast = ({ day, index }) => {
+const DailyForecast = ({ day }) => {
   return (
     <DayContainer>
       <DateContainer>
