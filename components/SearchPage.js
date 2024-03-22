@@ -4,27 +4,32 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location'
 import { cities, popularCities } from '../assets/citiList';
 
-const SearchPage = ({navigation, setCity, fetchLatLongHandler, fetchWeatherInfo}) => {
+const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler}) => {
     const goBack = navigation.canGoBack()
     const [searchQuery, setSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState(popularCities);
     const [listTitle, setListTitle] = useState("POPULAR CITIES")
-    const [isFetching, setIsFetching] = useState(false)
+    const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
 
     const requestLocationPermission = async () => {
         try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        
-        if (status === 'granted') {
-            setIsFetching(true)
-            await fetchWeatherInfo()
-            setIsFetching(false)
-            navigation.replace('Main')
-        }
-
+            if (isFetching) return
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            
+            if (status === 'granted') {
+                setIsFetching(true)
+                await getLocation()
+                navigateToMainPage()
+            }
         } catch (error) {
         console.error('Error requesting location permission: ', error);
         }
+    };
+
+    const navigateToMainPage = () => {
+        navigation.replace('Main', {
+            onDataFetchComplete: () => setIsFetching(false), 
+        });
     };
 
     const handleSearch = (text) => {
@@ -50,10 +55,14 @@ const SearchPage = ({navigation, setCity, fetchLatLongHandler, fetchWeatherInfo}
     };
 
     const enterSearch = async () => {
-        fetchLatLongHandler(searchQuery).then((result) => {
+        if (isFetching) return
+      
+        fetchLatLongHandler(searchQuery)
+        .then((result) => {
             if (result) {
+                setIsFetching(true)
                 setCity(searchQuery)
-                navigation.replace('Main')
+                navigateToMainPage()
             }
         })
     }
@@ -67,11 +76,11 @@ const SearchPage = ({navigation, setCity, fetchLatLongHandler, fetchWeatherInfo}
         return (
             <TouchableOpacity style={itemContainerStyle} activeOpacity={1}
                 onPress={async () => {
+                    if (isFetching) return 
                     setIsFetching(true)
                     await fetchLatLongHandler(item)
                     setCity(item)
-                    setIsFetching(false)
-                    navigation.replace('Main')
+                    navigateToMainPage()
                 }}
             >
                 <Text style={styles.item}>{item}</Text>

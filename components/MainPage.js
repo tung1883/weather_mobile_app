@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, ImageBackground } from "react-native";
+import { ScrollView, ImageBackground, Text } from "react-native";
 import ForecastSearch from "../components/ForecastSearch";
 import CurrentForecast from "../components/CurrentForecast";
 import DailyForecast from "../components/DailyForecast";
@@ -8,10 +8,7 @@ import config from "../config";
 import bgImg from "../assets/background_light.png"
 import { TouchableOpacity } from "react-native-gesture-handler";
 
-const MainPage = ({ city, setCity, location, setLocation, weather, setWeather, fetchLatLongHandler, navigation }) => {
-  const [toggleSearch, setToggleSearch] = useState("city");
-  const [postalCode, setPostalCode] = useState("L4W1S9");
-
+const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigation, route }) => {
   useEffect(() => {
     const getLocationInfo = async () => {
       try {
@@ -27,56 +24,29 @@ const MainPage = ({ city, setCity, location, setLocation, weather, setWeather, f
       }
     };
 
-    getLocationInfo()
+    if (!city) {
+      getLocationInfo()
+    }
   }, [])
 
-  const controller = new AbortController();
-  const signal = controller.signal;
-
-  //fetch lat long by postal code/zip since OpenWeather Api only accepts zips
-  const fetchByPostalHandler = () => {
-    fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?key=${config.GOOGLE_KEY}&components=postal_code:${postalCode}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setLocation({
-          lat: data.results[0].geometry.location.lat,
-          long: data.results[0].geometry.location.lng
-        })
-      });
-  };
-
-  //updates the weather when lat long changes
   useEffect(() => {
-    fetch(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`,
-      { signal }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setWeather(data);
+    const fetchWeather = async () => {
+      fetchWeatherInfo().then(() => {
+        console.log(weather)
+        // route?.params?.onDataFetchComplete() 
       })
-      .catch((err) => {
-        console.log("error", err);
-      });
-    return () => controller.abort();
-  }, [location]);
+    }
+
+    fetchWeather()
+  }, [location])
 
   return (
     <Container>
       <ImageBackground source={bgImg} style={{ width: "100%", height: "100%" }}>
-        <TouchableOpacity onPress={() => navigation.navigate('Search')}>
-          <ForecastSearch
-            city={city}
-            setCity={setCity}
-            fetchLatLongHandler={fetchLatLongHandler}
-            toggleSearch={toggleSearch}
-            setToggleSearch={setToggleSearch}
-            fetchByPostalHandler={fetchByPostalHandler}
-            setPostalCode={setPostalCode}
-            postalCode={postalCode}
-          />
+        <TouchableOpacity onPress={() => navigation.navigate('Search')}
+          style={{borderWidth: 1, borderColor: 'black', backgroundColor: 'grey', height: 50}}
+        >
+          <Text>Search</Text>
         </TouchableOpacity>
         <CurrentForecast currentWeather={weather} timezone={weather.timezone} />
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>

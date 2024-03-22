@@ -33,11 +33,13 @@ const App = () => {
     checkUser();
   }, []);
 
-
   useEffect(() => {
     getLocation()
     fetchWeatherInfo()
   }, []);
+
+  const controller = new AbortController();
+  const signal = controller.signal;
 
   const getLocation = async () => {
       try {
@@ -56,19 +58,20 @@ const App = () => {
       }
     }
     
-    const fetchWeatherInfo = async () => {
-      if (!location) return
-      fetch(
-        `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`,
-      )
-      .then((res) => res.json())
-      .then((data) => {
-        setWeather(data);
-      })
-      .catch((err) => {
-        console.log("error", err);
-      });
-    }
+  const fetchWeatherInfo = async () => {
+    if (!location) return
+    fetch(
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`,
+      { signal }
+    )
+    .then((res) => res.json())
+    .then((data) => {
+      setWeather(data);
+    })
+    .catch((err) => {
+      console.log("error", err);
+    });
+  }
 
   //fetch lat long by city
   const fetchLatLongHandler = async (city) => {
@@ -94,7 +97,7 @@ const App = () => {
       <Stack.Navigator initialRouteName="Loading">
         <Stack.Screen name="Search" options={{ headerShown: false }}>
           {(navigation) => <SearchPage 
-            {...navigation} setCity={setCity} setLocation={setLocation} fetchLatLongHandler={fetchLatLongHandler}
+            {...navigation} setCity={setCity} getLocation={getLocation} fetchLatLongHandler={fetchLatLongHandler}
             fetchWeatherInfo={fetchWeatherInfo}
           ></SearchPage>}
         </Stack.Screen>
@@ -105,6 +108,7 @@ const App = () => {
           options={{ headerShown: false }}>
             {(navigation) => <MainPage {...navigation} city={city} setCity={setCity} 
               fetchLatLongHandler={fetchLatLongHandler}
+              fetchWeatherInfo={fetchWeatherInfo}
               location={location} setLocation={setLocation} 
               weather={weather} setWeather={setWeather}/>}
           </Stack.Screen>
