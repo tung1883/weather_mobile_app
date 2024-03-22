@@ -15,7 +15,7 @@ After cloning the project, run:
 
 to install the modules
 
-To run the project, run:
+To run the project, use:
 
 ```
     npx expo start
