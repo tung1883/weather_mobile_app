@@ -24,10 +24,10 @@ const App = () => {
   useEffect(() => {
     const checkUser = async () => {
       const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
-      AsyncStorage.removeItem('notFirstTime')
-      // if (notFirstTime === null) {
-      //   AsyncStorage.setItem('notFirstTime', "true");
-      // }
+      // AsyncStorage.removeItem('notFirstTime') //uncomment this and comment 3 lines to below to be first time user
+      if (notFirstTime === null) {
+        AsyncStorage.setItem('notFirstTime', "true");
+      }
     };
 
     checkUser();
@@ -91,7 +91,7 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Search">
+      <Stack.Navigator initialRouteName="Loading">
         <Stack.Screen name="Search" options={{ headerShown: false }}>
           {(navigation) => <SearchPage 
             {...navigation} setCity={setCity} setLocation={setLocation} fetchLatLongHandler={fetchLatLongHandler}

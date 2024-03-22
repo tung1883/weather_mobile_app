@@ -39,7 +39,7 @@ export const LocationPermissionPage = ({navigation}) => {
                 style={styles.button}
             >
                 <Text 
-                  onPress={() => console.log("MOVE TO SEARCH PAGE")}
+                  onPress={() => navigation.replace('Search')}
                   style={styles.buttonText}
                 >No, I do not allow </Text>
             </TouchableOpacity>
