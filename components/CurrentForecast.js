@@ -2,9 +2,15 @@ import React from "react";
 import styled from "styled-components/native";
 
 const CurrentForecast = ({ currentWeather }) => {
+  const parseTimezone = (timezone) => {
+    if (!timezone) return 
+
+    return timezone.replace(/_/g, ' ')
+  }
+
   return (
     <CurrentView>
-      <Timezone>{currentWeather.timezone}</Timezone>
+      <Timezone>{parseTimezone(currentWeather.timezone)}</Timezone>
       <MainInfoContainer>
         <CurrentTempView>
           {currentWeather.current && (

@@ -21,9 +21,11 @@
     "react-native": "0.73.5",
     "react-native-dotenv": "^3.4.11",
     "react-native-gesture-handler": "~2.14.0",
+    "react-native-maps": "^1.11.3",
     "react-native-permissions": "^4.1.4",
     "react-native-web": "~0.19.6",
-    "styled-components": "^6.1.8"
+    "styled-components": "^6.1.8",
+    "@expo/vector-icons": "^14.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

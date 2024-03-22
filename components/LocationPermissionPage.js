@@ -38,7 +38,10 @@ export const LocationPermissionPage = ({navigation}) => {
             <TouchableOpacity 
                 style={styles.button}
             >
-                <Text style={styles.buttonText}>No, I do not allow </Text>
+                <Text 
+                  onPress={() => console.log("MOVE TO SEARCH PAGE")}
+                  style={styles.buttonText}
+                >No, I do not allow </Text>
             </TouchableOpacity>
         </Container>
     );
@@ -46,7 +49,7 @@ export const LocationPermissionPage = ({navigation}) => {
 
 const Container = styled.View`
   flex: 1;
-  background-color: #696969;
+  background-color: #1E1E1E;
   display: flex;
   align-items: center;
 `;

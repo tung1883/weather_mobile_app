@@ -8,7 +8,6 @@ export const LoadingPage = ({navigation}) => {
   useEffect(() => {
       const timer = setTimeout(async () => {
           const notFirstTime = await AsyncStorage.getItem('notFirstTime') 
-          console.log(notFirstTime)
           navigation.replace((notFirstTime === 'true') ? 'Main' : 'LocationPermission'); // Replace the loading screen with the menu screen
       }, 2000); // Wait for 2 seconds before navigating to the menu
       return () => clearTimeout(timer); // Cleanup function to clear the timer
@@ -23,7 +22,7 @@ export const LoadingPage = ({navigation}) => {
 
 const Container = styled.View`
   flex: 1;
-  background-color: #696969;
+  background-color: #1E1E1E;
   display: flex;
   align-items: center;
   justify-content: center;

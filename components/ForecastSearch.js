@@ -13,7 +13,7 @@ const ForecastSearch = ({
 }) => {
   const handleSubmit = (e) => {
     if (toggleSearch === "city") {
-      fetchLatLongHandler();
+      fetchLatLongHandler(city);
     }
     if (toggleSearch === "postal") {
       fetchByPostalHandler();

@@ -6,27 +6,22 @@ import DailyForecast from "../components/DailyForecast";
 import styled from "styled-components/native";
 import config from "../config";
 import bgImg from "../assets/background_light.png"
+import { TouchableOpacity } from "react-native-gesture-handler";
 
-const MainPage = ({route}) => {
-  const { location } = route.params
+const MainPage = ({ city, setCity, location, setLocation, weather, setWeather, fetchLatLongHandler, navigation }) => {
   const [toggleSearch, setToggleSearch] = useState("city");
-  const [city, setCity] = useState("Hanoi");
   const [postalCode, setPostalCode] = useState("L4W1S9");
-  const [lat, setLat] = useState((location) ? location.coords.latitude : 21.0245);
-  const [long, setLong] = useState((location) ? location.coords.longitude : 105.8412);
-  const [weather, setWeather] = useState({});
 
   useEffect(() => {
     const getLocationInfo = async () => {
       try {
         const response = await fetch(
-          `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${OPENWEATHERMAP_API_KEY}`
+          `https://api.openweathermap.org/geo/1.0/reverse?lat=${location.lat}&lon=${location.long}&limit=1&appid=${config.API_KEY}`
         );
         const data = await response.json();
-        // Extract city and country from the response
         const city = data[0].name;
-        const country = data[0].country;
-        setLocationInfo(`${city}, ${country}`);
+        // const country = data[0].country;
+        setCity(city)
       } catch (error) {
         console.error('Error fetching location info:', error);
       }
@@ -38,18 +33,6 @@ const MainPage = ({route}) => {
   const controller = new AbortController();
   const signal = controller.signal;
 
-  //fetch lat long by city
-  const fetchLatLongHandler = () => {
-    fetch(
-      `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${config.API_KEY}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setLat(data.coord.lat);
-        setLong(data.coord.lon);
-      });
-  };
-
   //fetch lat long by postal code/zip since OpenWeather Api only accepts zips
   const fetchByPostalHandler = () => {
     fetch(
@@ -57,42 +40,44 @@ const MainPage = ({route}) => {
     )
       .then((res) => res.json())
       .then((data) => {
-        setLat(data.results[0].geometry.location.lat);
-        setLong(data.results[0].geometry.location.lng);
+        setLocation({
+          lat: data.results[0].geometry.location.lat,
+          long: data.results[0].geometry.location.lng
+        })
       });
   };
 
   //updates the weather when lat long changes
   useEffect(() => {
     fetch(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`,
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`,
       { signal }
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(lat)
-        console.log(long)
         setWeather(data);
       })
       .catch((err) => {
         console.log("error", err);
       });
     return () => controller.abort();
-  }, [lat, long]);
+  }, [location]);
 
   return (
     <Container>
       <ImageBackground source={bgImg} style={{ width: "100%", height: "100%" }}>
-        <ForecastSearch
-          city={city}
-          setCity={setCity}
-          fetchLatLongHandler={fetchLatLongHandler}
-          toggleSearch={toggleSearch}
-          setToggleSearch={setToggleSearch}
-          fetchByPostalHandler={fetchByPostalHandler}
-          setPostalCode={setPostalCode}
-          postalCode={postalCode}
-        />
+        <TouchableOpacity onPress={() => navigation.navigate('Search')}>
+          <ForecastSearch
+            city={city}
+            setCity={setCity}
+            fetchLatLongHandler={fetchLatLongHandler}
+            toggleSearch={toggleSearch}
+            setToggleSearch={setToggleSearch}
+            fetchByPostalHandler={fetchByPostalHandler}
+            setPostalCode={setPostalCode}
+            postalCode={postalCode}
+          />
+        </TouchableOpacity>
         <CurrentForecast currentWeather={weather} timezone={weather.timezone} />
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
           <FutureForecastContainer>
