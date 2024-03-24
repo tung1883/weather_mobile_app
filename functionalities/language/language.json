@@ -1,0 +1,35 @@
+{
+    "en": {
+        "translation": {
+            "locationPermission": {
+                "title": "Precise Weather Information",
+                "subtext": "Enabling location services will provide you with accurate weather forecasts, important local alerts and much more features",
+                "allowButton": "Allow Location Service",
+                "rejectButton": "No, I do not allow"
+            },
+            "searchPage": {
+                "placeholder": "Search for a city",
+                "currentLocation": "Use Current Location",
+                "popularSuggestion": "Popular Cities",
+                "searchSuggestion": "Suggestions"
+            }
+        }
+    },
+
+    "vn": {
+        "translation": {
+            "locationPermission": {
+                "title": "Dữ liệu thời tiết chuẩn xác",
+                "subtext": "Cho phép ứng dúng sử dụng vị trí sẽ giúp bạn có được dự báo thời tiết chính xác, cảnh báo quan trọng và nhiều tính năng khác",
+                "allowButton": "Cho phép sử dụng vị trí",
+                "rejectButton": "Không đồng ý sử dụng"
+            },
+            "searchPage": {
+                "placeholder": "Nhập tên thành phố bạn muốn tìm",
+                "currentLocation": "Sử dụng vị trí hiện tại",
+                "popularSuggestion": "Các thành phố nổi tiếng",
+                "searchSuggestion": "Gợi ý"
+            }
+        }
+    }
+}

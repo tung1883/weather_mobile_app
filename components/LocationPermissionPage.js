@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import * as Location from 'expo-location';
 import styled from "styled-components/native";
 import MapImg from "../assets/google_map_icon.png"
+import i18n from "../functionalities/language/i18n";
 
 export const LocationPermissionPage = ({navigation}) => {
     const requestLocationPermission = async () => {
@@ -22,17 +23,15 @@ export const LocationPermissionPage = ({navigation}) => {
         <Container>
             <Image source={MapImg} style={styles.image}></Image>
             <Text style={{fontSize: 18, fontWeight: 'bold', 
-                color: 'white', marginTop: 15, marginBottom: 15}}>Precise Weather Information</Text>
-            <Text style={styles.text}>
-                Enabling location services will provide you with 
-                accurate weather forecasts, important local alerts and much more features
+                color: 'white', marginTop: 15, marginBottom: 15}}>{i18n.t('locationPermission.title')}</Text>
+            <Text style={styles.text}>{i18n.t('locationPermission.subtext')}
             </Text>
 
             <TouchableOpacity 
                 onPress={requestLocationPermission}
                 style={{...styles.button, marginBottom: 20}}
             >
-                <Text style={styles.buttonText}>Allow Location Service </Text>
+                <Text style={styles.buttonText}>{i18n.t('locationPermission.allowButton')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
@@ -41,7 +40,7 @@ export const LocationPermissionPage = ({navigation}) => {
                 <Text 
                   onPress={() => navigation.replace('Search')}
                   style={styles.buttonText}
-                >No, I do not allow </Text>
+                >{i18n.t('locationPermission.rejectButton')} </Text>
             </TouchableOpacity>
         </Container>
     );
