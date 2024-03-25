@@ -1,10 +1,14 @@
-import React, { useEffect } from "react";
-import { Image, StyleSheet} from "react-native";
-import styled from "styled-components/native";
-import logoImg from "../assets/logo.png"
+import React, { useEffect, useContext } from "react";
+import { Image, StyleSheet, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import logoImg from "../assets/logo.png"
+import { lightStyles, darkStyles } from "./defaultStyles";
+import { ColorContext } from "./ColorContext";
+
 export const LoadingPage = ({navigation}) => {
+  const { isDarkMode } = useContext(ColorContext);
+  
   useEffect(() => {
       const timer = setTimeout(async () => {
           const notFirstTime = await AsyncStorage.getItem('notFirstTime') 
@@ -14,21 +18,24 @@ export const LoadingPage = ({navigation}) => {
   }, [navigation]);
 
   return (
-      <Container>
+      <View style={[styles.container, isDarkMode && styles.darkContainer]}>
       <Image source={logoImg} style={styles.image}></Image>
-      </Container>
+      </View>
   );
 };
 
-const Container = styled.View`
-  flex: 1;
-  background-color: #1E1E1E;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: lightStyles.bgColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  darkContainer: {
+    backgroundColor: darkStyles.bgColor
+  },
+
   image: {
     width: 100,
     height: 100,

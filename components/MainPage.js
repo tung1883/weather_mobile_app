@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, ImageBackground, Text } from "react-native";
-import ForecastSearch from "../components/ForecastSearch";
 import CurrentForecast from "../components/CurrentForecast";
 import DailyForecast from "../components/DailyForecast";
 import styled from "styled-components/native";
@@ -10,14 +9,13 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 
 const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigation, route }) => {
   useEffect(() => {
-    const getLocationInfo = async () => {
+    const getLocationDetails = async () => {
       try {
         const response = await fetch(
           `https://api.openweathermap.org/geo/1.0/reverse?lat=${location.lat}&lon=${location.long}&limit=1&appid=${config.API_KEY}`
         );
         const data = await response.json();
         const city = data[0].name;
-        // const country = data[0].country;
         setCity(city)
       } catch (error) {
         console.error('Error fetching location info:', error);
@@ -25,18 +23,18 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
     };
 
     if (!city) {
-      getLocationInfo()
+      getLocationDetails()
     }
   }, [])
 
   useEffect(() => {
     const fetchWeather = async () => {
-      fetchWeatherInfo().then(() => {
-        console.log(weather)
+      fetchWeatherInfo(city).then(() => {
+        console.log('here')
         // route?.params?.onDataFetchComplete() 
       })
     }
-
+    
     fetchWeather()
   }, [location])
 
@@ -46,7 +44,6 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
         <TouchableOpacity onPress={() => navigation.navigate('Search')}
           style={{borderWidth: 1, borderColor: 'black', backgroundColor: 'grey', height: 50}}
         >
-          <Text>Search</Text>
         </TouchableOpacity>
         <CurrentForecast currentWeather={weather} timezone={weather.timezone} />
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
