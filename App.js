@@ -117,7 +117,7 @@ const App = () => {
   return (
     <ColorProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Loading">
+        <Stack.Navigator initialRouteName="Search">
           <Stack.Screen name="Search" options={{ headerShown: false }}>
             {(navigation) => <SearchPage 
               {...navigation} setCity={setCity} getLocation={getLocation} fetchLatLongHandler={fetchLatLongHandler}

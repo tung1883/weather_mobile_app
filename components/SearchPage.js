@@ -18,7 +18,6 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => 
     const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
 
     const requestLocationPermission = async () => {
-        toggleTheme('dark')
         // try {
         //     if (isFetching) return
         //     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -37,9 +36,9 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => 
         //     `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${config.API_KEY}`
         //     )
         //     .then((response) => response.json())
-        //     .then((data) => { return {lat: data.coord.lat, long: data.coord.lon}})
+        //     .then((data) => { console.log(data); return {lat: data.coord.lat, long: data.coord.lon}})
         //     .then(({lat, long}) => {
-        //         fetch(
+        //         return fetch(
         //         `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`
         //         )
         //     }) 
@@ -53,7 +52,7 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => 
         //     .catch((err) => {
         //     console.log("error", err);
         // });
-        // 
+        
         // })
     };
 
