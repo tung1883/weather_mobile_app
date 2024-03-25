@@ -9,7 +9,7 @@ import { jsonWriter, loadAllData } from './jsonWriter';
 import { lightStyles, darkStyles } from './defaultStyles';
 import { ColorContext } from './ColorContext';
 
-const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => {
+const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFavoriteLocation, removeFavoriteLocation, addFavoriteLocationCounter }) => {
     const goBack = navigation?.canGoBack()
     const { isDarkMode, toggleTheme } = useContext(ColorContext);
     const [searchQuery, setSearchQuery] = useState('');
@@ -18,7 +18,6 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => 
     const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
 
     const requestLocationPermission = async () => {
-        toggleTheme('dark')
         // try {
         //     if (isFetching) return
         //     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -39,7 +38,7 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => 
         //     .then((response) => response.json())
         //     .then((data) => { return {lat: data.coord.lat, long: data.coord.lon}})
         //     .then(({lat, long}) => {
-        //         fetch(
+        //         return fetch(
         //         `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`
         //         )
         //     }) 
@@ -53,7 +52,7 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => 
         //     .catch((err) => {
         //     console.log("error", err);
         // });
-        // 
+        
         // })
     };
 
@@ -107,11 +106,12 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => 
         return (
             <TouchableOpacity style={[itemContainerStyle, isDarkMode && styles.darkItemContainer]} activeOpacity={1}
                 onPress={async () => {
-                    if (isFetching) return 
-                    setIsFetching(true)
-                    await fetchLatLongHandler(item)
-                    setCity(item)
-                    navigateToMainPage()
+                    // if (isFetching) return 
+                    // setIsFetching(true)
+                    // await fetchLatLongHandler(item)
+                    // setCity(item)
+                    // navigateToMainPage()
+                    addFavoriteLocationCounter(item)
                 }}
             >
                 <Text style={[styles.item, isDarkMode && styles.darkItem]}>{item}</Text>

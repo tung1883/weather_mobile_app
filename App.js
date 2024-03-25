@@ -23,6 +23,7 @@ const App = () => {
   });
   const [city, setCity] = useState('Hanoi')
   const [weather, setWeather] = useState({})
+  const [favoriteLocations, setFavoriteLocations] = useState([])
 
   //language
   const {t, i18n} = useTranslation(); 
@@ -40,15 +41,22 @@ const App = () => {
       AsyncStorage.removeItem('notFirstTime') //uncomment this and comment 3 lines to below to be first time user
       // if (notFirstTime === null) {
       //   AsyncStorage.setItem('notFirstTime', "true");
+      //   AsyncStorage.setItem('favoriteLocations', [])
       // }
     };
+  
+    const initFavoriteLocations = async () => {
+      await AsyncStorage.removeItem('favoriteLocations')
+      let locations = JSON.parse(await AsyncStorage.getItem('favoriteLocations'))
+      if (!locations) locations = []
+      sortFavoriteLocations(locations)
+      setFavoriteLocations(locations)
+    }
 
     checkUser();
-  }, []);
-
-  useEffect(() => {
     getLocation()
     fetchWeatherInfo()
+    initFavoriteLocations()
   }, []);
 
   const controller = new AbortController();
@@ -114,14 +122,87 @@ const App = () => {
     }
   };
 
+  const addFavoriteLocation = async (locationToAdd) => {
+    let list = favoriteLocations
+    if (!list) list = []
+    let isInList = false
+    list.find((locationObj) => {
+      if (locationObj?.location === locationToAdd) {
+        locationObj.favorite = true
+        isInList = true
+      }
+    })
+
+    if (!isInList) {
+      list.push({
+        location: locationToAdd,
+        counter: 0,
+        favorite: true
+      })
+    } 
+
+    sortFavoriteLocations(list)
+    setFavoriteLocations(list)
+    AsyncStorage.setItem('favoriteLocations', JSON.stringify(list))
+  }
+
+  //add 1 if user visit a location
+  const addFavoriteLocationCounter = async (locationToAdd) => {
+    let list = favoriteLocations
+    if (!list) list = []
+    let isInList = false
+    list.find((locationObj) => {
+      if (locationObj?.location === locationToAdd) {
+        locationObj.counter += 1
+        isInList = true
+      }
+    })
+
+    if (!isInList) {
+      list.push({
+        location: locationToAdd,
+        counter: 1,
+        favorite: false
+      })
+    } 
+
+    sortFavoriteLocations(list)
+    setFavoriteLocations(list)
+    AsyncStorage.setItem('favoriteLocations', JSON.stringify(list))
+  } 
+
+  const sortFavoriteLocations = async (list) => {
+    list.sort((a, b) => {
+      if (a.favorite === b.favorite) {
+        return b.counter - a.counter
+      } else {
+        return a.favorite ? -1 : 1;
+      }
+    });
+  }
+
+  const removeFavoriteLocation = async (locationToRemove) => {
+    const newFavoriteLocations = favoriteLocations.filter(locationObj => locationObj.location !== locationToRemove)
+    sortFavoriteLocations(list)
+    setFavoriteLocations(newFavoriteLocations)
+    await AsyncStorage.setItem('favoriteLocations', JSON.stringify(newFavoriteLocations))
+  }
+
+  const getFavoriteLocations = () => {
+    const list = favoriteLocations.filter(obj => obj.favorite)
+    return (list.length < 5) ? favoriteLocations.slice(0, 5) : list
+  }
+
   return (
     <ColorProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Loading">
+        <Stack.Navigator initialRouteName="Search">
           <Stack.Screen name="Search" options={{ headerShown: false }}>
             {(navigation) => <SearchPage 
               {...navigation} setCity={setCity} getLocation={getLocation} fetchLatLongHandler={fetchLatLongHandler}
-              fetchWeatherInfo={fetchWeatherInfo}
+              fetchWeatherInfo={fetchWeatherInfo} 
+              addFavoriteLocation={addFavoriteLocation} removeFavoriteLocation={removeFavoriteLocation}
+              addFavoriteLocationCounter={addFavoriteLocationCounter}
             ></SearchPage>}
           </Stack.Screen>
           <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
