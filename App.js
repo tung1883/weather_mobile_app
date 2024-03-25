@@ -26,7 +26,7 @@ const App = () => {
 
   //language
   const {t, i18n} = useTranslation(); 
-  const [currentLanguage,setLanguage] = useState ('en'); 
+  const [currentLanguage,setLanguage] = useState ('vn'); 
   const changeLanguage = (lang)=> { 
     i18n 
       .changeLanguage(lang) 
@@ -116,8 +116,7 @@ const App = () => {
 
   return (
     <ColorProvider>
-      <SearchPage></SearchPage>
-      {/* <NavigationContainer>
+      <NavigationContainer>
         <Stack.Navigator initialRouteName="Loading">
           <Stack.Screen name="Search" options={{ headerShown: false }}>
             {(navigation) => <SearchPage 
@@ -136,8 +135,8 @@ const App = () => {
                 location={location} setLocation={setLocation} 
                 weather={weather} setWeather={setWeather}/>}
             </Stack.Screen>
-        </Stack.Navigator> */}
-      {/* </NavigationContainer> */}
+        </Stack.Navigator>
+      </NavigationContainer>
     </ColorProvider>
   );
 };

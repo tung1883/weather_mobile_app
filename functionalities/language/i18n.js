@@ -5,7 +5,7 @@ import language from './language.json';
 i18n.use(initReactI18next).init({ 
     compatibilityJSON: 'v3',
     lng: 'vn', 
-    fallbackLng: 'en', 
+    fallbackLng: 'vn', 
     resources: { 
         en: language.en,
         vn: language.vn

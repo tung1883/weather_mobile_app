@@ -11,25 +11,26 @@ import { ColorContext } from './ColorContext';
 
 const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => {
     const goBack = navigation?.canGoBack()
-    const { isDarkMode } = useContext(ColorContext);
+    const { isDarkMode, toggleTheme } = useContext(ColorContext);
     const [searchQuery, setSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState(popularCities);
     const [listTitle, setListTitle] = useState("POPULAR CITIES")
     const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
 
     const requestLocationPermission = async () => {
-        try {
-            if (isFetching) return
-            const { status } = await Location.requestForegroundPermissionsAsync();
+        toggleTheme('dark')
+        // try {
+        //     if (isFetching) return
+        //     const { status } = await Location.requestForegroundPermissionsAsync();
             
-            if (status === 'granted') {
-                setIsFetching(true)
-                await getLocation()
-                navigateToMainPage()
-            }
-        } catch (error) {
-            console.error('Error requesting location permission: ', error);
-        }
+        //     if (status === 'granted') {
+        //         setIsFetching(true)
+        //         await getLocation()
+        //         navigateToMainPage()
+        //     }
+        // } catch (error) {
+        //     console.error('Error requesting location permission: ', error);
+        // }
 
         // popularCities.forEach(async (city) => {
         //     fetch(
