@@ -8,7 +8,7 @@ import bgImg from "../assets/background_light.png";
 import { SearchBar } from 'react-native-elements';
 
 const colors = {
-  taskbarBackground: 'rgba(255, 255, 255, 0.8)',
+  taskbarBackground: 'white',
   textColor: 'black',
   buttonColor: 'rgba(0, 0, 0, 0.5)',
   buttonTextColor: 'white',
@@ -75,26 +75,7 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
   return (
     <Container>
       <ImageBackground source={bgImg} style={{ width: "100%", height: "100%" }}>
-        <Animated.View style={{ position: 'absolute', top: 0, left: 0, width: taskbarWidth, height: "100%", backgroundColor: colors.taskbarBackground, opacity: taskbarOpacity }}>
-          <GridItem>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-      <TaskbarItem text="Location" onPress={() => console.log('Edit location')} />
-      <TaskbarItem text="Edit" onPress={() => console.log('Edit')} />
-    </View>
-          </GridItem>
-          <GridItem>
-            <TaskbarItem text="Hoàn Kiếm, Vn" onPress={() => console.log('View more locations')} />
-          </GridItem>
-          <GridItem>
-            <TaskbarItem text="Add Widget to home Screen" onPress={() => console.log('Add Widget to home Screen')} />
-          </GridItem>
-          <GridItem>
-          <TaskbarItem text="Daily Summary Notifications" onPress={() => console.log('Daily Summary Notifications')} />
-          </GridItem>
-          <GridItem>
-            <TaskbarItem text="Settings" onPress={() => console.log('Settings')} />
-          </GridItem>
-        </Animated.View>
+        
         <TouchableOpacity onPress={() => setIsTaskbarOpen(!isTaskbarOpen)} 
           style={{ position: 'absolute', top: 20, right: 20, zIndex: 1, borderRadius: sizes.buttonRadius, backgroundColor: colors.buttonColor, padding: sizes.buttonPadding }}
         >
@@ -115,6 +96,79 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
           </FutureForecastContainer>
         </ScrollView>
       </ImageBackground>
+        <Animated.View style={{ 
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          width: taskbarWidth, 
+          height: "100%", 
+          backgroundColor: colors.taskbarBackground, 
+          opacity: taskbarOpacity, 
+          zIndex: 10 }}>
+           <GridItem style={{ borderWidth: 0.1, top: 40 }}>
+          <View style ={{
+            padding: 30
+          }}>
+          <TaskbarItem text="Weather"/>
+          </View>
+          </GridItem>
+          <View style= {{
+            top :50,
+          }}> 
+          <GridItem style={{ borderWidth: 0.1 }}> 
+          <GridItem style={{ borderWidth: 0 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
+            <TaskbarItem text="Location" onPress={() => console.log('Edit location')} />
+            <TaskbarItem text="Edit" onPress={() => console.log('Edit')} />
+          </View>
+          </GridItem>
+           
+          <GridItem style={{ borderWidth: 0 }}>  
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
+            <TaskbarItem text="Hoàn Kiếm, Vn" onPress={() => console.log('View more locations')} />
+            <TaskbarItem text="22 C" onPress={() => console.log('View more locations')} />
+            </View>
+          </GridItem>
+          <GridItem style={{ borderWidth: 0 }}>
+          <View style={{ padding: 10 }}>
+            <TaskbarItem text="View more locations" onPress={() => console.log('View more locations')} />
+            </View>
+          </GridItem>
+          </GridItem>
+          <GridItem style={{ borderWidth: 0.1 }}> 
+          <GridItem style={{ borderWidth: 0 }}>
+            <View style={{ padding: 10 }}>
+            <TaskbarItem text="Add Widget to home Screen" onPress={() => console.log('Add Widget to home Screen')} />
+            </View>
+          </GridItem>
+          <GridItem style={{ borderWidth: 0 }}>
+          <View style={{ padding: 10 }}>
+          <TaskbarItem text="Daily Summary Notifications" onPress={() => console.log('Daily Summary Notifications')} />
+          </View>
+          </GridItem>
+          </GridItem>
+          <GridItem style={{ borderWidth: 0.1 }}>
+          <View style={{ padding: 10 }}>
+            <TaskbarItem text="Settings" onPress={() => console.log('Settings')} />
+            </View>
+          </GridItem>
+          <GridItem style={{ borderWidth: 0.1 }}>
+          <View style={{ padding: 10 }}>
+            <TaskbarItem text="AdChoices" onPress={() => console.log('AdChoices')} />
+            </View>
+          </GridItem>
+          <GridItem style={{ borderWidth: 0.1 }}>
+          <View style={{ padding: 10 }}>
+            <TaskbarItem text="Help" onPress={() => console.log('Help')} />
+            </View>
+          </GridItem>
+          <GridItem style={{ borderWidth: 0.1 }}>
+          <View style={{ padding: 10 }}>
+            <TaskbarItem text="Remove ads" onPress={() => console.log('Remove ads')} />
+            </View>
+          </GridItem>
+          </View>
+        </Animated.View>
     </Container>
   );
 };
