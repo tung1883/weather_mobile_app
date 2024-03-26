@@ -1,46 +1,75 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, ImageBackground, Text, Animated, TouchableOpacity, View } from "react-native";
+import { ScrollView, ImageBackground, Image, Text, Animated, TouchableOpacity, View, StyleSheet, FlatList} from "react-native";
 import CurrentForecast from "../components/CurrentForecast";
 import DailyForecast from "../components/DailyForecast";
 import styled from "styled-components/native";
 import config from "../config";
 import bgImg from "../assets/background_light.png";
+import logoImg from "../assets/logo.png"
 import { SearchBar } from 'react-native-elements';
-
-const colors = {
-  taskbarBackground: 'white',
-  textColor: 'black',
-  buttonColor: 'rgba(0, 0, 0, 0.5)',
-  buttonTextColor: 'white',
-};
-
-const sizes = {
-  buttonRadius: 10,
-  buttonPadding: 10,
-  taskbarMarginTop: 20,
-  taskbarPaddingHorizontal: 20,
-  gridItemPadding: 10,
-  gridItemBorderWidth: 1,
-};
-
-const GridItem = styled.View`
-  border: 2px solid #000; /* Màu viền */
-  padding: 5px;
-  margin-bottom: 5px;
-  border-radius: 5px; /* Bo tròn góc */
-`;
-
-const TaskbarItem = ({ text, onPress }) => (
-  <TouchableOpacity onPress={onPress} style={{ paddingHorizontal: sizes.taskbarPaddingHorizontal }}>
-    <Text>{text}</Text>
-  </TouchableOpacity>
-);
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigation, route }) => {
-  const [isTaskbarOpen, setIsTaskbarOpen] = useState(false);
+  const [isTaskbarOpen, setIsTaskbarOpen] = useState(true);
 
-  const taskbarWidth = isTaskbarOpen ? '66%' : '0%';
-  const taskbarOpacity = isTaskbarOpen ? 1 : 0;
+  //3 following lists are just for UI
+  const locations = [
+    {'name': 'Hoan Kiem, VN', icon: <MaterialCommunityIcons name='weather-cloudy' size={16}/>, temp: '23°'},
+    {'name': 'New York City', icon: <MaterialCommunityIcons name='weather-cloudy' size={16}/>, temp: '24°'},
+    {'name': 'Ho Chi Minh', icon: <MaterialCommunityIcons name='weather-cloudy' size={16}/>, temp: '25°'}
+  ]
+
+  const featureList = [
+    {icon: <MaterialCommunityIcons name='widgets' color='#87CEEB' size={18}/>, title: 'Add Widgets to Home Screen'},
+    {icon: <MaterialCommunityIcons name='bell' color='#FFDB58' size={18}/>, title: 'Daily Summary Notification'},
+    {icon: <MaterialCommunityIcons name='account-plus' color='#32CD32' size={18}/>, title: 'Refer a Friend'}
+  ]
+
+  const settingList = [
+    'Settings', 'Restore to AdFree', 'AdChoices', 'Help', 'Remove Ads', 'Privacy Settings', 'About'
+  ]
+
+  const renderLocation = ( {item, index} ) => {
+    selectedTextStyle = (index === selectedLocation) ? {color: '#2D5DA1', fontSize: 16, fontWeight: 'bold'} : {}
+    return (
+      <TouchableOpacity 
+        onPress={() => setSelectedLocation(index)}
+        style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8}}
+      >
+        <Text style={[{fontSize: 15}, selectedTextStyle]}>{item.name}</Text>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          {index === selectedLocation && <MaterialCommunityIcons name='navigation-variant' color='#2D5DA1' size={20} style={{marginRight: 5}}></MaterialCommunityIcons>}
+          {item.icon}
+          <Text style={{paddingLeft: 10}}>{item.temp}</Text>
+        </View>
+      </TouchableOpacity>
+    )
+  }
+
+  const renderFeatures = ( {item, index} ) => {
+    return (
+      <TouchableOpacity style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
+        paddingVertical: 10}}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          {item.icon}
+          <Text style={{paddingLeft: 5}}>{item.title}</Text>
+        </View>
+        <MaterialCommunityIcons name='chevron-right' size={20}></MaterialCommunityIcons>
+      </TouchableOpacity>
+    )
+  }
+
+  const renderSettings = ( {item, index} ) => {
+    return (
+      <TouchableOpacity style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
+        paddingVertical: 10}}>
+        <Text style={{fontSize: 15}}>{item}</Text>
+        <MaterialCommunityIcons name='chevron-right' size={20}></MaterialCommunityIcons>
+      </TouchableOpacity>
+    )
+  }
+
+  const [selectedLocation, setSelectedLocation] = useState(0)
 
   useEffect(() => {
     const getLocationDetails = async () => {
@@ -75,11 +104,10 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
   return (
     <Container>
       <ImageBackground source={bgImg} style={{ width: "100%", height: "100%" }}>
-        
         <TouchableOpacity onPress={() => setIsTaskbarOpen(!isTaskbarOpen)} 
-          style={{ position: 'absolute', top: 20, right: 20, zIndex: 1, borderRadius: sizes.buttonRadius, backgroundColor: colors.buttonColor, padding: sizes.buttonPadding }}
+          style={{ position: 'absolute', top: 20, right: 20, zIndex: 1}}
         >
-          <Text style={{ color: colors.buttonTextColor, fontSize: 16 }}>Search</Text>
+          <Text style={{ color: 'black', fontSize: 16 }}>Search</Text>
         </TouchableOpacity>
         <CurrentForecast currentWeather={weather} timezone={weather.timezone} />
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
@@ -96,82 +124,86 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
           </FutureForecastContainer>
         </ScrollView>
       </ImageBackground>
-        <Animated.View style={{ 
-          position: 'absolute', 
-          top: 0, 
-          left: 0, 
-          width: taskbarWidth, 
-          height: "100%", 
-          backgroundColor: colors.taskbarBackground, 
-          opacity: taskbarOpacity, 
-          zIndex: 10 }}>
-           <GridItem style={{ borderWidth: 0.1, top: 40 }}>
-          <View style ={{
-            padding: 30
-          }}>
-          <TaskbarItem text="Weather"/>
+      
+      {isTaskbarOpen && 
+      <View style={styles.taskbar}>
+        {/* logo */}
+        <View style ={[styles.grid, {flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingBottom: 30}]}>
+          <Image source={logoImg} style={styles.taskbarLogo}></Image>
+          <Text style={{marginLeft: 10, fontWeight: 'bold', fontSize: 18}}>OpenWeather</Text>
+        </View>
+
+        {/* locations */}
+        <View> 
+          <View style={[styles.grid, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
+              <Text style={{fontWeight: 'bold'}}>Locations</Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <MaterialCommunityIcons name='pencil' size={16}></MaterialCommunityIcons>
+                <Text style={{paddingLeft: 5, paddingRight: 2}}>Edit</Text>
+              </View>
           </View>
-          </GridItem>
-          <View style= {{
-            top :50,
-          }}> 
-          <GridItem style={{ borderWidth: 0.1 }}> 
-          <GridItem style={{ borderWidth: 0 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
-            <TaskbarItem text="Location" onPress={() => console.log('Edit location')} />
-            <TaskbarItem text="Edit" onPress={() => console.log('Edit')} />
+          <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.20, borderBottomColor: 'grey'}}>
+            <FlatList
+                data={locations}
+                renderItem={({item, index}) => renderLocation({ item, index })}
+                keyExtractor={(item) => {item}}
+                style={{width: '100%'}}
+            />
+            <TouchableOpacity>
+              <View style={{width: '100%', flexDirection: 'row', alignItems: 'center', 
+                justifyContent: 'space-between', paddingVertical: 5, paddingRight: 0}}>
+                <Text style={{fontSize: 15}}>View 1 more locations</Text>
+                <MaterialCommunityIcons name='chevron-down' size={20}></MaterialCommunityIcons>
+              </View>
+            </TouchableOpacity>
           </View>
-          </GridItem>
-           
-          <GridItem style={{ borderWidth: 0 }}>  
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10 }}>
-            <TaskbarItem text="Hoàn Kiếm, Vn" onPress={() => console.log('View more locations')} />
-            <TaskbarItem text="22 C" onPress={() => console.log('View more locations')} />
-            </View>
-          </GridItem>
-          <GridItem style={{ borderWidth: 0 }}>
-          <View style={{ padding: 10 }}>
-            <TaskbarItem text="View more locations" onPress={() => console.log('View more locations')} />
-            </View>
-          </GridItem>
-          </GridItem>
-          <GridItem style={{ borderWidth: 0.1 }}> 
-          <GridItem style={{ borderWidth: 0 }}>
-            <View style={{ padding: 10 }}>
-            <TaskbarItem text="Add Widget to home Screen" onPress={() => console.log('Add Widget to home Screen')} />
-            </View>
-          </GridItem>
-          <GridItem style={{ borderWidth: 0 }}>
-          <View style={{ padding: 10 }}>
-          <TaskbarItem text="Daily Summary Notifications" onPress={() => console.log('Daily Summary Notifications')} />
+        </View>
+      
+        {/* special features */}
+        <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.20, borderBottomColor: 'grey'}}>
+            <FlatList
+                data={featureList}
+                renderItem={({item, index}) => renderFeatures({ item, index })}
+                keyExtractor={(item) => {item}}
+                style={{width: '100%'}}
+            />
           </View>
-          </GridItem>
-          </GridItem>
-          <GridItem style={{ borderWidth: 0.1 }}>
-          <View style={{ padding: 10 }}>
-            <TaskbarItem text="Settings" onPress={() => console.log('Settings')} />
-            </View>
-          </GridItem>
-          <GridItem style={{ borderWidth: 0.1 }}>
-          <View style={{ padding: 10 }}>
-            <TaskbarItem text="AdChoices" onPress={() => console.log('AdChoices')} />
-            </View>
-          </GridItem>
-          <GridItem style={{ borderWidth: 0.1 }}>
-          <View style={{ padding: 10 }}>
-            <TaskbarItem text="Help" onPress={() => console.log('Help')} />
-            </View>
-          </GridItem>
-          <GridItem style={{ borderWidth: 0.1 }}>
-          <View style={{ padding: 10 }}>
-            <TaskbarItem text="Remove ads" onPress={() => console.log('Remove ads')} />
-            </View>
-          </GridItem>
-          </View>
-        </Animated.View>
+
+        {/* settings */}
+        <View style={{padding: 10}}>
+          <FlatList
+              data={settingList}
+              renderItem={({item, index}) => renderSettings({ item, index })}
+              keyExtractor={(item) => {item}}
+              style={{width: '100%'}}
+          />
+        </View>
+      </View>}
     </Container>
   );
 };
+
+const styles = StyleSheet.create({
+  taskbar: { 
+      position: 'absolute', 
+      top: 0, 
+      left: 0, 
+      width: '67%', 
+      height: "100%", 
+      backgroundColor: 'white', 
+  },
+  taskbarLogo: {
+    width: 40,
+    height: 40
+  },
+  grid: {
+    padding: 10,
+    paddingLeft: 10,
+    marginBottom: 5,
+    borderBottomWidth: 0.20,
+    borderBottomColor: 'grey'
+  }
+})
 
 const Container = styled.View`
   flex: 1;

@@ -15,6 +15,7 @@
     "@react-navigation/drawer": "^6.6.15",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.29",
+    "d3-scale": "^4.0.2",
     "expo": "~50.0.13",
     "expo-file-system": "~16.0.8",
     "expo-location": "~16.5.5",
@@ -30,6 +31,7 @@
     "react-native-gesture-handler": "~2.14.0",
     "react-native-maps": "^1.11.3",
     "react-native-permissions": "^4.1.4",
+    "react-native-svg": "^15.1.0",
     "react-native-web": "~0.19.6",
     "styled-components": "^6.1.8"
   },
