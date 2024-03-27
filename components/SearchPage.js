@@ -9,7 +9,7 @@ import { jsonWriter, loadAllData } from './jsonWriter';
 import { lightStyles, darkStyles } from './defaultStyles';
 import { ColorContext } from './ColorContext';
 
-const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => {
+const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFavoriteLocation, removeFavoriteLocation, addFavoriteLocationCounter }) => {
     const goBack = navigation?.canGoBack()
     const { isDarkMode, toggleTheme } = useContext(ColorContext);
     const [searchQuery, setSearchQuery] = useState('');
@@ -106,11 +106,12 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler }) => 
         return (
             <TouchableOpacity style={[itemContainerStyle, isDarkMode && styles.darkItemContainer]} activeOpacity={1}
                 onPress={async () => {
-                    if (isFetching) return 
-                    setIsFetching(true)
-                    await fetchLatLongHandler(item)
-                    setCity(item)
-                    navigateToMainPage()
+                    // if (isFetching) return 
+                    // setIsFetching(true)
+                    // await fetchLatLongHandler(item)
+                    // setCity(item)
+                    // navigateToMainPage()
+                    addFavoriteLocationCounter(item)
                 }}
             >
                 <Text style={[styles.item, isDarkMode && styles.darkItem]}>{item}</Text>
