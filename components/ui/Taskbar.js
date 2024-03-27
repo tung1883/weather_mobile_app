@@ -1,22 +1,49 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { StyleSheet, View, FlatList, TouchableOpacity, Image, Text } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import logoImg from '../../assets/logo.png'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export default Taskbar = ({navigation}) => {
+export default Taskbar = ({navigation, fetchWeatherInfo}) => {
     const [selectedLocation, setSelectedLocation] = useState(0)
+    const [locationList, setLocationList] = useState([])
+    const [isViewingMore, setIsViewingMore] = useState(false) //to change the UI when click "view more locations"
+
+    useEffect(() => {
+      let fetchLocationList = async () => {
+        AsyncStorage.getItem('favoriteLocations')
+        .then((result) => {
+          return JSON.parse(result)
+        })
+        .then((data) => {
+          let tempList = []
+          data.forEach(async (item, index) => {
+            const locationData = await JSON.parse(await AsyncStorage.getItem(item.location))
+            if (locationData) {
+              tempList.push({name: item.location, icon: locationData.current.weather[0].icon, temp: Math.round(locationData.current.temp)})
+            }
+          
+            if (index === data.length - 1 || index > 9) {
+              return setLocationList(tempList)
+            }
+          })
+        })
+      }
+
+      fetchLocationList()
+    }, [])
 
     //3 following lists are just for UI
-    const locations = [
-        {'name': 'Hoan Kiem, VN', icon: <MaterialCommunityIcons name='weather-cloudy' size={16}/>, temp: '23°'},
-        {'name': 'New York City', icon: <MaterialCommunityIcons name='weather-cloudy' size={16}/>, temp: '24°'},
-        {'name': 'Ho Chi Minh', icon: <MaterialCommunityIcons name='weather-cloudy' size={16}/>, temp: '25°'}
-    ]
+    // const locations = [
+    //     {'name': 'Hoan Kiem, VN', icon: '10n', temp: 23},
+    //     {'name': 'New York City', icon: '03d', temp: 24},
+    //     {'name': 'Ho Chi Minh', icon: '03d', temp: 25}
+    // ]
 
     const featureList = [
-        {icon: <MaterialCommunityIcons name='widgets' color='#87CEEB' size={18}/>, title: 'Add Widgets to Home Screen'},
-        {icon: <MaterialCommunityIcons name='bell' color='#FFDB58' size={18}/>, title: 'Daily Summary Notification'},
+        {icon: <MaterialCommunityIcons name='widgets' color='#87CEEB' size={18}/>, title: 'Add Widgets to Home Screen', page: 'WidgetSettings'},
+        {icon: <MaterialCommunityIcons name='bell' color='#FFDB58' size={18}/>, title: 'Daily Summary Notification', page: 'NotificationSettings'},
         {icon: <MaterialCommunityIcons name='account-plus' color='#32CD32' size={18}/>, title: 'Refer a Friend'}
     ]
 
@@ -25,17 +52,17 @@ export default Taskbar = ({navigation}) => {
     ]
 
     const renderLocation = ( {item, index} ) => {
-        selectedTextStyle = (index === selectedLocation) ? {color: '#2D5DA1', fontSize: 16, fontWeight: 'bold'} : {}
+        selectedTextStyle = (item.name === selectedLocation) ? {color: '#2D5DA1', fontSize: 16, fontWeight: 'bold'} : {}
         return (
         <TouchableOpacity 
-            onPress={() => setSelectedLocation(index)}
+            onPress={() => setSelectedLocation(item.name)}
             style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8}}
         >
             <Text style={[{fontSize: 15}, selectedTextStyle]}>{item.name}</Text>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            {index === selectedLocation && <MaterialCommunityIcons name='navigation-variant' color='#2D5DA1' size={20} style={{marginRight: 5}}></MaterialCommunityIcons>}
-            {item.icon}
-            <Text style={{paddingLeft: 10}}>{item.temp}</Text>
+            {item.name === selectedLocation && <MaterialCommunityIcons name='navigation-variant' color='#2D5DA1' size={20} style={{marginRight: 5}}></MaterialCommunityIcons>}
+            <Image style={{width: 35, height: 20}} source={{uri: `https://openweathermap.org/img/wn/${item.icon}@2x.png`}}></Image>
+            <Text style={{paddingLeft: 10}}>{item.temp + '°'}</Text>
             </View>
         </TouchableOpacity>
         )
@@ -43,7 +70,12 @@ export default Taskbar = ({navigation}) => {
 
     const renderFeatures = ( {item, index} ) => {
         return (
-        <TouchableOpacity style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
+        <TouchableOpacity 
+          onPress={() => {
+            if (index == 2) return
+            navigation.navigate(item.page)
+          }}
+          style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
             paddingVertical: 10}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
             {item.icon}
@@ -56,7 +88,7 @@ export default Taskbar = ({navigation}) => {
 
     const renderSettings = ( {item, index} ) => {
         return (
-        <TouchableOpacity
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}
             style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
                 paddingVertical: 10}}>
             <Text style={{fontSize: 15}}>{item}</Text>
@@ -77,7 +109,9 @@ export default Taskbar = ({navigation}) => {
           <View> 
             <View style={[styles.grid, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
               <Text style={{fontWeight: 'bold'}}>Locations</Text>
-              <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center'}}>
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('LocationSettings')}
+                style={{flexDirection: 'row', alignItems: 'center'}}>
                 <MaterialCommunityIcons name='pencil' size={16}></MaterialCommunityIcons>
                 <Text style={{paddingLeft: 5, paddingRight: 2}}>Edit</Text>
               </TouchableOpacity>
@@ -85,16 +119,27 @@ export default Taskbar = ({navigation}) => {
             
             <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.2, borderBottomColor: 'grey'}}>
               <FlatList
-                  data={locations}
+                  data={locationList.slice(0, 3)}
                   renderItem={({item, index}) => renderLocation({ item, index })}
                   keyExtractor={(item) => item.name}
                   style={{width: '100%'}}
               />
-              <TouchableOpacity>
+              {
+                isViewingMore && 
+                <FlatList
+                  data={locationList.slice(3, 11)}
+                  renderItem={({item, index}) => renderLocation({ item, index })}
+                  keyExtractor={(item) => item.name}
+                  style={{width: '100%'}}
+              />
+              }
+              <TouchableOpacity
+                onPress={() => setIsViewingMore(!isViewingMore)}
+              >
                 <View style={{width: '100%', flexDirection: 'row', alignItems: 'center', 
                   justifyContent: 'space-between', paddingVertical: 5, paddingRight: 0}}>
-                  <Text style={{fontSize: 15}}>View 1 more locations</Text>
-                  <MaterialCommunityIcons name='chevron-down' size={20}></MaterialCommunityIcons>
+                  <Text style={{fontSize: 15}}>{(isViewingMore) ? 'View fewer locations' : `View ${locationList.length - 3} more locations`}</Text>
+                  <MaterialCommunityIcons name={(isViewingMore) ? 'chevron-up' : 'chevron-down'} size={20}></MaterialCommunityIcons>
                 </View>
               </TouchableOpacity>
             </View>

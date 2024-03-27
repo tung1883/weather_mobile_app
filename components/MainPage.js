@@ -74,7 +74,7 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
               </TouchableOpacity>
               <View style={{paddingLeft: 30}}>
                 <Text style={{fontSize: 20, fontWeight: 'bold', color:  'white'}}>{currentLocation}</Text>
-                <Text style={{color: 'white'}}>{formattedTime}</Text>
+                {weather && <Text style={{color: 'white'}}>{formattedTime}</Text>}
               </View>
               <View>
               </View>
@@ -98,7 +98,7 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
       </TouchableOpacity>
 
       
-      {isTaskbarOpen && <Taskbar navigation={navigation}></Taskbar>}
+      {isTaskbarOpen && <Taskbar navigation={navigation} fetchWeatherInfo={fetchWeatherInfo}></Taskbar>}
     </View>
   );
 };

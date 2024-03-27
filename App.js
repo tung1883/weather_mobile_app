@@ -13,6 +13,10 @@ import { LocationPermissionPage } from './components/LocationPermissionPage';
 import SearchPage from './components/SearchPage';
 import config from './config'
 import { ColorProvider } from './components/ColorContext';
+import Settings from './components/settingsPages/Settings';
+import WidgetSettings from './components/settingsPages/WidgetSetting';
+import LocationSettings from './components/settingsPages/LocationSettings';
+import NotificationSettings from './components/settingsPages/NotificationSettings'
 
 const Stack = createStackNavigator();
 
@@ -47,7 +51,6 @@ const App = () => {
     };
   
     const initFavoriteLocations = async () => {
-      await AsyncStorage.removeItem('favoriteLocations')
       let locations = JSON.parse(await AsyncStorage.getItem('favoriteLocations'))
       if (!locations) locations = []
       sortFavoriteLocations(locations)
@@ -218,6 +221,10 @@ const App = () => {
                 location={location} setLocation={setLocation} 
                 weather={weather} setWeather={setWeather}/>}
             </Stack.Screen>
+          <Stack.Screen name='Settings' options={{headerShown: false}}>{(navigation) => <Settings {...navigation}/>}</Stack.Screen>
+          <Stack.Screen name='WidgetSettings' options={{headerShown: false}}>{(navigation) => <WidgetSettings {...navigation}/>}</Stack.Screen>
+          <Stack.Screen name='LocationSettings' options={{headerShown: false}}>{(navigation) => <LocationSettings {...navigation}/>}</Stack.Screen>
+          <Stack.Screen name='NotificationSettings' options={{headerShown: false}}>{(navigation) => <NotificationSettings {...navigation}/>}</Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     </ColorProvider>

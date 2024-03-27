@@ -103,7 +103,7 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFa
                     <MaterialCommunityIcons 
                         name="arrow-left" size={24} color={isDarkMode ? "white" : "black"}
                         style={{margin: -3, padding: -3, marginRight: 15}}
-                        onPress={() => {navigation.goBack()}}
+                        onPress={() => {navigation?.goBack()}}
                     />
                 }
                 <View style={[styles.searchBar, isDarkMode && styles.darkSearchBar]}>
