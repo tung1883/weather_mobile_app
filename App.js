@@ -5,7 +5,6 @@ import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import i18n from './functionalities/language/i18n';
-import { EventProvider } from 'react-native-outside-press';
 
 import MainPage from "./components/MainPage";
 import { LoadingPage } from './components/LoadingPage';
