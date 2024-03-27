@@ -8,7 +8,7 @@ import config from '../config';
 import { lightStyles, darkStyles } from './defaultStyles';
 import { ColorContext } from './ColorContext';
 
-const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFavoriteLocation, removeFavoriteLocation, addFavoriteLocationCounter }) => {
+const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFavoriteLocation, removeFavoriteLocation, addFavoriteLocationCounter }) => {    
     const goBack = navigation?.canGoBack()
     const { isDarkMode, toggleTheme } = useContext(ColorContext);
     const [searchQuery, setSearchQuery] = useState('');

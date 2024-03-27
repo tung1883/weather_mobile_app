@@ -1,237 +1,122 @@
-import React, { useEffect, useState } from "react";
-import { ScrollView, ImageBackground, Image, Text, TouchableOpacity, View, StyleSheet, FlatList} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { ImageBackground, Text, TouchableOpacity, View, StyleSheet, Dimensions } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import styled from "styled-components/native";
-import OutsidePressHandler from "react-native-outside-press";
 
-import CurrentForecast from "./CurrentForecast";
-import DailyForecast from "./DailyForecast";
 import config from "../config";
-import bgImg from "../assets/background_light.png";
-import logoImg from "../assets/logo.png"
+import darkBgImg from '../assets/background_dark.png'
+import { lightStyles, darkStyles } from "./defaultStyles";
+import WeatherPage from "./ui/WeatherPage";
+import Taskbar from "./ui/Taskbar";
 
 const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigation, route }) => {
-  const [isTaskbarOpen, setIsTaskbarOpen] = useState(false);
-
-  //3 following lists are just for UI
-  const locations = [
-    {'name': 'Hoan Kiem, VN', icon: <MaterialCommunityIcons name='weather-cloudy' size={16}/>, temp: '23°'},
-    {'name': 'New York City', icon: <MaterialCommunityIcons name='weather-cloudy' size={16}/>, temp: '24°'},
-    {'name': 'Ho Chi Minh', icon: <MaterialCommunityIcons name='weather-cloudy' size={16}/>, temp: '25°'}
-  ]
-
-  const featureList = [
-    {icon: <MaterialCommunityIcons name='widgets' color='#87CEEB' size={18}/>, title: 'Add Widgets to Home Screen'},
-    {icon: <MaterialCommunityIcons name='bell' color='#FFDB58' size={18}/>, title: 'Daily Summary Notification'},
-    {icon: <MaterialCommunityIcons name='account-plus' color='#32CD32' size={18}/>, title: 'Refer a Friend'}
-  ]
-
-  const settingList = [
-    'Settings', 'Restore to AdFree', 'AdChoices', 'Help', 'Remove Ads', 'Privacy Settings', 'About'
-  ]
-
-  const renderLocation = ( {item, index} ) => {
-    selectedTextStyle = (index === selectedLocation) ? {color: '#2D5DA1', fontSize: 16, fontWeight: 'bold'} : {}
-    return (
-      <TouchableOpacity 
-        onPress={() => setSelectedLocation(index)}
-        style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8}}
-      >
-        <Text style={[{fontSize: 15}, selectedTextStyle]}>{item.name}</Text>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          {index === selectedLocation && <MaterialCommunityIcons name='navigation-variant' color='#2D5DA1' size={20} style={{marginRight: 5}}></MaterialCommunityIcons>}
-          {item.icon}
-          <Text style={{paddingLeft: 10}}>{item.temp}</Text>
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
-  const renderFeatures = ( {item, index} ) => {
-    return (
-      <TouchableOpacity style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
-        paddingVertical: 10}}>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          {item.icon}
-          <Text style={{paddingLeft: 5}}>{item.title}</Text>
-        </View>
-        <MaterialCommunityIcons name='chevron-right' size={20}></MaterialCommunityIcons>
-      </TouchableOpacity>
-    )
-  }
-
-  const renderSettings = ( {item, index} ) => {
-    return (
-      <TouchableOpacity style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
-        paddingVertical: 10}}>
-        <Text style={{fontSize: 15}}>{item}</Text>
-        <MaterialCommunityIcons name='chevron-right' size={20}></MaterialCommunityIcons>
-      </TouchableOpacity>
-    )
-  }
-
-  const [selectedLocation, setSelectedLocation] = useState(0)
+  const [isTaskbarOpen, setIsTaskbarOpen] = useState(false);  
+  const [formattedTime, setFormattedTime] = useState('');
+  const intervals = useRef([])
+  const [currentLocation, setCurrentLocation] = useState((city) ? city : '') //used for render the location in header UI
+  const [currentSection, setCurrentSection] = useState(0) //used to move between different weather sections, 0 is for today weather, see sectionList in Footer.js for more details
 
   useEffect(() => {
-    const getLocationDetails = async () => {
-      try {
-        const response = await fetch(
-          `https://api.openweathermap.org/geo/1.0/reverse?lat=${location.lat}&lon=${location.long}&limit=1&appid=${config.API_KEY}`
-        );
-        const data = await response.json();
-        const city = data[0].name;
-        setCity(city)
-      } catch (error) {
-        console.error('Error fetching location info:', error);
-      }
-    };
-
-    if (!city) {
-      getLocationDetails()
-    }
+    getLocationDetails()
   }, []);
 
   useEffect(() => {
     const fetchWeather = async () => {
       fetchWeatherInfo(city).then(() => {
         // route?.params?.onDataFetchComplete() 
+        getLocationDetails()
       })
     }
-    
+  
     fetchWeather()
   }, [location]);
 
-  return (
-    <Container>
-      <ImageBackground source={bgImg} style={{ width: "100%", height: "100%" }}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => {console.log(true);setIsTaskbarOpen(true)}}>
-            <MaterialCommunityIcons name='menu' size={20}></MaterialCommunityIcons>
-          </TouchableOpacity>
-        </View>
-        <CurrentForecast currentWeather={weather} timezone={weather.timezone} />
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
-          <FutureForecastContainer>
-            {weather.daily ? (
-              weather.daily.map((day, index) => {
-                if (index !== 0) {
-                  return <DailyForecast key={day.dt} day={day} index={index} />;
-                }
-              })
-            ) : (
-              <NoWeather>No Weather to show</NoWeather>
-            )}
-          </FutureForecastContainer>
-        </ScrollView>
-      </ImageBackground>
-      
-      {isTaskbarOpen && 
-      // <OutsidePressHandler onOutsidePress={() => {
-      //   if (isTaskbarOpen) setIsTaskbarOpen(false)
-      // }}>
-        <View style={styles.taskbar}>
-          {/* logo */}
-          <View style ={[styles.grid, {flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingBottom: 30}]}>
-            <Image source={logoImg} style={styles.taskbarLogo}></Image>
-            <Text style={{marginLeft: 10, fontWeight: 'bold', fontSize: 18}}>OpenWeather</Text>
-          </View>
+  useEffect(() => {
+    getTime()
 
-          {/* locations */}
-          <View> 
-            <View style={[styles.grid, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
-              <Text style={{fontWeight: 'bold'}}>Locations</Text>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <MaterialCommunityIcons name='pencil' size={16}></MaterialCommunityIcons>
-                <Text style={{paddingLeft: 5, paddingRight: 2}}>Edit</Text>
+    return () => intervals.current.forEach(clearInterval);
+  }, [weather]);
+
+  const getLocationDetails = async () => {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/geo/1.0/reverse?lat=${location.lat}&lon=${location.long}&limit=1&appid=${config.API_KEY}`
+      );
+      const data = await response.json();
+      const city = data[0].name;
+      const country = data[0].country
+      setCity(city)
+      setCurrentLocation(`${city}, ${country}`)
+    } catch (error) {
+      console.error('Error fetching location info:', error);
+    }
+  };
+
+  const getTime = () => {
+    if (!weather?.timezone_offset) return setFormattedTime('')
+    date = new Date()
+    let locationTime= new Date(date.getTime() + date.getTimezoneOffset() * 60000 + (1000 * weather.timezone_offset))
+    let hour = locationTime.getHours();
+    let minutes = locationTime.getMinutes()
+
+    setFormattedTime(`${(hour < 10) ? '0' + hour : hour} : ${((minutes< 10)) ? '0' + minutes : minutes}`);
+    intervals.current.push(setInterval(getTime, Math.ceil(date.getTime()  / 60000) * 60000 - date.getTime()))
+  }
+
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={() => setIsTaskbarOpen(false)} style={{ width: "100%", height: "100%" }} activeOpacity={1}>
+        <ImageBackground source={darkBgImg} style={{ width: "100%", height: "100%" }}>
+          {/* header */}
+          <View style={styles.header}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <TouchableOpacity onPress={() => {setIsTaskbarOpen(true)}}>
+                <MaterialCommunityIcons name='menu' size={20} color='white'></MaterialCommunityIcons>
+              </TouchableOpacity>
+              <View style={{paddingLeft: 30}}>
+                <Text style={{fontSize: 20, fontWeight: 'bold', color:  'white'}}>{currentLocation}</Text>
+                <Text style={{color: 'white'}}>{formattedTime}</Text>
+              </View>
+              <View>
               </View>
             </View>
-            
-            <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.2, borderBottomColor: 'grey'}}>
-              <FlatList
-                  data={locations}
-                  renderItem={({item, index}) => renderLocation({ item, index })}
-                  keyExtractor={(item) => item.name}
-                  style={{width: '100%'}}
-              />
-              <TouchableOpacity>
-                <View style={{width: '100%', flexDirection: 'row', alignItems: 'center', 
-                  justifyContent: 'space-between', paddingVertical: 5, paddingRight: 0}}>
-                  <Text style={{fontSize: 15}}>View 1 more locations</Text>
-                  <MaterialCommunityIcons name='chevron-down' size={20}></MaterialCommunityIcons>
-                </View>
+            <View style={{paddingRight: 10, flexDirection: 'row', alignItems: 'center'}}>
+              <TouchableOpacity style={{paddingRight: 10}} onPress={() => { navigation.navigate('Search') }}>
+                <MaterialCommunityIcons name='magnify' color='white' size={25}></MaterialCommunityIcons>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => { }}>
+                <MaterialCommunityIcons name='share-variant' color='white' size={25}></MaterialCommunityIcons>
               </TouchableOpacity>
             </View>
           </View>
-        
-          {/* special features */}
-          <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.20, borderBottomColor: 'grey'}}>
-              <FlatList
-                  data={featureList}
-                  renderItem={({item, index}) => renderFeatures({ item, index })}
-                  keyExtractor={(item) => item.title}
-                  style={{width: '100%'}}
-              />
-            </View>
 
-          {/* settings */}
-          <View style={{padding: 10}}>
-            <FlatList
-                data={settingList}
-                renderItem={({item, index}) => renderSettings({ item, index })}
-                keyExtractor={(item) => item}
-                style={{width: '100%'}}
-            />
-          </View>
-        </View>
-      // </OutsidePressHandler>
-      }
-    </Container>
+          {/* body */}
+          <WeatherPage weather={weather} currentSection={currentSection}></WeatherPage>
+
+          {/* footer */}
+          <Footer currentSection={currentSection} setCurrentSection={setCurrentSection}/>
+        </ImageBackground>
+      </TouchableOpacity>
+
+      
+      {isTaskbarOpen && <Taskbar navigation={navigation}></Taskbar>}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  taskbar: { 
-      position: 'absolute', 
-      top: 0, 
-      left: 0, 
-      width: '67%', 
-      height: "100%", 
-      backgroundColor: 'white', 
-  },
-  taskbarLogo: {
-    width: 40,
-    height: 40
-  },
-  grid: {
-    padding: 10,
-    paddingLeft: 10,
-    marginBottom: 5,
-    borderBottomWidth: 0.20,
-    borderBottomColor: 'grey'
-  },
   header: {
-    paddingTop: 40,
+    paddingTop: 30,
+    paddingBottom: 10,
     paddingLeft: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center' 
   }
 })
-
-const Container = styled.View`
-  flex: 1;
-  background-color: dodgerblue;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const NoWeather = styled.Text`
-  text-align: center;
-  color: white;
-`;
-
-const FutureForecastContainer = styled.View`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 export default MainPage;

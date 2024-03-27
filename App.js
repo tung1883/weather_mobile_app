@@ -82,27 +82,27 @@ const App = () => {
     
   const fetchWeatherInfo = async (key) => {
     //true API
-    if (!location) return
+    // if (!location) return
 
-    fetch(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`,
-      { signal }
-    )
-    .then((res) => {
-      return res.json()
-    })
-    .then((data) => {
-      setWeather(data);
-    })
-    .catch((err) => {
-      console.log("error", err);
-    });
-
-    // if (!key) key = 'Hanoi'
-    // AsyncStorage.getItem(key)
+    // fetch(
+    //   `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`,
+    //   { signal }
+    // )
     // .then((res) => {
-    //   setWeather(JSON.parse(res))
+    //   return res.json()
     // })
+    // .then((data) => {
+    //   setWeather(data);
+    // })
+    // .catch((err) => {
+    //   console.log("error", err);
+    // });
+
+    if (!key) key = 'Hanoi'
+    AsyncStorage.getItem(key)
+    .then((res) => {
+      setWeather(JSON.parse(res))
+    })
   }
 
   //fetch lat long by city
@@ -196,33 +196,31 @@ const App = () => {
   }
 
   return (
-    <EventProvider>
-      <ColorProvider>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Loading">
-            <Stack.Screen name="Search" options={{ headerShown: false }}>
-              {(navigation) => <SearchPage 
-                {...navigation} setCity={setCity} getLocation={getLocation} fetchLatLongHandler={fetchLatLongHandler}
-                fetchWeatherInfo={fetchWeatherInfo} 
-                addFavoriteLocation={addFavoriteLocation} removeFavoriteLocation={removeFavoriteLocation}
-                addFavoriteLocationCounter={addFavoriteLocationCounter}
-              ></SearchPage>}
+    <ColorProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Loading">
+          <Stack.Screen name="Search" options={{ headerShown: false }}>
+            {(navigation) => <SearchPage 
+              {...navigation} setCity={setCity} getLocation={getLocation} fetchLatLongHandler={fetchLatLongHandler}
+              fetchWeatherInfo={fetchWeatherInfo} 
+              addFavoriteLocation={addFavoriteLocation} removeFavoriteLocation={removeFavoriteLocation}
+              addFavoriteLocationCounter={addFavoriteLocationCounter}
+            ></SearchPage>}
+          </Stack.Screen>
+          <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
+          <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
+          <Stack.Screen 
+            name="Main" 
+            options={{ headerShown: false }}>
+              {(navigation) => <MainPage {...navigation} city={city} setCity={setCity} 
+                fetchLatLongHandler={fetchLatLongHandler}
+                fetchWeatherInfo={fetchWeatherInfo}
+                location={location} setLocation={setLocation} 
+                weather={weather} setWeather={setWeather}/>}
             </Stack.Screen>
-            <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
-            <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
-            <Stack.Screen 
-              name="Main" 
-              options={{ headerShown: false }}>
-                {(navigation) => <MainPage {...navigation} city={city} setCity={setCity} 
-                  fetchLatLongHandler={fetchLatLongHandler}
-                  fetchWeatherInfo={fetchWeatherInfo}
-                  location={location} setLocation={setLocation} 
-                  weather={weather} setWeather={setWeather}/>}
-              </Stack.Screen>
-          </Stack.Navigator>
-        </NavigationContainer>
-      </ColorProvider>
-    </EventProvider>
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ColorProvider>
   );
 };
 
