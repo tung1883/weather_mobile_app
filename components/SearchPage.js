@@ -5,7 +5,6 @@ import * as Location from 'expo-location'
 
 import { cities, popularCities } from '../assets/citiList';
 import config from '../config';
-import { jsonWriter, loadAllData } from './jsonWriter';
 import { lightStyles, darkStyles } from './defaultStyles';
 import { ColorContext } from './ColorContext';
 
@@ -18,42 +17,18 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFa
     const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
 
     const requestLocationPermission = async () => {
-        // try {
-        //     if (isFetching) return
-        //     const { status } = await Location.requestForegroundPermissionsAsync();
+        try {
+            if (isFetching) return
+            const { status } = await Location.requestForegroundPermissionsAsync();
             
-        //     if (status === 'granted') {
-        //         setIsFetching(true)
-        //         await getLocation()
-        //         navigateToMainPage()
-        //     }
-        // } catch (error) {
-        //     console.error('Error requesting location permission: ', error);
-        // }
-
-        // popularCities.forEach(async (city) => {
-        //     fetch(
-        //     `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${config.API_KEY}`
-        //     )
-        //     .then((response) => response.json())
-        //     .then((data) => { console.log(data); return {lat: data.coord.lat, long: data.coord.lon}})
-        //     .then(({lat, long}) => {
-        //         return fetch(
-        //         `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`
-        //         )
-        //     }) 
-        //     .then((res) => {
-        //         return res.json()
-        //     })
-        //     .then((data) => {
-        //         jsonWriter(city, data)    
-        //     })
-        //     .then(() => loadAllData())
-        //     .catch((err) => {
-        //     console.log("error", err);
-        // });
-        
-        // })
+            if (status === 'granted') {
+                setIsFetching(true)
+                await getLocation()
+                navigateToMainPage()
+            }
+        } catch (error) {
+            console.error('Error requesting location permission: ', error);
+        }
     };
 
     const navigateToMainPage = () => {
@@ -106,11 +81,11 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFa
         return (
             <TouchableOpacity style={[itemContainerStyle, isDarkMode && styles.darkItemContainer]} activeOpacity={1}
                 onPress={async () => {
-                    // if (isFetching) return 
-                    // setIsFetching(true)
-                    // await fetchLatLongHandler(item)
-                    // setCity(item)
-                    // navigateToMainPage()
+                    if (isFetching) return 
+                    setIsFetching(true)
+                    await fetchLatLongHandler(item)
+                    setCity(item)
+                    navigateToMainPage()
                     addFavoriteLocationCounter(item)
                 }}
             >

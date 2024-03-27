@@ -38,11 +38,11 @@ const App = () => {
   useEffect(() => {
     const checkUser = async () => {
       const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
-      AsyncStorage.removeItem('notFirstTime') //uncomment this and comment 3 lines to below to be first time user
-      // if (notFirstTime === null) {
-      //   AsyncStorage.setItem('notFirstTime', "true");
-      //   AsyncStorage.setItem('favoriteLocations', [])
-      // }
+      // AsyncStorage.removeItem('notFirstTime') //uncomment this and comment 3 lines to below to be first time user
+      if (notFirstTime === null) {
+        AsyncStorage.setItem('notFirstTime', "true");
+        AsyncStorage.setItem('favoriteLocations', JSON.stringify([]))
+      }
     };
   
     const initFavoriteLocations = async () => {
@@ -80,6 +80,7 @@ const App = () => {
     }
     
   const fetchWeatherInfo = async (key) => {
+    //true API
     // if (!location) return
 
     // fetch(
@@ -196,7 +197,7 @@ const App = () => {
   return (
     <ColorProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Search">
+        <Stack.Navigator initialRouteName="Loading">
           <Stack.Screen name="Search" options={{ headerShown: false }}>
             {(navigation) => <SearchPage 
               {...navigation} setCity={setCity} getLocation={getLocation} fetchLatLongHandler={fetchLatLongHandler}

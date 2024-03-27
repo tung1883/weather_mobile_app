@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, ImageBackground, Image, Text, Animated, TouchableOpacity, View, StyleSheet, FlatList} from "react-native";
-import CurrentForecast from "../components/CurrentForecast";
-import DailyForecast from "../components/DailyForecast";
+import { ScrollView, ImageBackground, Image, Text, TouchableOpacity, View, StyleSheet, FlatList} from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import styled from "styled-components/native";
+
+import CurrentForecast from "./CurrentForecast";
+import DailyForecast from "./DailyForecast";
 import config from "../config";
 import bgImg from "../assets/background_light.png";
 import logoImg from "../assets/logo.png"
-import { SearchBar } from 'react-native-elements';
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigation, route }) => {
-  const [isTaskbarOpen, setIsTaskbarOpen] = useState(true);
+  const [isTaskbarOpen, setIsTaskbarOpen] = useState(false);
 
   //3 following lists are just for UI
   const locations = [
@@ -93,7 +93,6 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
   useEffect(() => {
     const fetchWeather = async () => {
       fetchWeatherInfo(city).then(() => {
-        console.log('here')
         // route?.params?.onDataFetchComplete() 
       })
     }
@@ -136,17 +135,18 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
         {/* locations */}
         <View> 
           <View style={[styles.grid, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
-              <Text style={{fontWeight: 'bold'}}>Locations</Text>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <MaterialCommunityIcons name='pencil' size={16}></MaterialCommunityIcons>
-                <Text style={{paddingLeft: 5, paddingRight: 2}}>Edit</Text>
-              </View>
+            <Text style={{fontWeight: 'bold'}}>Locations</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <MaterialCommunityIcons name='pencil' size={16}></MaterialCommunityIcons>
+              <Text style={{paddingLeft: 5, paddingRight: 2}}>Edit</Text>
+            </View>
           </View>
-          <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.20, borderBottomColor: 'grey'}}>
+          
+          <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.2, borderBottomColor: 'grey'}}>
             <FlatList
                 data={locations}
                 renderItem={({item, index}) => renderLocation({ item, index })}
-                keyExtractor={(item) => {item}}
+                keyExtractor={(item) => item.name}
                 style={{width: '100%'}}
             />
             <TouchableOpacity>
@@ -164,7 +164,7 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
             <FlatList
                 data={featureList}
                 renderItem={({item, index}) => renderFeatures({ item, index })}
-                keyExtractor={(item) => {item}}
+                keyExtractor={(item) => item.title}
                 style={{width: '100%'}}
             />
           </View>
@@ -174,7 +174,7 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
           <FlatList
               data={settingList}
               renderItem={({item, index}) => renderSettings({ item, index })}
-              keyExtractor={(item) => {item}}
+              keyExtractor={(item) => item}
               style={{width: '100%'}}
           />
         </View>
