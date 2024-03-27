@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, ImageBackground, Image, Text, TouchableOpacity, View, StyleSheet, FlatList} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import styled from "styled-components/native";
+import OutsidePressHandler from "react-native-outside-press";
 
 import CurrentForecast from "./CurrentForecast";
 import DailyForecast from "./DailyForecast";
@@ -103,11 +104,11 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
   return (
     <Container>
       <ImageBackground source={bgImg} style={{ width: "100%", height: "100%" }}>
-        <TouchableOpacity onPress={() => setIsTaskbarOpen(!isTaskbarOpen)} 
-          style={{ position: 'absolute', top: 20, right: 20, zIndex: 1}}
-        >
-          <Text style={{ color: 'black', fontSize: 16 }}>Search</Text>
-        </TouchableOpacity>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => {console.log(true);setIsTaskbarOpen(true)}}>
+            <MaterialCommunityIcons name='menu' size={20}></MaterialCommunityIcons>
+          </TouchableOpacity>
+        </View>
         <CurrentForecast currentWeather={weather} timezone={weather.timezone} />
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
           <FutureForecastContainer>
@@ -125,60 +126,65 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
       </ImageBackground>
       
       {isTaskbarOpen && 
-      <View style={styles.taskbar}>
-        {/* logo */}
-        <View style ={[styles.grid, {flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingBottom: 30}]}>
-          <Image source={logoImg} style={styles.taskbarLogo}></Image>
-          <Text style={{marginLeft: 10, fontWeight: 'bold', fontSize: 18}}>OpenWeather</Text>
-        </View>
+      // <OutsidePressHandler onOutsidePress={() => {
+      //   if (isTaskbarOpen) setIsTaskbarOpen(false)
+      // }}>
+        <View style={styles.taskbar}>
+          {/* logo */}
+          <View style ={[styles.grid, {flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingBottom: 30}]}>
+            <Image source={logoImg} style={styles.taskbarLogo}></Image>
+            <Text style={{marginLeft: 10, fontWeight: 'bold', fontSize: 18}}>OpenWeather</Text>
+          </View>
 
-        {/* locations */}
-        <View> 
-          <View style={[styles.grid, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
-            <Text style={{fontWeight: 'bold'}}>Locations</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <MaterialCommunityIcons name='pencil' size={16}></MaterialCommunityIcons>
-              <Text style={{paddingLeft: 5, paddingRight: 2}}>Edit</Text>
+          {/* locations */}
+          <View> 
+            <View style={[styles.grid, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
+              <Text style={{fontWeight: 'bold'}}>Locations</Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <MaterialCommunityIcons name='pencil' size={16}></MaterialCommunityIcons>
+                <Text style={{paddingLeft: 5, paddingRight: 2}}>Edit</Text>
+              </View>
+            </View>
+            
+            <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.2, borderBottomColor: 'grey'}}>
+              <FlatList
+                  data={locations}
+                  renderItem={({item, index}) => renderLocation({ item, index })}
+                  keyExtractor={(item) => item.name}
+                  style={{width: '100%'}}
+              />
+              <TouchableOpacity>
+                <View style={{width: '100%', flexDirection: 'row', alignItems: 'center', 
+                  justifyContent: 'space-between', paddingVertical: 5, paddingRight: 0}}>
+                  <Text style={{fontSize: 15}}>View 1 more locations</Text>
+                  <MaterialCommunityIcons name='chevron-down' size={20}></MaterialCommunityIcons>
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
-          
-          <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.2, borderBottomColor: 'grey'}}>
-            <FlatList
-                data={locations}
-                renderItem={({item, index}) => renderLocation({ item, index })}
-                keyExtractor={(item) => item.name}
-                style={{width: '100%'}}
-            />
-            <TouchableOpacity>
-              <View style={{width: '100%', flexDirection: 'row', alignItems: 'center', 
-                justifyContent: 'space-between', paddingVertical: 5, paddingRight: 0}}>
-                <Text style={{fontSize: 15}}>View 1 more locations</Text>
-                <MaterialCommunityIcons name='chevron-down' size={20}></MaterialCommunityIcons>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      
-        {/* special features */}
-        <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.20, borderBottomColor: 'grey'}}>
-            <FlatList
-                data={featureList}
-                renderItem={({item, index}) => renderFeatures({ item, index })}
-                keyExtractor={(item) => item.title}
-                style={{width: '100%'}}
-            />
-          </View>
+        
+          {/* special features */}
+          <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.20, borderBottomColor: 'grey'}}>
+              <FlatList
+                  data={featureList}
+                  renderItem={({item, index}) => renderFeatures({ item, index })}
+                  keyExtractor={(item) => item.title}
+                  style={{width: '100%'}}
+              />
+            </View>
 
-        {/* settings */}
-        <View style={{padding: 10}}>
-          <FlatList
-              data={settingList}
-              renderItem={({item, index}) => renderSettings({ item, index })}
-              keyExtractor={(item) => item}
-              style={{width: '100%'}}
-          />
+          {/* settings */}
+          <View style={{padding: 10}}>
+            <FlatList
+                data={settingList}
+                renderItem={({item, index}) => renderSettings({ item, index })}
+                keyExtractor={(item) => item}
+                style={{width: '100%'}}
+            />
+          </View>
         </View>
-      </View>}
+      // </OutsidePressHandler>
+      }
     </Container>
   );
 };
@@ -202,6 +208,10 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     borderBottomWidth: 0.20,
     borderBottomColor: 'grey'
+  },
+  header: {
+    paddingTop: 40,
+    paddingLeft: 10,
   }
 })
 
