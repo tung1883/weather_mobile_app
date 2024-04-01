@@ -8,48 +8,27 @@ import { lightStyles, darkStyles } from "./defaultStyles";
 import WeatherPage from "./ui/WeatherPage";
 import Taskbar from "./ui/Taskbar";
 
-const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigation, route }) => {
+const MainPage = ({ location, getLocationByCity, weather, setWeather, getWeather, setLocation, navigation }) => {
   const [isTaskbarOpen, setIsTaskbarOpen] = useState(false);  
   const [formattedTime, setFormattedTime] = useState('');
   const intervals = useRef([])
-  const [currentLocation, setCurrentLocation] = useState((city) ? city : '') //used for render the location in header UI
-  const [currentSection, setCurrentSection] = useState(0) //used to move between different weather sections, 0 is for today weather, see sectionList in Footer.js for more details
+  const [currentSection, setCurrentSection] = useState(0) //used to move between different weather sections, see sectionList in Footer.js
 
-  useEffect(() => {
-    getLocationDetails()
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     if (!location.lat) {
+  //       await getLocationByCity(location.city)
+  //     }
 
-  useEffect(() => {
-    const fetchWeather = async () => {
-      fetchWeatherInfo(city).then(() => {
-        // route?.params?.onDataFetchComplete() 
-        getLocationDetails()
-      })
-    }
-  
-    fetchWeather()
-  }, [location]);
+  //     setWeather(await getWeather({location}))
+  //   })()
+  // }, [location]);
 
   useEffect(() => {
     getTime()
 
     return () => intervals.current.forEach(clearInterval);
   }, [weather]);
-
-  const getLocationDetails = async () => {
-    try {
-      const response = await fetch(
-        `https://api.openweathermap.org/geo/1.0/reverse?lat=${location.lat}&lon=${location.long}&limit=1&appid=${config.API_KEY}`
-      );
-      const data = await response.json();
-      const city = data[0].name;
-      const country = data[0].country
-      setCity(city)
-      setCurrentLocation(`${city}, ${country}`)
-    } catch (error) {
-      console.error('Error fetching location info:', error);
-    }
-  };
 
   const getTime = () => {
     if (!weather?.timezone_offset) return setFormattedTime('')
@@ -73,7 +52,7 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
                 <MaterialCommunityIcons name='menu' size={20} color='white'></MaterialCommunityIcons>
               </TouchableOpacity>
               <View style={{paddingLeft: 30}}>
-                <Text style={{fontSize: 20, fontWeight: 'bold', color:  'white'}}>{currentLocation}</Text>
+                <Text style={{fontSize: 20, fontWeight: 'bold', color:  'white'}}>{(location?.city) ? `${location.city}, ${location.country}` : ''}</Text>
                 {weather && <Text style={{color: 'white'}}>{formattedTime}</Text>}
               </View>
               <View>
@@ -98,7 +77,7 @@ const MainPage = ({ city, setCity, location, weather, fetchWeatherInfo, navigati
       </TouchableOpacity>
 
       
-      {isTaskbarOpen && <Taskbar navigation={navigation} fetchWeatherInfo={fetchWeatherInfo}></Taskbar>}
+      {isTaskbarOpen && <Taskbar navigation={navigation} location={location} setWeather={setWeather} getWeather={getWeather} setLocation={setLocation}></Taskbar>}
     </View>
   );
 };

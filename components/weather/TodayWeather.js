@@ -1,15 +1,20 @@
 import { StyleSheet, View, ScrollView, Text } from "react-native";
+import { useEffect  } from "react";
 import CurrentForecast from "./CurrentForecast";
 import DailyForecast from "./DailyForecast";
 
 export default TodayWeather = ({weather}) => {
+    // useEffect(() => {
+    //     console.log(weather.daily)
+    // }, [])
+
     return (
         <>
             {weather && <>
                 <CurrentForecast currentWeather={weather} timezone={weather?.timezone} />
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
                 <View style={styles.futureForecastContainer}>
-                    {weather?.daily.map((day, index) => {
+                    {weather?.daily?.map((day, index) => {
                     if (index !== 0) {
                         return <DailyForecast key={day.dt} day={day} index={index} />;
                     }

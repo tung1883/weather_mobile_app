@@ -16,77 +16,138 @@ import Settings from './components/settingsPages/Settings';
 import WidgetSettings from './components/settingsPages/WidgetSetting';
 import LocationSettings from './components/settingsPages/LocationSettings';
 import NotificationSettings from './components/settingsPages/NotificationSettings'
+import { cities } from './assets/citiList';
 
 const Stack = createStackNavigator();
 
 const App = () => {
-  const [locationStatus, setLocationStatus] = useState()
-  const [location, setLocation] = useState({
-    lat: 21.0245,
-    long: 105.8412
-  });
-  const [city, setCity] = useState('Hanoi')
+  const [location, setLocation] = useState({});
   const [weather, setWeather] = useState({})
-  const [favoriteLocations, setFavoriteLocations] = useState([])
+  const [favs, setFavs] = useState([])
 
   //language
-  const {t, i18n} = useTranslation(); 
-  const [currentLanguage,setLanguage] = useState ('vn'); 
-  const changeLanguage = (lang)=> { 
-    i18n 
-      .changeLanguage(lang) 
-      .then(() => setLanguage(lang)) 
-      .catch(err => console.log(err)); 
-  }; 
+  {
+    const {t, i18n} = useTranslation(); 
+    const [currentLanguage, setLanguage] = useState ('vn'); 
+    const changeLanguage = (lang)=> { 
+      i18n 
+        .changeLanguage(lang) 
+        .then(() => setLanguage(lang)) 
+        .catch(err => console.log(err)); 
+    }; 
+  }
 
   useEffect(() => {
-    const checkUser = async () => {
-      const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
-      // AsyncStorage.removeItem('notFirstTime') //uncomment this and comment 3 lines to below to be first time user
-      if (notFirstTime === null) {
-        AsyncStorage.setItem('notFirstTime', "true");
-        AsyncStorage.setItem('favoriteLocations', JSON.stringify([]))
-      }
-    };
-  
-    const initFavoriteLocations = async () => {
-      let locations = JSON.parse(await AsyncStorage.getItem('favoriteLocations'))
-      if (!locations) locations = []
-      sortFavoriteLocations(locations)
-      setFavoriteLocations(locations)
+    init()
+  }, [])
+
+  const init = async () => {
+    //check if the user uses the app for the first time
+    const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
+    // AsyncStorage.removeItem('notFirstTime') //uncomment this and comment 3 lines to below to be first time user
+    if (notFirstTime === null) {
+      await AsyncStorage.setItem('notFirstTime', "true");
+      await AsyncStorage.setItem('favoriteLocations', JSON.stringify([]))
     }
 
-    checkUser();
-    getLocation()
-    fetchWeatherInfo()
-    initFavoriteLocations()
-  }, []);
+    const location = await getCurrentLocation()
+    const weather = await getWeather({location})
+    setWeather(weather)
+    await AsyncStorage.setItem('current', JSON.stringify(location))
+  
+    const favs = JSON.parse(await AsyncStorage.getItem('favoriteLocations'))
+    setFavs((favs) ? favs : [])
+
+    //store data to AsyncStorage to reduce api calls
+    // { 
+    //   //key: name from cities -> value: location
+    //   //key: current -> value: current location
+    //   //key: location -> value: weather 
+    //   cities.forEach(async (city) => {
+    //     const location = await getLocationByCity(city)
+    //     if (!location) return 
+
+    //     const weather = await getWeather({location})
+    //     await AsyncStorage.setItem(city, JSON.stringify(location))
+    //     await AsyncStorage.setItem(JSON.stringify(location), JSON.stringify(weather))
+    //   })
+
+    //   const location = await getCurrentLocation()
+    //   const weather = await getWeather({location})
+    //   await AsyncStorage.setItem('current', JSON.stringify(location))
+    //   await AsyncStorage.setItem(JSON.stringify(location), JSON.stringify(weather))
+
+    ////print all values
+    //   const keys = await AsyncStorage.getAllKeys()
+    //   keys.forEach(async (key) => {
+    //     if (key !== 'current') return
+    //     console.log("KEY: " + key + " VALUE: " + await AsyncStorage.getItem(key))
+    //     console.log(" -------------------------- ")
+    //   })
+    // }
+  }
+
 
   const controller = new AbortController();
   const signal = controller.signal;
 
-  const getLocation = async () => {
+  const getCurrentLocation = async () => {
       try {
         const { status } = await Location.getForegroundPermissionsAsync();
-        setLocationStatus(status)
 
         if (status !== 'granted') {
           console.log('Permission to access location was denied');
-          return;
+          return null;
         }
 
-        const { latitude, longitude } = (await Location.getCurrentPositionAsync({})).coords
-        setLocation({lat: latitude, long: longitude})
+        const { latitude: lat, longitude: long } = (await Location.getCurrentPositionAsync({})).coords
+        const {city, country} = await getLocationDetails({lat, long})
+        setLocation({ lat, long, city, country});
+        return {lat, long, city, country}
       } catch (error) {
         console.error('Error getting location:', error);
+        return null
       }
     }
-    
-  const fetchWeatherInfo = async (key) => {
-    //true API
-    // if (!location) return
 
-    // fetch(
+  const getLocationByCity = async (city) => {
+    try {
+      const response = await fetch(
+        `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${config.API_KEY}`
+      );
+      const data = await response.json();
+      if (!data?.coord?.lat) {
+        console.log('getLocationByCity Error');
+        return null
+      }
+
+      const {lat, lon: long} = data.coord
+      const details = await getLocationDetails({lat, long})
+      setLocation({ lat, long, city: details.city, country: details.country});
+      return {lat, long, city: details.city, country: details.country}
+    } catch (error) {
+      console.error('getLocationByCity Error:', error);
+      return null
+    }
+  };
+
+   const getLocationDetails = async ({lat, long}) => {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${long}&limit=1&appid=${config.API_KEY}`
+      );
+      const data = (await response.json()).sort((a, b) => b.name.length - a.name.length)
+      return {city: data[0].name, country: data[0].country}
+    } catch (error) {
+      console.error('Error fetching location info:', error);
+    }
+  };
+
+  const getWeather = async ({location, current}) => {
+    //TRUE API CALL
+    // if (!location) return null
+
+    // return fetch(
     //   `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`,
     //   { signal }
     // )
@@ -94,132 +155,43 @@ const App = () => {
     //   return res.json()
     // })
     // .then((data) => {
-    //   setWeather(data);
+    //   return data
     // })
     // .catch((err) => {
     //   console.log("error", err);
+    //   return null
     // });
 
-    if (!key) key = 'Hanoi'
-    AsyncStorage.getItem(key)
-    .then((res) => {
-      setWeather(JSON.parse(res))
-    })
-  }
-
-  //fetch lat long by city
-  const fetchLatLongHandler = async (city) => {
-    try {
-      const response = await fetch(
-        `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${config.API_KEY}`
-      );
-      const data = await response.json();
-      if (!data?.coord?.lat) {
-        console.log('fetchLatLongHandler Error');
-        return false;
-      }
-      setLocation({ lat: data.coord.lat, long: data.coord.lon });
-      return true;
-    } catch (error) {
-      console.error('fetchLatLongHandler Error:', error);
-      return false;
+    //MOCK API CALL
+    if (current) {
+      location = await AsyncStorage.getItem('current')
     }
-  };
-
-  const addFavoriteLocation = async (locationToAdd) => {
-    let list = favoriteLocations
-    if (!list) list = []
-    let isInList = false
-    list.find((locationObj) => {
-      if (locationObj?.location === locationToAdd) {
-        locationObj.favorite = true
-        isInList = true
-      }
-    })
-
-    if (!isInList) {
-      list.push({
-        location: locationToAdd,
-        counter: 0,
-        favorite: true
-      })
-    } 
-
-    sortFavoriteLocations(list)
-    setFavoriteLocations(list)
-    AsyncStorage.setItem('favoriteLocations', JSON.stringify(list))
-  }
-
-  //add 1 if user visit a location
-  const addFavoriteLocationCounter = async (locationToAdd) => {
-    let list = favoriteLocations
-    if (!list) list = []
-    let isInList = false
-    list.find((locationObj) => {
-      if (locationObj?.location === locationToAdd) {
-        locationObj.counter += 1
-        isInList = true
-      }
-    })
-
-    if (!isInList) {
-      list.push({
-        location: locationToAdd,
-        counter: 1,
-        favorite: false
-      })
-    } 
-
-    sortFavoriteLocations(list)
-    setFavoriteLocations(list)
-    AsyncStorage.setItem('favoriteLocations', JSON.stringify(list))
-  } 
-
-  const sortFavoriteLocations = async (list) => {
-    list.sort((a, b) => {
-      if (a.favorite === b.favorite) {
-        return b.counter - a.counter
-      } else {
-        return a.favorite ? -1 : 1;
-      }
-    });
-  }
-
-  const removeFavoriteLocation = async (locationToRemove) => {
-    const newFavoriteLocations = favoriteLocations.filter(locationObj => locationObj.location !== locationToRemove)
-    sortFavoriteLocations(list)
-    setFavoriteLocations(newFavoriteLocations)
-    await AsyncStorage.setItem('favoriteLocations', JSON.stringify(newFavoriteLocations))
-  }
-
-  const getFavoriteLocations = () => {
-    const list = favoriteLocations.filter(obj => obj.favorite)
-    return (list.length < 5) ? favoriteLocations.slice(0, 5) : list
+    
+    return JSON.parse(await AsyncStorage.getItem(JSON.stringify(location)))
   }
 
   return (
     <ColorProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Loading">
-          <Stack.Screen name="Search" options={{ headerShown: false }}>
-            {(navigation) => <SearchPage 
-              {...navigation} setCity={setCity} getLocation={getLocation} fetchLatLongHandler={fetchLatLongHandler}
-              fetchWeatherInfo={fetchWeatherInfo} 
-              addFavoriteLocation={addFavoriteLocation} removeFavoriteLocation={removeFavoriteLocation}
-              addFavoriteLocationCounter={addFavoriteLocationCounter}
-            ></SearchPage>}
-          </Stack.Screen>
           <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
           <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
+          
+          <Stack.Screen name="Search" options={{ headerShown: false }}>
+            {(navigation) => <SearchPage {...navigation}
+              getCurrentLocation={getCurrentLocation} getLocationByCity={getLocationByCity} getWeather={getWeather} 
+              favs={favs} setFavs={setFavs} setWeather={setWeather}
+            ></SearchPage>}
+          </Stack.Screen>
           <Stack.Screen 
             name="Main" 
             options={{ headerShown: false }}>
-              {(navigation) => <MainPage {...navigation} city={city} setCity={setCity} 
-                fetchLatLongHandler={fetchLatLongHandler}
-                fetchWeatherInfo={fetchWeatherInfo}
-                location={location} setLocation={setLocation} 
-                weather={weather} setWeather={setWeather}/>}
+              {(navigation) => <MainPage {...navigation} location={location} weather={weather} setWeather={setWeather}
+                getWeather={getWeather} getLocationByCity={getLocationByCity}
+                setLocation={setLocation}
+              />}
             </Stack.Screen>
+
           <Stack.Screen name='Settings' options={{headerShown: false}}>{(navigation) => <Settings {...navigation}/>}</Stack.Screen>
           <Stack.Screen name='WidgetSettings' options={{headerShown: false}}>{(navigation) => <WidgetSettings {...navigation}/>}</Stack.Screen>
           <Stack.Screen name='LocationSettings' options={{headerShown: false}}>{(navigation) => <LocationSettings {...navigation}/>}</Stack.Screen>
@@ -229,6 +201,5 @@ const App = () => {
     </ColorProvider>
   );
 };
-
 
 export default App;

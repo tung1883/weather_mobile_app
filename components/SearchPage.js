@@ -2,13 +2,15 @@ import React, { useContext, useState } from 'react';
 import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { cities, popularCities } from '../assets/citiList';
 import config from '../config';
 import { lightStyles, darkStyles } from './defaultStyles';
 import { ColorContext } from './ColorContext';
+import { addCounter } from '../functionalities/favoriteLocations';
 
-const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFavoriteLocation, removeFavoriteLocation, addFavoriteLocationCounter }) => {    
+const SearchPage = ({navigation, getCurrentLocation, getLocationByCity, getWeather, favs, setFavs, setWeather }) => {    
     const goBack = navigation?.canGoBack()
     const { isDarkMode, toggleTheme } = useContext(ColorContext);
     const [searchQuery, setSearchQuery] = useState('');
@@ -23,18 +25,17 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFa
             
             if (status === 'granted') {
                 setIsFetching(true)
-                await getLocation()
-                navigateToMainPage()
+                const location = await getCurrentLocation()
+                if (location) {
+                    setWeather(await getWeather({location}))
+                    navigation.replace('Main');
+                }
+
+                setIsFetching(false)
             }
         } catch (error) {
             console.error('Error requesting location permission: ', error);
         }
-    };
-
-    const navigateToMainPage = () => {
-        navigation.replace('Main', {
-            onDataFetchComplete: () => setIsFetching(false), 
-        });
     };
 
     const handleSearch = (text) => {
@@ -62,13 +63,15 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFa
     const enterSearch = async () => {
         if (isFetching) return
       
-        fetchLatLongHandler(searchQuery)
-        .then((result) => {
+        getLocationByCity(searchQuery)
+        .then(async (result) => {
             if (result) {
                 setIsFetching(true)
-                setCity(searchQuery)
-                navigateToMainPage()
+                setWeather(await getWeather({result}))
+                navigation.replace('Main');
             }
+
+            setIsFetching(false)
         })
     }
 
@@ -83,10 +86,16 @@ const SearchPage = ({navigation, setCity, getLocation,fetchLatLongHandler, addFa
                 onPress={async () => {
                     if (isFetching) return 
                     setIsFetching(true)
-                    await fetchLatLongHandler(item)
-                    setCity(item)
-                    navigateToMainPage()
-                    addFavoriteLocationCounter(item)
+                    
+                    const location = await getLocationByCity(item)
+
+                    if (location) {
+                        setWeather(await getWeather({location}))
+                        addCounter({location, favs, setFavs})
+                        navigation.replace('Main');
+                    }
+
+                    setIsFetching(false)
                 }}
             >
                 <Text style={[styles.item, isDarkMode && styles.darkItem]}>{item}</Text>
