@@ -3,12 +3,11 @@ import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, A
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { lightStyles, darkStyles } from '../defaultStyles';
-import { ColorContext } from '../ColorContext';
+import { FunctionalContext } from '../Context';
 
 const SettingsPage = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, toggleTheme } = useContext(ColorContext);
-    const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
+    const { isDarkMode, toggleTheme, t } = useContext(FunctionalContext);
 
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
@@ -21,23 +20,34 @@ const SettingsPage = ({ navigation }) => {
                         onPress={() => {navigation.goBack()}}
                     />
                 }
-                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Settings</Text>
+                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>{t('settings.title')}</Text>
             </View>
             <View>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
+                <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 20,
+                    borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <MaterialCommunityIcons name='bell' color='#FFDB58' size={18} style={{paddingRight: 10}}/>
+                        <Text style={{color: 'white', fontSize: 16}}>{t('settings.noti')}</Text>
                     </View>
+                    <MaterialCommunityIcons name='chevron-right' size={18} color='white'></MaterialCommunityIcons>
                 </TouchableOpacity>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
+                <TouchableOpacity 
+                    onPress={() => navigation.navigate('LanguageUnits')}
+                    style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 20,
+                    borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <MaterialCommunityIcons name='earth' color='#9BCF53' size={18} style={{paddingRight: 10}}/>
+                        <Text style={{color: 'white', fontSize: 16}}>{t('settings.lu')}</Text>
                     </View>
+                    <MaterialCommunityIcons name='chevron-right' size={18} color='white'></MaterialCommunityIcons>
                 </TouchableOpacity>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
+                <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 20,
+                    borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <MaterialCommunityIcons name='palette' color='#B4B4B3' size={18} style={{paddingRight: 10}}/>
+                        <Text style={{color: 'white', fontSize: 16}}>{t('settings.theme')}</Text>
                     </View>
+                    <MaterialCommunityIcons name='chevron-right' size={18} color='white'></MaterialCommunityIcons>
                 </TouchableOpacity>
             </View>
         </View>

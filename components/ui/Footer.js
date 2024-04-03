@@ -1,8 +1,9 @@
-import React from "react";
-import { Text, TouchableOpacity, View, StyleSheet, FlatList, Dimensions } from "react-native";
+import React, { useContext } from "react";
+import { Text, TouchableOpacity, View, StyleSheet, FlatList, Dimensions, Pressable } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { lightStyles, darkStyles } from "../defaultStyles";
+import { FunctionalContext } from "../Context";
 
 const SCREEN_WIDTH = Dimensions.get('window').width
 
@@ -16,17 +17,19 @@ export const sectionList = [
 
 
 export default Footer = ({currentSection, setCurrentSection}) => {
+  const { t, isDarkMode } = useContext(FunctionalContext)
+
   const renderSection = ({item, index}) => {
-    const contentColor = (currentSection === index) ? '#2D5DA1' : darkStyles.secondaryBgColor
+    const contentColor = (currentSection === index) ? ((!isDarkMode) ? '#2D5DA1' : "#068FFF") : darkStyles.secondaryBgColor
 
     return (
-      <TouchableOpacity 
+      <Pressable 
         onPress={() => setCurrentSection(index)}
-        style={{width: SCREEN_WIDTH / 5, alignItems: 'center', justifyContent: 'space-between', 
-            paddingVertical: 7}}>
+        style={[{width: SCREEN_WIDTH / 5, alignItems: 'center', justifyContent: 'space-between', 
+            paddingVertical: 7}, isDarkMode && { backgroundColor: 'black'}]}>
         <MaterialCommunityIcons name={item.icon} size={17} color={contentColor}/> 
-        <Text style={{fontSize: 10, color: contentColor}}>{item.title.toUpperCase()}</Text> 
-      </TouchableOpacity>
+        <Text style={{fontSize: 10, color: contentColor}}>{t('footer.' + item.title).toUpperCase()}</Text> 
+      </Pressable>
     )
   }
 

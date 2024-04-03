@@ -1,28 +1,22 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { ImageBackground, Text, TouchableOpacity, View, StyleSheet, Dimensions } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import config from "../config";
-import darkBgImg from '../assets/background_dark.png'
+import darkBgImg from '../assets/dark_bg.png'
+import bgImg from '../assets/background_light.png'
 import { lightStyles, darkStyles } from "./defaultStyles";
 import WeatherPage from "./ui/WeatherPage";
 import Taskbar from "./ui/Taskbar";
+import { FunctionalContext, WeatherContext } from "./Context";
 
-const MainPage = ({ location, getLocationByCity, weather, setWeather, getWeather, setLocation, navigation }) => {
+const MainPage = ({ navigation }) => {
+  const { location, weather } = useContext(WeatherContext)
+  const { isDarkMode } = useContext(FunctionalContext)
   const [isTaskbarOpen, setIsTaskbarOpen] = useState(false);  
   const [formattedTime, setFormattedTime] = useState('');
   const intervals = useRef([])
   const [currentSection, setCurrentSection] = useState(0) //used to move between different weather sections, see sectionList in Footer.js
-
-  // useEffect(() => {
-  //   (async () => {
-  //     if (!location.lat) {
-  //       await getLocationByCity(location.city)
-  //     }
-
-  //     setWeather(await getWeather({location}))
-  //   })()
-  // }, [location]);
 
   useEffect(() => {
     getTime()
@@ -44,7 +38,7 @@ const MainPage = ({ location, getLocationByCity, weather, setWeather, getWeather
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => setIsTaskbarOpen(false)} style={{ width: "100%", height: "100%" }} activeOpacity={1}>
-        <ImageBackground source={darkBgImg} style={{ width: "100%", height: "100%" }}>
+        <ImageBackground source={(isDarkMode) ? darkBgImg : bgImg} style={{ width: "100%", height: "100%" }}>
           {/* header */}
           <View style={styles.header}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -77,7 +71,7 @@ const MainPage = ({ location, getLocationByCity, weather, setWeather, getWeather
       </TouchableOpacity>
 
       
-      {isTaskbarOpen && <Taskbar navigation={navigation} location={location} setWeather={setWeather} getWeather={getWeather} setLocation={setLocation}></Taskbar>}
+      {isTaskbarOpen && <Taskbar navigation={navigation}></Taskbar>}
     </View>
   );
 };

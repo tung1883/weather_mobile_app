@@ -69,12 +69,37 @@ export const getFavoriteLocations = async ({currentLoc, favs}) => {
   }
 }
 
-const sortLocations = async (favs) => {
-  favs.sort((a, b) => {
-    if (a.favorite === b.favorite) {
-      return b.counter - a.counter
-    } else {
-      return a.favorite ? -1 : 1;
+export const putToFrontFavs = ({favs, setFavs, fav}) => {
+  for (let i = 0; i < favs.length; i++) { 
+    if (favs[i].location.city == fav.location.city) {
+      favs.splice(i, 1)
+      break
+    } 
+  }
+
+  favs = [fav, ...favs]
+
+  setFavs([...favs.splice(0, 5)]);
+}
+
+export const sortLocations = async (favs) => {
+  return favs.sort((a, b) => {
+    // Rule 1: Sort by current (true > false)
+    if (a.current !== b.current) {
+        return a.current ? -1 : 1;
     }
+
+    // Rule 2: Sort by gps (true > false)
+    if (a.gps !== b.gps) {
+        return a.gps ? -1 : 1;
+    }
+
+    // Rule 3: Sort by favorite (true > false)
+    if (a.favorite !== b.favorite) {
+        return a.favorite ? -1 : 1;
+    }
+
+    // Rule 4: Sort by counter in ascending order
+    return a.counter - b.counter;
   });
 }

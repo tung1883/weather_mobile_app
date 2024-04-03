@@ -1,175 +1,206 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState, useRef } from 'react'
 import { StyleSheet, View, FlatList, TouchableOpacity, Image, Text } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import logoImg from '../../assets/logo.png'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { FunctionalContext, WeatherContext } from '../Context';
+import { putToFrontFavs } from '../../functionalities/favoriteLocations'
 
-export default Taskbar = ({navigation, setLocation, location, setWeather, getWeather, fav, setFavs}) => {
-    const [selectedLocation, setSelectedLocation] = useState(location?.city)
-    const [locationList, setLocationList] = useState([])
-    const [isViewingMore, setIsViewingMore] = useState(false) //to change the UI when click "view more locations"
+export default Taskbar = ({navigation}) => {
+  const { location,  setLocation, weather, setWeather, getWeather, favs, setFavs, gps } = useContext(WeatherContext)
+  const { isDarkMode, t } = useContext(FunctionalContext)
+  const [isViewingMore, setIsViewingMore] = useState(false) //to change the UI when click "view more locations"
 
-    useEffect(() => {
-      let fetchFavs = async () => {
-        AsyncStorage.getItem('favoriteLocations')
-        .then((result) => {
-          return JSON.parse(result)
-        })
-        .then((data) => {
-          let tempList = []
-          data.forEach(async (item, index) => {
-            const weather = (await getWeather({location: item.location}))
-            
-            if (weather) {
-              tempList.push({name: item.location.city, icon: weather.current.weather[0].icon, temp: Math.round(weather.current.temp)})
-            }
-          
-            if (index === data.length - 1 || index > 9) {
-              return setLocationList(tempList)
-            }
-          })
-        })
-      }
+  useEffect(() => {
+    let fetchList = async () => {
+      favs.forEach(async (fav, index) => {
+        if (!fav?.location?.city) {
+          len.current++
+          favs.splice(index, 1)
+        }
 
-      fetchFavs()
-    }, [])
+        if (fav?.weather) return  
 
-    const featureList = [
-        {icon: <MaterialCommunityIcons name='widgets' color='#87CEEB' size={18}/>, title: 'Add Widgets to Home Screen', page: 'WidgetSettings'},
-        {icon: <MaterialCommunityIcons name='bell' color='#FFDB58' size={18}/>, title: 'Daily Summary Notification', page: 'NotificationSettings'},
-        {icon: <MaterialCommunityIcons name='account-plus' color='#32CD32' size={18}/>, title: 'Refer a Friend'}
-    ]
+        const weather = (await getWeather({location: fav.location}))
+        fav.weather = weather
+      })
 
-    const settingList = [
-        'Settings', 'Restore to AdFree', 'AdChoices', 'Help', 'Remove Ads', 'Privacy Settings', 'About'
-    ]
-
-    const renderLocation = ( {item, index} ) => {
-        selectedTextStyle = (item.name === selectedLocation) ? {color: '#2D5DA1', fontSize: 16, fontWeight: 'bold'} : {}
-        return (
-        <TouchableOpacity 
-            onPress={() => {
-              setSelectedLocation(item.name)
-              setLocation({city: item.name})
-            }}
-            style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8}}
-        >
-            <Text style={[{fontSize: 15}, selectedTextStyle]}>{item.name}</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            {item.name === selectedLocation && <MaterialCommunityIcons name='navigation-variant' color='#2D5DA1' size={20} style={{marginRight: 5}}></MaterialCommunityIcons>}
-            <Image style={{width: 35, height: 20}} source={{uri: `https://openweathermap.org/img/wn/${item.icon}@2x.png`}}></Image>
-            <Text style={{minWidth: 30, textAlign: 'right'}}>{item.temp + '°'}</Text>
-            </View>
-        </TouchableOpacity>
-        )
+      setFavs([...favs])
     }
 
-    const renderFeatures = ( {item, index} ) => {
-        return (
-        <TouchableOpacity 
-          onPress={() => {
-            if (index == 2) return
-            navigation.navigate(item.page)
-          }}
-          style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
-            paddingVertical: 10}}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            {item.icon}
-            <Text style={{paddingLeft: 5}}>{item.title}</Text>
-            </View>
-            <MaterialCommunityIcons name='chevron-right' size={20}></MaterialCommunityIcons>
-        </TouchableOpacity>
-        )
+    fetchList()
+  }, [])
+
+  const featureList = [
+      {icon: <MaterialCommunityIcons name='widgets' color='#87CEEB' size={18}/>, title: t('taskbar.widget'), page: 'WidgetSettings'},
+      {icon: <MaterialCommunityIcons name='bell' color='#FFDB58' size={18}/>, title: t('taskbar.noti'), page: 'NotificationSettings'},
+      {icon: <MaterialCommunityIcons name='account-plus' color='#77D970' size={18}/>, title: t('taskbar.refer')}
+  ]
+
+  const settingList = [
+    t('taskbar.settings'),  t('taskbar.adFree'), 'AdChoices', t('taskbar.help'),  t('taskbar.ads'),  t('taskbar.privacy'),  t('taskbar.about')
+  ]
+
+  const renderLocation = ( {item, index} ) => {
+    if (!item.location.city || (index !== 0 && item.location.city == location.city)) {
+      return <></>
     }
 
-    const renderSettings = ( {item, index} ) => {
-        return (
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')}
-            style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
-                paddingVertical: 10}}>
-            <Text style={{fontSize: 15}}>{item}</Text>
-            <MaterialCommunityIcons name='chevron-right' size={20}></MaterialCommunityIcons>
-        </TouchableOpacity>
-        )
-    }
-
+    let icon = item?.weather?.current?.weather[0]?.icon
+    let temp = Math.round(item?.weather?.current?.temp)
     return (
-        <View style={styles.taskbar}>
-          {/* logo */}
-          <View style ={[styles.grid, {flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingBottom: 30}]}>
-            <Image source={logoImg} style={styles.taskbarLogo}></Image>
-            <Text style={{marginLeft: 10, fontWeight: 'bold', fontSize: 18}}>OpenWeather</Text>
-          </View>
+    <TouchableOpacity 
+        onPress={() => {
+          putToFrontFavs({favs, setFavs, fav: {...item}})
+          setLocation(item.location)
+          setWeather(item.weather)
+        }}
+        style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8}}
+    >
+        {
+          (index === 0) ?
+          <Text style={[{color: '#2D5DA1', fontSize: 16, fontWeight: 'bold'}, isDarkMode && { color: '#068FFF'}]}>{item.location.city}</Text> :
+            <Text style={[{fontSize: 15}, isDarkMode && { color: 'white' }]}>{item.location.city}</Text> 
+        }
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        {item.gps === true && <MaterialCommunityIcons name='navigation-variant' color={(isDarkMode) ? "#068FFF" : '#2D5DA1'} size={20} style={{marginRight: 5}}/>}
+        <Image style={{width: 35, height: 20}} source={{uri: `https://openweathermap.org/img/wn/${icon}@2x.png`}}></Image>
+        <Text style={[{minWidth: 30, textAlign: 'right'}, isDarkMode && { color: 'white' }]}>{temp + '°'}</Text>
+        </View>
+    </TouchableOpacity>
+    )
+  }
 
-          {/* locations */}
-          <View> 
-            <View style={[styles.grid, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
-              <Text style={{fontWeight: 'bold'}}>Locations</Text>
-              <TouchableOpacity 
-                onPress={() => navigation.navigate('LocationSettings')}
-                style={{flexDirection: 'row', alignItems: 'center'}}>
-                <MaterialCommunityIcons name='pencil' size={16}></MaterialCommunityIcons>
-                <Text style={{paddingLeft: 5, paddingRight: 2}}>Edit</Text>
-              </TouchableOpacity>
-            </View>
-            
-            <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.2, borderBottomColor: 'grey'}}>
-              <FlatList
-                  data={locationList.slice(0, 3)}
-                  renderItem={({item, index}) => renderLocation({ item, index })}
-                  keyExtractor={(item) => item?.location?.city}
-                  style={{width: '100%'}}
-              />
-              {
-                isViewingMore && 
-                <FlatList
-                  data={locationList.slice(3, 11)}
-                  renderItem={({item, index}) => renderLocation({ item, index })}
-                  keyExtractor={(item) => item?.location?.city}
-                  style={{width: '100%'}}
-              />
-              }
-              <TouchableOpacity
-                onPress={() => setIsViewingMore(!isViewingMore)}
-              >
-                <View style={{width: '100%', flexDirection: 'row', alignItems: 'center', 
-                  justifyContent: 'space-between', paddingVertical: 5, paddingRight: 0}}>
-                  {(locationList.length > 3) &&
-                    <>
-                      <Text style={{fontSize: 15}}>
-                        {(isViewingMore) ? 'View fewer locations' : 
-                          `View ${locationList.length - 3} more locations`}</Text>
-                      <MaterialCommunityIcons name={(isViewingMore) ? 'chevron-up' : 'chevron-down'} size={20}></MaterialCommunityIcons>
-                    </>
-                  }
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-        
-          {/* special features */}
-          <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.20, borderBottomColor: 'grey'}}>
-              <FlatList
-                  data={featureList}
-                  renderItem={({item, index}) => renderFeatures({ item, index })}
-                  keyExtractor={(item) => item.title}
-                  style={{width: '100%'}}
-              />
-            </View>
+  const renderSecondLocation = ( {item, index} ) => {
+    if (!item.location.city) {
+      return <></>
+    }
 
-          {/* settings */}
-          <View style={{padding: 10}}>
+    let icon = item?.weather?.current?.weather[0]?.icon
+    let temp = Math.round(item?.weather?.current?.temp)
+    return (
+    <TouchableOpacity 
+        onPress={() => {
+          putToFrontFavs({favs, setFavs, fav: {...item}})
+          setLocation(item.location)
+          setWeather(item.weather)
+        }}
+        style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8}}
+    >
+        <Text style={[{fontSize: 15}, isDarkMode && { color: 'white' }]}>{item.location.city}</Text> 
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        {item.gps === true && <MaterialCommunityIcons name='navigation-variant' color='#2D5DA1' size={20} style={{marginRight: 5}}/>}
+        <Image style={{width: 35, height: 20}} source={{uri: `https://openweathermap.org/img/wn/${icon}@2x.png`}}></Image>
+        <Text style={[{minWidth: 30, textAlign: 'right'}, isDarkMode && { color: 'white' }]}>{temp + '°'}</Text>
+        </View>
+    </TouchableOpacity>
+    )
+  }
+
+  const renderFeatures = ( {item, index} ) => {
+    return (
+      <TouchableOpacity 
+        onPress={() => {
+          if (index == 2) return
+          navigation.navigate(item.page)
+        }}
+        style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
+          paddingVertical: 10}}>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          {item.icon}
+          <Text style={[{paddingLeft: 5}, isDarkMode && { color: 'white' }]}>{item.title}</Text>
+          </View>
+          <MaterialCommunityIcons color={isDarkMode && 'white'} name='chevron-right' size={20}></MaterialCommunityIcons>
+      </TouchableOpacity>
+    )
+  }
+
+  const renderSettings = ( {item, index} ) => {
+      return (
+      <TouchableOpacity onPress={() => navigation.navigate('Settings')}
+          style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
+              paddingVertical: 10}}>
+          <Text style={[{fontSize: 15}, isDarkMode && { color: 'white' }]}>{item}</Text>
+          <MaterialCommunityIcons color={isDarkMode && 'white'} name='chevron-right' size={20}></MaterialCommunityIcons>
+      </TouchableOpacity>
+      )
+  }
+
+  return (
+      <View style={[styles.taskbar, isDarkMode && { backgroundColor: '#1E1E1E' }]}>
+        {/* logo */}
+        <View style ={[styles.grid, {flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingBottom: 30}]}>
+          <Image source={logoImg} style={styles.taskbarLogo}></Image>
+          <Text style={[{marginLeft: 10, fontWeight: 'bold', fontSize: 18}, isDarkMode && { color: 'white' }]}>OpenWeather</Text>
+        </View>
+
+        {/* locations */}
+        <View> 
+          <View style={[styles.grid, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
+            <Text style={[{fontWeight: 'bold'}, isDarkMode && { color: 'white' }]}>{t('taskbar.location')}</Text>
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('LocationSettings')}
+              style={{flexDirection: 'row', alignItems: 'center'}}>
+              <MaterialCommunityIcons color={isDarkMode && 'white'} name='pencil' size={16}></MaterialCommunityIcons>
+              <Text style={[{paddingLeft: 5, paddingRight: 2}, isDarkMode && { color: 'white' }]}>{t('taskbar.locEdit')}</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.2, borderBottomColor: 'grey'}}>
             <FlatList
-                data={settingList}
-                renderItem={({item, index}) => renderSettings({ item, index })}
-                keyExtractor={(item) => item}
+                data={favs.slice(0, 3)}
+                renderItem={({item, index}) => renderLocation({ item, index })}
+                keyExtractor={(item) => JSON.stringify(item.location.city + item.selected)}
+                style={{width: '100%'}}
+            />
+            {
+              isViewingMore && 
+              <FlatList
+                data={favs.slice(3, 11)}
+                renderItem={({item, index}) => renderSecondLocation({ item, index })}
+                keyExtractor={(item) => item?.location?.city}
+                style={{width: '100%'}}
+              />
+            }
+            {favs.length > 3 && <TouchableOpacity
+              onPress={() => setIsViewingMore(!isViewingMore)}
+            >
+              <View style={{width: '100%', flexDirection: 'row', alignItems: 'center', 
+                justifyContent: 'space-between', paddingVertical: 5, paddingRight: 0}}>
+                <>
+                  <Text style={[{fontSize: 15}, isDarkMode && { color: 'white' }]}>
+                    {(isViewingMore) ? 'View fewer locations' : 
+                      `View more locations`}</Text>
+                  <MaterialCommunityIcons color={isDarkMode && 'white'} name={(isViewingMore) ? 'chevron-up' : 'chevron-down'} size={20}></MaterialCommunityIcons>
+                </>
+              </View>
+            </TouchableOpacity>}
+          </View>
+        </View>
+      
+        {/* special features */}
+        <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.20, borderBottomColor: 'grey'}}>
+            <FlatList
+                data={featureList}
+                renderItem={({item, index}) => renderFeatures({ item, index })}
+                keyExtractor={(item) => item.title}
                 style={{width: '100%'}}
             />
           </View>
 
+        {/* settings */}
+        <View style={{padding: 10}}>
+          <FlatList
+              data={settingList}
+              renderItem={({item, index}) => renderSettings({ item, index })}
+              keyExtractor={(item) => item}
+              style={{width: '100%'}}
+          />
         </View>
-    )
+
+      </View>
+  )
 }
 
 const styles = StyleSheet.create({

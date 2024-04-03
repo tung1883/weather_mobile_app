@@ -4,10 +4,6 @@ import CurrentForecast from "./CurrentForecast";
 import DailyForecast from "./DailyForecast";
 
 export default TodayWeather = ({weather}) => {
-    // useEffect(() => {
-    //     console.log(weather.daily)
-    // }, [])
-
     return (
         <>
             {weather && <>

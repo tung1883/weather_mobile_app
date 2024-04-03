@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location'
@@ -7,15 +7,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { cities, popularCities } from '../assets/citiList';
 import config from '../config';
 import { lightStyles, darkStyles } from './defaultStyles';
-import { ColorContext } from './ColorContext';
-import { addCounter } from '../functionalities/favoriteLocations';
+import { FunctionalContext, WeatherContext } from './Context';
+import { addCounter, putToFrontFavs, sortLocations } from '../functionalities/favoriteLocations';
 
-const SearchPage = ({navigation, getCurrentLocation, getLocationByCity, getWeather, favs, setFavs, setWeather }) => {    
+const SearchPage = ({navigation}) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, toggleTheme } = useContext(ColorContext);
+    const { isDarkMode, toggleTheme, t, translateText} = useContext(FunctionalContext);
+    let { setLocation, gps, setGps, getGpsLocation, getLocationByCity, getWeather, favs, setFavs, setWeather } = useContext(WeatherContext)
     const [searchQuery, setSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState(popularCities);
-    const [listTitle, setListTitle] = useState("POPULAR CITIES")
+    const [listTitle, setListTitle] = useState(t('searchPage.popularSuggestion'))
     const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
 
     const requestLocationPermission = async () => {
@@ -24,11 +25,24 @@ const SearchPage = ({navigation, getCurrentLocation, getLocationByCity, getWeath
             const { status } = await Location.requestForegroundPermissionsAsync();
             
             if (status === 'granted') {
-                setIsFetching(true)
-                const location = await getCurrentLocation()
+                setIsFetching(true) 
+
+                if (gps?.location) {
+                    setLocation(gps.location)
+                    setWeather(gps.weather)
+                    putToFrontFavs({favs, setFavs, fav: {...gps, gps: true}})
+                    setIsFetching(false)
+                    return navigation.replace('Main')
+                }
+
+                const location = await getGpsLocation()
                 if (location) {
-                    setWeather(await getWeather({location}))
-                    navigation.replace('Main');
+                    const weather = await getWeather({location})
+                    setWeather(weather)
+                    setGps({location, weather})
+                    putToFrontFavs({favs, setFavs, fav: {location, weather, gps: true}})
+                    setIsFetching(false)
+                    return navigation.replace('Main')
                 }
 
                 setIsFetching(false)
@@ -42,7 +56,7 @@ const SearchPage = ({navigation, getCurrentLocation, getLocationByCity, getWeath
         setSearchQuery(text);
 
         if (text === '') {
-            setListTitle('POPULAR CITIES')
+            setListTitle(t('searchPage.popularSuggestion'))
             return setSuggestions(popularCities)
         }
 
@@ -56,7 +70,7 @@ const SearchPage = ({navigation, getCurrentLocation, getLocationByCity, getWeath
 
     const clearSearch = () => {
         setSearchQuery('');
-        setListTitle('POPULAR CITIES')
+        setListTitle(t('searchPage.popularSuggestion'))
         setSuggestions(popularCities)
     };
 
@@ -65,13 +79,16 @@ const SearchPage = ({navigation, getCurrentLocation, getLocationByCity, getWeath
       
         getLocationByCity(searchQuery)
         .then(async (result) => {
-            if (result) {
-                setIsFetching(true)
-                setWeather(await getWeather({result}))
-                navigation.replace('Main');
-            }
+            if (!result) return
 
+            setIsFetching(true)
+            const weather = await getWeather({location: result})
+            setLocation(result)
+            setWeather(weather)
+            addCounter({location: result, favs, setFavs})
+            putToFrontFavs({favs, setFavs, fav: {location: result, weather}})
             setIsFetching(false)
+            navigation.replace('Main')
         })
     }
 
@@ -88,14 +105,15 @@ const SearchPage = ({navigation, getCurrentLocation, getLocationByCity, getWeath
                     setIsFetching(true)
                     
                     const location = await getLocationByCity(item)
+                    if (!location) return setIsFetching(false)
 
-                    if (location) {
-                        setWeather(await getWeather({location}))
-                        addCounter({location, favs, setFavs})
-                        navigation.replace('Main');
-                    }
-
+                    const weather = await getWeather({location})
+                    setLocation(location)
+                    setWeather(weather)
+                    addCounter({location, favs, setFavs})
+                    putToFrontFavs({favs, setFavs, fav: {location, weather}})
                     setIsFetching(false)
+                    navigation.replace('Main');
                 }}
             >
                 <Text style={[styles.item, isDarkMode && styles.darkItem]}>{item}</Text>
@@ -119,7 +137,7 @@ const SearchPage = ({navigation, getCurrentLocation, getLocationByCity, getWeath
                     <MaterialCommunityIcons name="magnify" size={24} color={isDarkMode ? "white" : "black"} style={{marginLeft: 10}} />
                     <TextInput
                         style={styles.input}
-                        placeholder="Search for a city"
+                        placeholder={t('searchPage.placeholder')}
                         value={searchQuery}
                         onChangeText={handleSearch}
                         onSubmitEditing={enterSearch}
@@ -136,7 +154,7 @@ const SearchPage = ({navigation, getCurrentLocation, getLocationByCity, getWeath
                 style={[styles.button, isDarkMode && styles.darkButton]}
             >
                 <MaterialCommunityIcons name="navigation-variant" size={20} color="white" style={{margin: -3, padding: -3, marginRight: 5}}/>
-                <Text style={styles.buttonText}>Use Current Location </Text>
+                <Text style={styles.buttonText}>{t('searchPage.currentLocation')}</Text>
             </TouchableOpacity>
             <Text style={[{marginTop: 20, marginBottom: 5, fontSize: 16, fontWeight: 'bold', color: 'black'}, isDarkMode && { color: 'white' }]}>{listTitle}</Text>
             <FlatList
@@ -149,7 +167,7 @@ const SearchPage = ({navigation, getCurrentLocation, getLocationByCity, getWeath
                 <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     <ActivityIndicator size="large" color="black" />
-                    <Text style={styles.loadingText}>Fetching weather data...</Text>
+                    <Text style={styles.loadingText}>{t('searchPage.fetch')}</Text>
                 </View>
                 </View>
             </Modal>

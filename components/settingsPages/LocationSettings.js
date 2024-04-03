@@ -3,11 +3,11 @@ import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, A
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { lightStyles, darkStyles } from '../defaultStyles';
-import { ColorContext } from '../ColorContext';
+import { FunctionalContext } from '../Context';
 
 const LocationSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, toggleTheme } = useContext(ColorContext);
+    const { isDarkMode, toggleTheme } = useContext(FunctionalContext);
     const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
 
     return (

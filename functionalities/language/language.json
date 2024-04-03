@@ -11,7 +11,55 @@
                 "placeholder": "Search for a city",
                 "currentLocation": "Use Current Location",
                 "popularSuggestion": "Popular Cities",
-                "searchSuggestion": "Suggestions"
+                "searchSuggestion": "Suggestions",
+                "fetch": "Fetching weather data.."
+            },
+            "languageAndUnitsPage": {
+                "title": "Language and Units",
+                "item1": "Language"
+            },
+            "languagePage": {
+                "title": "Language",
+                "saveBtn": "Save"
+            },
+            "map": {
+                "auto": "Device Default",
+                "en": "English",
+                "vn": "Vietnamese"
+            },
+            "footer": {
+                "today": "today",
+                "forecast": "forecast",
+                "precip": "precip",
+                "radar": "radadr",
+                "sun": "sun"
+            },
+            "taskbar": {
+                "location": "Locations",
+                "locEdit": "Edit",
+                "widget": "Add Widgets to Home Screen",
+                "noti": "Daily Summary a Notification",
+                "refer": "Refer a Friend",
+                "settings": "Settings",
+                "adFree": "Restore to AdFree",
+                "help": "Help",
+                "ads": "Remove Ads",
+                "privacy": "Privacy Settings",
+                "about": "About"
+            },
+            "settings": {
+                "title": "Settings",
+                "noti": "Manage Notifications", 
+                "lu": "Language and Units",
+                "theme": "Change App Theme"
+            },
+            "weather": {
+                "feels": "Feels",
+                "low": "Low",
+                "high": "High",
+                "wind": "Wind",
+                "humid": "Humidity",
+                "rain": "Rain"
             }
         }
     },
@@ -28,7 +76,55 @@
                 "placeholder": "Nhập tên thành phố bạn muốn tìm",
                 "currentLocation": "Sử dụng vị trí hiện tại",
                 "popularSuggestion": "Các thành phố nổi tiếng",
-                "searchSuggestion": "Gợi ý"
+                "searchSuggestion": "Gợi ý",
+                "fetch": "Đang tải dữ liệu.."
+            },
+            "languageAndUnitsPage": {
+                "title": "Ngôn ngữ và Đơn vị",
+                "item1": "Ngôn ngữ"
+            },
+            "languagePage": {
+                "title": "Ngôn ngữ",
+                "saveBtn": "Lưu"
+            },
+            "map": {
+                "auto": "Cài đặt mặc định",
+                "en": "Tiếng Anh",
+                "vn": "Tiếng Việt"
+            },
+            "footer": {
+                "today": "hôm nay",
+                "forecast": "dự báo",
+                "precip": "lượng mưa",
+                "radar": "radar",
+                "sun": "mặt trời"
+            },
+            "taskbar": {
+                "location": "Địa điểm",
+                "locEdit": "Chỉnh sửa",
+                "widget": "Thêm Widget vào màn hình",
+                "noti": "Thông báo hằng ngày",
+                "refer": "Gợi ý cho bạn bè",
+                "settings": "Cài đặt",
+                "adFree": "Khôi phục về AdFree",
+                "help": "Trợ giúp",
+                "ads": "Bỏ quảng cáo",
+                "privacy": "Cài đặt riêng tư",
+                "about": "Về chúng tôi"
+            },
+            "settings": {
+                "title": "Cài đặt",
+                "noti": "Cài đặt thông báo", 
+                "lu": "Ngôn ngữ và đơn vị",
+                "theme": "Chế độ sáng tối "
+            },
+            "weather": {
+                "feels": "Cảm giác",
+                "low": "Thấp",
+                "high": "Cao",
+                "wind": "Tốc độ gió",
+                "humid": "Độ ẩm",
+                "rain": "Mưa"
             }
         }
     }

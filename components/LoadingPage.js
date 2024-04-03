@@ -4,10 +4,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import logoImg from "../assets/logo.png"
 import { lightStyles, darkStyles } from "./defaultStyles";
-import { ColorContext } from "./ColorContext";
+import { FunctionalContext } from "./Context";
 
-export const LoadingPage = ({navigation}) => {
-  const { isDarkMode } = useContext(ColorContext);
+export default LoadingPage = ({navigation}) => {
+  const { isDarkMode } = useContext(FunctionalContext);
   
   useEffect(() => {
       const timer = setTimeout(async () => {
