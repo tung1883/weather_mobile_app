@@ -19,10 +19,11 @@ import { FunctionalProvider, WeatherProvider } from './components/Context';
 const Stack = createStackNavigator();
 
 const App = () => {
+
   useEffect(() => {
     (async () => {
       //check if the user uses the app for the first time
-      // AsyncStorage.removeItem('notFirstTime') //uncomment this to be first time user
+      AsyncStorage.removeItem('notFirstTime') //uncomment this to be first time user
       const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
       if (notFirstTime === null) {
         await AsyncStorage.setItem('notFirstTime', "true");
@@ -39,7 +40,7 @@ const App = () => {
     <FunctionalProvider>
       <WeatherProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="LocationPermission">
+          <Stack.Navigator initialRouteName="Loading">
             <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
             <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
             <Stack.Screen name="Search" options={{ headerShown: false }}>{(navigation) => <SearchPage {...navigation}/>}</Stack.Screen>

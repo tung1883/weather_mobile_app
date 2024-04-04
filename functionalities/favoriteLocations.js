@@ -77,7 +77,7 @@ export const putToFrontFavs = ({favs, setFavs, fav}) => {
     } 
   }
 
-  favs = [fav, ...favs]
+  favs = [fav, ...favs] 
 
   setFavs([...favs.splice(0, 5)]);
 }

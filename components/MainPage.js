@@ -11,7 +11,7 @@ import Taskbar from "./ui/Taskbar";
 import { FunctionalContext, WeatherContext } from "./Context";
 
 const MainPage = ({ navigation }) => {
-  const { location, weather } = useContext(WeatherContext)
+  const { location, weather, setWeather, getWeather } = useContext(WeatherContext)
   const { isDarkMode } = useContext(FunctionalContext)
   const [isTaskbarOpen, setIsTaskbarOpen] = useState(false);  
   const [formattedTime, setFormattedTime] = useState('');
@@ -23,6 +23,14 @@ const MainPage = ({ navigation }) => {
 
     return () => intervals.current.forEach(clearInterval);
   }, [weather]);
+
+  useEffect(() => {
+    (async () => {
+      if (location && !weather) {
+        setWeather(await getWeather({location}))
+      } 
+    })()
+  }, [weather, location])
 
   const getTime = () => {
     if (!weather?.timezone_offset) return setFormattedTime('')

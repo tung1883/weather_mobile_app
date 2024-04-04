@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Checkbox from 'expo-checkbox'
 
-import { View, Button, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext } from '../Context';
@@ -9,7 +9,7 @@ import { langs } from '../../functionalities/language/langs';
 
 const LanguageUnitsPage = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, toggleTheme, lang, t, getAutoLang } = useContext(FunctionalContext)
+    const { isDarkMode, lang, t } = useContext(FunctionalContext)
 
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
@@ -22,7 +22,7 @@ const LanguageUnitsPage = ({ navigation }) => {
                         onPress={() => {navigation.goBack()}}
                     />
                 }
-                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>{t('languageAndUnitsPage.title')}</Text>
+                <Text style={[{fontSize: 18, fontWeight: 'bold'}, isDarkMode && {color: 'white'}]}>{t('languageAndUnitsPage.title')}</Text>
             </View>
             <View>
                 <TouchableOpacity 
@@ -30,10 +30,10 @@ const LanguageUnitsPage = ({ navigation }) => {
                     style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20,
                         borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
                     <View>
-                        <Text style={{color: 'white', fontSize: 16}}>{t('languageAndUnitsPage.item1')}</Text>
+                        <Text style={[{fontSize: 16}, isDarkMode && {color: 'white'}]}>{t('languageAndUnitsPage.item1')}</Text>
                         <Text style={{color: 'white', fontSize: 12, color: 'grey', paddingTop: 8, paddingBottom: 12}}>{lang.auto ? t('map.auto') : t('map.' + lang.lang)}</Text>
                     </View>
-                    <MaterialCommunityIcons name='chevron-right' size={18} color='white'></MaterialCommunityIcons>
+                    <MaterialCommunityIcons name='chevron-right' size={18} color={isDarkMode ? 'white' : 'black'}></MaterialCommunityIcons>
                 </TouchableOpacity>
             </View>
         </View>
@@ -44,6 +44,13 @@ export const Language = ({navigation}) => {
     const goBack = navigation?.canGoBack()
     const { isDarkMode, lang, t, changeLanguage, getAutoLang } = useContext(FunctionalContext)
     const [selected, setSelected] = useState((lang.auto) ? 'auto' : lang.lang)
+    const [isSaving, setIsSaving] = useState(false)
+
+    useEffect(() => {
+        if ((!lang.auto && selected !== lang.lang) || (lang.auto && selected !== 'auto')) {
+            setIsSaving(true)
+        } else setIsSaving(false)
+    }, [lang, selected])
 
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
@@ -56,16 +63,17 @@ export const Language = ({navigation}) => {
                             onPress={() => {navigation.goBack()}}
                         />
                     }
-                    <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>{t('languagePage.title')}</Text>
+                    <Text style={[{fontSize: 18, fontWeight: 'bold'}, isDarkMode && {color: 'white'}]}>{t('languagePage.title')}</Text>
                 </View>
-                { ((lang.auto && selected !== 'auto') || (!lang.auto && selected !== lang.lang)) && 
+                { isSaving && 
                     <TouchableOpacity
                         onPress={() => {
-                            if (selected == 'auto') changeLanguage(getAutoLang())
+                            setIsSaving(false)
+                            if (selected === 'auto') changeLanguage(getAutoLang())
                             else changeLanguage({auto: false, lang: selected})
                         }}
                     >
-                        <Text style={{color: 'white', fontSize: 18, paddingRight: 20}}>{t('languagePage.saveBtn')}</Text>
+                        <Text style={[{fontSize: 18, paddingRight: 20}, isDarkMode && {color: 'white'}]}>{t('languagePage.saveBtn')}</Text>
                     </TouchableOpacity>
                 }
             </View>
@@ -77,7 +85,7 @@ export const Language = ({navigation}) => {
                             style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
                                 paddingVertical: 20, borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
                             <View>
-                                <Text style={{color: 'white', fontSize: 16}}>{t('map.' + item)}</Text>
+                                <Text style={[{fontSize: 16}, isDarkMode && {color: 'white'}]}>{t('map.' + item)}</Text>
                             </View>
                             <Checkbox color='dodgerblue' value={item === selected } onValueChange={() => {
                                 setSelected(item)

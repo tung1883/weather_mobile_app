@@ -1,46 +1,79 @@
 import React, { useContext, useState } from 'react';
-import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext } from '../Context';
+import Checkbox from 'expo-checkbox';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LocationSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, toggleTheme } = useContext(FunctionalContext);
-    const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
+    const { isDarkMode, setIsAuto, getAutoTheme, setIsDarkMode, t } = useContext(FunctionalContext);
+    const [isSettingTheme, setIsSettingTheme] = useState(false)
 
     return (
-        <View style={[styles.container, isDarkMode && styles.darkContainer]}>
-            <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 10, borderBottomColor: 'grey', borderBottomWidth: 0.5}}>
-                {
-                    goBack &&
-                    <MaterialCommunityIcons 
-                        name="arrow-left" size={24} color={isDarkMode ? "white" : "black"}
-                        style={{margin: -3, padding: -3, marginRight: 15, paddingLeft: 20}}
-                        onPress={() => {navigation.goBack()}}
-                    />
-                }
-                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Edit Location</Text>
+        <>
+            <View 
+                style={[styles.container, isDarkMode && styles.darkContainer]}
+            >
+                <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 10, borderBottomColor: 'grey', borderBottomWidth: 0.5}}>
+                    {
+                        goBack &&
+                        <MaterialCommunityIcons 
+                            name="arrow-left" size={24} color={isDarkMode ? "white" : "black"}
+                            style={{margin: -3, padding: -3, marginRight: 15, paddingLeft: 20}}
+                            onPress={() => {navigation.goBack()}}
+                        />
+                    }
+                    <Text style={[{fontSize: 18, fontWeight: 'bold'}, isDarkMode && { color: 'white' }]}>{t('locationSettings.title')}</Text>
+                </View>
+                <View>
+                    <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 20,
+                        borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <MaterialCommunityIcons name='bell' color={isDarkMode ? '#FCDC2A' : '#FFD23F'} size={18} style={{paddingRight: 10}}/>
+                            <Text style={[{fontSize: 16}, isDarkMode && { color: 'white' }]}>{t('settings.noti')}</Text>
+                        </View>
+                        <MaterialCommunityIcons name='chevron-right' size={18} color={(isDarkMode) ? 'white' : 'black'}></MaterialCommunityIcons>
+                    </TouchableOpacity>
+                </View>
             </View>
-            <View>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
+
+            {isSettingTheme && <Modal visible={isSettingTheme} transparent animationType="fade">
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={{fontSize: 15, paddingBottom: 10, fontWeight: 'bold'}}>Select Theme</Text>
+                        <TouchableOpacity 
+                            onPress={async () => {
+                                setIsAuto(true)
+                                const theme = getAutoTheme()
+                                if (theme === 'light') setIsDarkMode(false)
+                                else setIsDarkMode(true)
+
+                                await AsyncStorage.setItem('theme', 'auto')
+                                setIsSettingTheme(false)
+                            }}
+                            style={{borderBottomWidth: 0.5, borderBottomColor: 'grey', paddingRight: 100, paddingVertical: 10}}>
+                            <Text style={{fontSize: 15}}>Default</Text></TouchableOpacity>
+                        <TouchableOpacity 
+                            onPress={async () => {
+                                setIsDarkMode(false)
+                                await AsyncStorage.setItem('theme', 'light')
+                                setIsSettingTheme(false)
+                            }}
+                            style={{borderBottomWidth: 0.5, borderBottomColor: 'grey', paddingRight: 100, paddingVertical: 10}}><Text>Light</Text></TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={async () => {
+                                setIsDarkMode(true)
+                                await AsyncStorage.setItem('theme', 'dark')
+                                setIsSettingTheme(false)
+                            }}
+                            style={{paddingRight: 100, paddingVertical: 5}}><Text>Dark</Text></TouchableOpacity>
                     </View>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
-        </View>
+                </View>
+            </Modal>}
+        </>
     );
 };
 
@@ -133,9 +166,8 @@ const styles = StyleSheet.create({
     },
     modalContent: {
         backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        alignItems: 'center',
+        padding: 30,
+        borderRadius: 10
     },
     loadingText: {
         marginTop: 10,

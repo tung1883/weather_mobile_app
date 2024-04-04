@@ -31,8 +31,20 @@ export const WeatherProvider = ({ children }) => {
     await AsyncStorage.setItem('current', JSON.stringify(location))
   
     let favs = JSON.parse(await AsyncStorage.getItem('favoriteLocations'))
-    if (location) putToFrontFavs({favs, setFavs, fav: {location, weather, gps: true}})
-    setFavs(favs)
+    if (location) favs = [{location, weather, gps: true}, ...favs]
+    
+    favs.forEach(async (fav, index) => {
+      if (!fav?.location?.city) {
+        favs.splice(index, 1)
+      }
+
+      if (!fav?.weather) {
+        const weather = await getWeather({location: fav.location})
+        fav.weather = weather
+      }
+      
+      if (index == favs.length - 1) setFavs([...favs])
+    })
 
     //store data to AsyncStorage to reduce api calls
     // { 
@@ -169,7 +181,7 @@ export const FunctionalProvider = ({ children }) => {
   
       if (theme === 'auto') {
         setIsAuto(true)
-        if (Appearance.getColorScheme() === 'light') setIsDarkMode(false)
+        if (getAutoTheme() === 'light') setIsDarkMode(false)
         else setIsDarkMode(true)
         return
       }
@@ -207,6 +219,9 @@ export const FunctionalProvider = ({ children }) => {
     return () => subscription?.remove();
   }, [isAuto]);
 
+  const getAutoTheme = () => {
+    return Appearance.getColorScheme() 
+  }
 
   const changeTheme = async (theme) => {
     if (theme === 'auto') {
@@ -217,7 +232,8 @@ export const FunctionalProvider = ({ children }) => {
 
     if (theme === 'light') setIsDarkMode(false)
     else setIsDarkMode(true)
-    AsyncStorage.setItem('theme', theme)
+  
+    await AsyncStorage.setItem('theme', theme)
   };
 
   const changeLanguage = (lang)=> { 
@@ -249,7 +265,7 @@ export const FunctionalProvider = ({ children }) => {
   }
 
   return (
-    <FunctionalContext.Provider value={{ isDarkMode, changeTheme, lang, setLang, t, i18n, changeLanguage, getAutoLang, translateText }}>
+    <FunctionalContext.Provider value={{ isDarkMode, isAuto, setIsAuto, setIsDarkMode, getAutoTheme, changeTheme, lang, setLang, t, i18n, changeLanguage, getAutoLang, translateText }}>
       {children}
     </FunctionalContext.Provider>
   );

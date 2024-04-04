@@ -20,13 +20,13 @@ export default Taskbar = ({navigation}) => {
           favs.splice(index, 1)
         }
 
-        if (fav?.weather) return  
-
-        const weather = (await getWeather({location: fav.location}))
-        fav.weather = weather
+        if (!fav?.weather) {
+          const weather = (await getWeather({location: fav.location}))
+          fav.weather = weather
+        }
+        
+        if (index == favs.length - 1) setFavs([...favs])
       })
-
-      setFavs([...favs])
     }
 
     fetchList()
@@ -142,7 +142,7 @@ export default Taskbar = ({navigation}) => {
             <TouchableOpacity 
               onPress={() => navigation.navigate('LocationSettings')}
               style={{flexDirection: 'row', alignItems: 'center'}}>
-              <MaterialCommunityIcons color={isDarkMode && 'white'} name='pencil' size={16}></MaterialCommunityIcons>
+              <MaterialCommunityIcons color={isDarkMode ? 'white' : 'black'} name='pencil' size={16}></MaterialCommunityIcons>
               <Text style={[{paddingLeft: 5, paddingRight: 2}, isDarkMode && { color: 'white' }]}>{t('taskbar.locEdit')}</Text>
             </TouchableOpacity>
           </View>
