@@ -26,41 +26,40 @@ const App = () => {
       if (notFirstTime === null) {
         await AsyncStorage.setItem('notFirstTime', "true");
         await AsyncStorage.setItem('favoriteLocations', JSON.stringify([]))
-        await AsyncStorage.setItem('theme', 'aut')
+        await AsyncStorage.setItem('theme', 'auto')
         await AsyncStorage.setItem('lang', 'auto')
         await AsyncStorage.setItem('notFirstTime', 'true')
+        await AsyncStorage.setItem('unit', 'metric')
       }
     }) ()
 
   }, [])
 
   return (
-    <>
-      <FunctionalProvider>
-        <WeatherProvider>
-          <NavigationContainer>
-            <Stack.Navigator initialRouteName="Main">
-              <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
-              <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
-              <Stack.Screen name="Search" options={{ headerShown: false }}>{(navigation) => <SearchPage {...navigation}/>}</Stack.Screen>
-              <Stack.Screen name="Main" options={{ headerShown: false }}>{(navigation) => <>
-                <MainPage {...navigation}/>
-                <Indicator></Indicator>
-              </>}</Stack.Screen>
-              <Stack.Screen name='Settings' options={{headerShown: false}}>{(navigation) => <Settings {...navigation}/>}</Stack.Screen>
-              <Stack.Screen name='WidgetSettings' options={{headerShown: false}}>{(navigation) => <WidgetSettings {...navigation}/>}</Stack.Screen>
-              <Stack.Screen name='LocationSettings' options={{headerShown: false}}>{(navigation) => <>
-                 <LocationSettings {...navigation}/>
-              </>}</Stack.Screen>
-              <Stack.Screen name='LocationAdd' options={{headerShown: false}}>{(navigation) => <LocationAdd {...navigation}/>}</Stack.Screen>
-              <Stack.Screen name='NotificationSettings' options={{headerShown: false}}>{(navigation) => <NotificationSettings {...navigation}/>}</Stack.Screen>
-              <Stack.Screen name='LanguageUnits' options={{headerShown: false}}>{(navigation) => <LanguageUnitsPage {...navigation}></LanguageUnitsPage>}</Stack.Screen>
-              <Stack.Screen name='Language' options={{headerShown: false}}>{(navigation) => <Language {...navigation}></Language>}</Stack.Screen>
-            </Stack.Navigator>
-          </NavigationContainer>
-        </WeatherProvider>
-      </FunctionalProvider>
-    </>
+    <FunctionalProvider>
+      <WeatherProvider>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Loading">
+            <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
+            <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
+            <Stack.Screen name="Search" options={{ headerShown: false }}>{(navigation) => <SearchPage {...navigation}/>}</Stack.Screen>
+            <Stack.Screen name="Main" options={{ headerShown: false }}>{(navigation) => <>
+              <MainPage {...navigation}/>
+              <Indicator></Indicator>
+            </>}</Stack.Screen>
+            <Stack.Screen name='Settings' options={{headerShown: false}}>{(navigation) => <Settings {...navigation}/>}</Stack.Screen>
+            <Stack.Screen name='WidgetSettings' options={{headerShown: false}}>{(navigation) => <WidgetSettings {...navigation}/>}</Stack.Screen>
+            <Stack.Screen name='LocationSettings' options={{headerShown: false}}>{(navigation) => <>
+                <LocationSettings {...navigation}/>
+            </>}</Stack.Screen>
+            <Stack.Screen name='LocationAdd' options={{headerShown: false}}>{(navigation) => <LocationAdd {...navigation}/>}</Stack.Screen>
+            <Stack.Screen name='NotificationSettings' options={{headerShown: false}}>{(navigation) => <NotificationSettings {...navigation}/>}</Stack.Screen>
+            <Stack.Screen name='LanguageUnits' options={{headerShown: false}}>{(navigation) => <LanguageUnitsPage {...navigation}></LanguageUnitsPage>}</Stack.Screen>
+            <Stack.Screen name='Language' options={{headerShown: false}}>{(navigation) => <Language {...navigation}></Language>}</Stack.Screen>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </WeatherProvider>
+    </FunctionalProvider>
   );
 };
 

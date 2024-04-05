@@ -4,13 +4,21 @@ import Checkbox from 'expo-checkbox'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { lightStyles, darkStyles } from '../defaultStyles';
-import { FunctionalContext } from '../Context';
+import { FunctionalContext, WeatherContext } from '../Context';
 import { langs } from '../../functionalities/language/langs';
 
 const LanguageUnitsPage = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
     const { isDarkMode, lang, t } = useContext(FunctionalContext)
+    const { unit, changeUnit } = useContext(WeatherContext)
+    const [selected, setSelected] = useState(unit)
 
+    const units = [
+        {name: "standard", title: t('languageAndUnitsPage.standard'), details: t('languageAndUnitsPage.standardDetails')}, 
+        {name: "metric", title: t('languageAndUnitsPage.metric'), details: t('languageAndUnitsPage.metricDetails')}, 
+        {name: "imperial", title: t('languageAndUnitsPage.imperial'), details: t('languageAndUnitsPage.imperialDetails')}
+    ]
+    
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
             <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 10, borderBottomColor: 'grey', borderBottomWidth: 0.5}}>
@@ -24,18 +32,45 @@ const LanguageUnitsPage = ({ navigation }) => {
                 }
                 <Text style={[{fontSize: 18, fontWeight: 'bold'}, isDarkMode && {color: 'white'}]}>{t('languageAndUnitsPage.title')}</Text>
             </View>
+            
             <View>
                 <TouchableOpacity 
                     onPress={() => navigation.navigate('Language')}
                     style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20,
-                        borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
+                        // borderBottomColor: 'grey', borderBottomWidth: 0.5, 
+                        marginHorizontal: 20}}>
                     <View>
                         <Text style={[{fontSize: 16}, isDarkMode && {color: 'white'}]}>{t('languageAndUnitsPage.item1')}</Text>
-                        <Text style={{color: 'white', fontSize: 12, color: 'grey', paddingTop: 8, paddingBottom: 12}}>{lang.auto ? t('map.auto') : t('map.' + lang.lang)}</Text>
+                        <Text style={{color: 'white', fontSize: 14, color: 'grey', paddingTop: 8, paddingBottom: 12}}>{lang.auto ? t('map.auto') : t('map.' + lang.lang)}</Text>
                     </View>
                     <MaterialCommunityIcons name='chevron-right' size={18} color={isDarkMode ? 'white' : 'black'}></MaterialCommunityIcons>
                 </TouchableOpacity>
             </View>
+
+            <View style={{backgroundColor: isDarkMode ? "#31363F" : '#DDDDDD'}}>
+                <Text style={[{padding: 15, paddingLeft: 20, fontSize: 16, fontWeight: 'bold'}, isDarkMode && {color: 'white'}]}>{t('languageAndUnitsPage.units')}</Text>
+            </View>
+            
+            {
+                units.map((u, index) => {
+                    return (
+                        <View 
+                            key={index}
+                            style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20,
+                                borderBottomColor: 'grey', borderBottomWidth: 0.5, 
+                                marginHorizontal: 20}}>
+                            <View>
+                                <Text style={[{fontSize: 16}, isDarkMode && {color: 'white'}]}>{u.title}</Text>
+                                <Text style={{color: 'white', fontSize: 14, color: 'grey', paddingTop: 8, paddingBottom: 12}}>{u.details}</Text>
+                            </View>
+                            <Checkbox color='dodgerblue' value={u.name === selected} onValueChange={() => {
+                                setSelected(u.name)
+                                changeUnit({newU: u.name})
+                            }}></Checkbox>
+                        </View>
+                    )
+                })
+            }
         </View>
     );
 };

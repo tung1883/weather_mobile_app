@@ -2,9 +2,10 @@ import React, { useContext } from "react";
 import { Text, StyleSheet, View, Image } from "react-native";
 import styled from "styled-components/native";
 import moment from "moment";
-import { FunctionalContext } from "../Context";
+import { FunctionalContext, WeatherContext } from "../Context";
 
 const DailyForecast = ({ day }) => {
+  const { unit, getUnit } = useContext(WeatherContext)
   const { t, isDarkMode } = useContext(FunctionalContext)
 
   function capitalizeEachWord(str) {
@@ -29,8 +30,8 @@ const DailyForecast = ({ day }) => {
         <Text style={isDarkMode && { color: 'white'}}>{capitalizeEachWord(day.weather[0].description)}</Text>
       </View>
       <View style={styles.degreeView}>
-        <Text style={[styles.degree, isDarkMode && { color: 'white'}]}>{Math.round(day.temp.max)}°C</Text>
-        <Text style={[styles.feelsLike, isDarkMode && { color: 'white' }]}>{t('weather.feels')} {Math.round(day.feels_like.day)}°C</Text>
+        <Text style={[styles.degree, isDarkMode && { color: 'white'}]}>{Math.round(day.temp.max)}{getUnit('temp', unit)}</Text>
+        <Text style={[styles.feelsLike, isDarkMode && { color: 'white' }]}>{t('weather.feels')} {Math.round(day.feels_like.day)}{getUnit('temp', unit)}</Text>
       </View>
     </View>
   );

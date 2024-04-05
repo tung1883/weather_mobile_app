@@ -16,7 +16,14 @@
             },
             "languageAndUnitsPage": {
                 "title": "Language and Units",
-                "item1": "Language"
+                "item1": "Language",
+                "units": "Units",
+                "standard": "Standard (K)",
+                "standardDetails": "Kelvin, Meter/Sec, hPa",
+                "metric": "Metric (°C)",
+                "metricDetails": "Celsius, Meter/Sec, hPa",
+                "imperial": "Imperial (°F)",
+                "imperialDetails": "Fahrenheit, Mile/Hour, In ('')"
             },
             "languagePage": {
                 "title": "Language",
@@ -85,7 +92,14 @@
             },
             "languageAndUnitsPage": {
                 "title": "Ngôn ngữ và Đơn vị",
-                "item1": "Ngôn ngữ"
+                "item1": "Ngôn ngữ",
+                "units": "Đơn vị",
+                "standard": "Tiêu chuẩn (K)",
+                "standardDetails": "Kelvin, Mét/Giây, hPa",
+                "metric": "Hệ mét (°C)",
+                "metricDetails": "Celsius, Mét/Giây, hPa",
+                "imperial": "Hệ đơn vị Anh (°F)",
+                "imperialDetails": "Fahrenheit, Dặm/Giờ, Inch ('')"
             },
             "languagePage": {
                 "title": "Ngôn ngữ",

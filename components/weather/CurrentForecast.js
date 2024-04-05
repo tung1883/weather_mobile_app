@@ -2,9 +2,10 @@ import React, { useContext } from "react";
 import styled from "styled-components/native";
 import { StyleSheet, View, Text, Image } from "react-native";
 
-import { FunctionalContext } from "../Context";
+import { FunctionalContext, WeatherContext } from "../Context";
 
 const CurrentForecast = ({ currentWeather }) => {
+  const { unit, getUnit } = useContext(WeatherContext)
   const { isDarkMode, t } = useContext(FunctionalContext)
 
   const parseTimezone = (timezone) => {
@@ -28,7 +29,7 @@ const CurrentForecast = ({ currentWeather }) => {
           )}
           <Text style={styles.currentDegrees}>
             {Math.round(currentWeather.current && currentWeather.current.temp)}
-            °C
+            {getUnit('temp', unit)}
           </Text>
         </View>
         <Text style={styles.description}>
@@ -43,7 +44,7 @@ const CurrentForecast = ({ currentWeather }) => {
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
               {currentWeather.current &&
                 Math.round(currentWeather.current.feels_like)}
-              °C
+              {getUnit('temp', unit)}
             </Text>
           </View>
           <View style={[styles.detailsBox, isDarkMode && { color: 'white'}]}>
@@ -51,7 +52,7 @@ const CurrentForecast = ({ currentWeather }) => {
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
               {currentWeather.daily &&
                 Math.round(currentWeather.daily[0].temp.min)}
-              °C
+              {getUnit('temp', unit)}
             </Text>
           </View>
           <View style={[styles.detailsBox, isDarkMode && { color: 'white'}]}>
@@ -59,7 +60,7 @@ const CurrentForecast = ({ currentWeather }) => {
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
               {currentWeather.daily &&
                 Math.round(currentWeather.daily[0].temp.max)}
-              °C
+              {getUnit('temp', unit)}
             </Text>
           </View>
         </View>
@@ -67,7 +68,7 @@ const CurrentForecast = ({ currentWeather }) => {
           <View style={styles.detailsBox}>
             <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.wind')}</Text>
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
-              {currentWeather.current && currentWeather.current.wind_speed} m/s
+              {currentWeather.current && currentWeather.current.wind_speed} {getUnit('wind', unit)}
             </Text>
           </View>
           <View style={[styles.detailsBox, isDarkMode && { color: 'white'}]}>

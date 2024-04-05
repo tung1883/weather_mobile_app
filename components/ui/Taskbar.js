@@ -1,14 +1,13 @@
 import { useContext, useEffect, useState, useRef } from 'react'
-import { StyleSheet, View, FlatList, TouchableOpacity, Image, Text } from 'react-native'
+import { StyleSheet, View, FlatList, TouchableOpacity, Image, Text, Share } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import logoImg from '../../assets/logo.png'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { FunctionalContext, WeatherContext } from '../Context';
 import { putToFrontFavs } from '../../functionalities/favoriteLocations'
 
 export default Taskbar = ({navigation}) => {
-  const { location,  setLocation, weather, setWeather, getWeather, favs, setFavs, gps } = useContext(WeatherContext)
+  const { location,  weather, share, setLocation, setWeather, getWeather, favs, setFavs, gps } = useContext(WeatherContext)
   const { isDarkMode, t } = useContext(FunctionalContext)
   const [isViewingMore, setIsViewingMore] = useState(false) //to change the UI when click "view more locations"
 
@@ -106,7 +105,11 @@ export default Taskbar = ({navigation}) => {
     return (
       <TouchableOpacity 
         onPress={() => {
-          if (index == 2) return
+          if (index == 2) {
+            share({text: referText})
+            return
+          }
+
           navigation.navigate(item.page)
         }}
         style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
@@ -122,7 +125,9 @@ export default Taskbar = ({navigation}) => {
 
   const renderSettings = ( {item, index} ) => {
       return (
-      <TouchableOpacity onPress={() => navigation.navigate('Settings')}
+      <TouchableOpacity onPress={() => {
+        if (index == 0) navigation.navigate('Settings')
+      }}
           style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
               paddingVertical: 10}}>
           <Text style={[{fontSize: 15}, isDarkMode && { color: 'white' }]}>{item}</Text>
@@ -132,78 +137,78 @@ export default Taskbar = ({navigation}) => {
   }
 
   return (
-      <View style={[styles.taskbar, isDarkMode && { backgroundColor: '#1E1E1E' }]}>
-        {/* logo */}
-        <View style ={[styles.grid, {flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingBottom: 30}]}>
-          <Image source={logoImg} style={styles.taskbarLogo}></Image>
-          <Text style={[{marginLeft: 10, fontWeight: 'bold', fontSize: 18}, isDarkMode && { color: 'white' }]}>OpenWeather</Text>
-        </View>
+    <View style={[styles.taskbar, isDarkMode && { backgroundColor: '#1E1E1E' }]}>
+      {/* logo */}
+      <View style ={[styles.grid, {flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingBottom: 30}]}>
+        <Image source={logoImg} style={styles.taskbarLogo}></Image>
+        <Text style={[{marginLeft: 10, fontWeight: 'bold', fontSize: 18}, isDarkMode && { color: 'white' }]}>OpenWeather</Text>
+      </View>
 
-        {/* locations */}
-        <View> 
-          <View style={[styles.grid, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
-            <Text style={[{fontWeight: 'bold'}, isDarkMode && { color: 'white' }]}>{t('taskbar.location')}</Text>
-            <TouchableOpacity 
-              onPress={() => navigation.navigate('LocationSettings')}
-              style={{flexDirection: 'row', alignItems: 'center'}}>
-              <MaterialCommunityIcons color={isDarkMode ? 'white' : 'black'} name='pencil' size={16}></MaterialCommunityIcons>
-              <Text style={[{paddingLeft: 5, paddingRight: 2}, isDarkMode && { color: 'white' }]}>{t('taskbar.locEdit')}</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.2, borderBottomColor: 'grey'}}>
-            <FlatList
-                data={favs.slice(0, 3)}
-                renderItem={({item, index}) => renderLocation({ item, index })}
-                keyExtractor={(item) => JSON.stringify(item.location.city + item.selected)}
-                style={{width: '100%'}}
-            />
-            {
-              isViewingMore && 
-              <FlatList
-                data={favs.slice(3, 11)}
-                renderItem={({item, index}) => renderSecondLocation({ item, index })}
-                keyExtractor={(item) => item?.location?.city}
-                style={{width: '100%'}}
-              />
-            }
-            {favs.length > 3 && <TouchableOpacity
-              onPress={() => setIsViewingMore(!isViewingMore)}
-            >
-              <View style={{width: '100%', flexDirection: 'row', alignItems: 'center', 
-                justifyContent: 'space-between', paddingVertical: 5, paddingRight: 0}}>
-                <>
-                  <Text style={[{fontSize: 15}, isDarkMode && { color: 'white' }]}>
-                    {(isViewingMore) ? 'View fewer locations' : 
-                      `View more locations`}</Text>
-                  <MaterialCommunityIcons color={isDarkMode && 'white'} name={(isViewingMore) ? 'chevron-up' : 'chevron-down'} size={20}></MaterialCommunityIcons>
-                </>
-              </View>
-            </TouchableOpacity>}
-          </View>
+      {/* locations */}
+      <View> 
+        <View style={[styles.grid, {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}]}>
+          <Text style={[{fontWeight: 'bold'}, isDarkMode && { color: 'white' }]}>{t('taskbar.location')}</Text>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('LocationSettings')}
+            style={{flexDirection: 'row', alignItems: 'center'}}>
+            <MaterialCommunityIcons color={isDarkMode ? 'white' : 'black'} name='pencil' size={16}></MaterialCommunityIcons>
+            <Text style={[{paddingLeft: 5, paddingRight: 2}, isDarkMode && { color: 'white' }]}>{t('taskbar.locEdit')}</Text>
+          </TouchableOpacity>
         </View>
-      
-        {/* special features */}
-        <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.20, borderBottomColor: 'grey'}}>
-            <FlatList
-                data={featureList}
-                renderItem={({item, index}) => renderFeatures({ item, index })}
-                keyExtractor={(item) => item.title}
-                style={{width: '100%'}}
-            />
-          </View>
-
-        {/* settings */}
-        <View style={{padding: 10}}>
+        
+        <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.2, borderBottomColor: 'grey'}}>
           <FlatList
-              data={settingList}
-              renderItem={({item, index}) => renderSettings({ item, index })}
-              keyExtractor={(item) => item}
+              data={favs.slice(0, 3)}
+              renderItem={({item, index}) => renderLocation({ item, index })}
+              keyExtractor={(item) => JSON.stringify(item.location.city + item.selected)}
+              style={{width: '100%'}}
+          />
+          {
+            isViewingMore && 
+            <FlatList
+              data={favs.slice(3, 11)}
+              renderItem={({item, index}) => renderSecondLocation({ item, index })}
+              keyExtractor={(item) => item?.location?.city}
+              style={{width: '100%'}}
+            />
+          }
+          {favs.length > 3 && <TouchableOpacity
+            onPress={() => setIsViewingMore(!isViewingMore)}
+          >
+            <View style={{width: '100%', flexDirection: 'row', alignItems: 'center', 
+              justifyContent: 'space-between', paddingVertical: 5, paddingRight: 0}}>
+              <>
+                <Text style={[{fontSize: 15}, isDarkMode && { color: 'white' }]}>
+                  {(isViewingMore) ? 'View fewer locations' : 
+                    `View more locations`}</Text>
+                <MaterialCommunityIcons color={isDarkMode && 'white'} name={(isViewingMore) ? 'chevron-up' : 'chevron-down'} size={20}></MaterialCommunityIcons>
+              </>
+            </View>
+          </TouchableOpacity>}
+        </View>
+      </View>
+    
+      {/* special features */}
+      <View style={{padding: 10, marginBottom: 5, borderBottomWidth: 0.20, borderBottomColor: 'grey'}}>
+          <FlatList
+              data={featureList}
+              renderItem={({item, index}) => renderFeatures({ item, index })}
+              keyExtractor={(item) => item.title}
               style={{width: '100%'}}
           />
         </View>
 
+      {/* settings */}
+      <View style={{padding: 10}}>
+        <FlatList
+            data={settingList}
+            renderItem={({item, index}) => renderSettings({ item, index })}
+            keyExtractor={(item) => item}
+            style={{width: '100%'}}
+        />
       </View>
+
+    </View>
   )
 }
 
@@ -241,3 +246,13 @@ const styles = StyleSheet.create({
     borderTopColor: 'grey'
   }
 })
+
+const referText = `
+Hello,
+How's the weather there? I'd recommend you to check out 1Weather for accurate weather forecasts, helpful weather alerts and tips, live weather widgets, and detailed and easy-to-navigate radar tracking.
+
+The app also features Shorts, a rail of fact-checked weather news cards with 60-word summaries. This keeps you updated on major weather and environmental news across the US and the world.
+
+Download the app using my referral link here: 
+https://openweather.com
+`

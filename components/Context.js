@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { Appearance } from 'react-native';
+import { Appearance, Share } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location'
 import { useTranslation } from 'react-i18next';
@@ -18,12 +18,19 @@ export const WeatherProvider = ({ children }) => {
   const [gps, setGps] = useState({})
   const [favs, setFavs] = useState([])
   const [fetching, setFetching] = useState(false)
+  const [unit, setUnit] = useState()
 
   useEffect(() => {
     init()
-  }, [])
+  }, [unit])
 
   const init = async () => {
+    if (!unit) {
+      let u = await AsyncStorage.getItem('unit')
+      setUnit(u)
+      return 
+    }
+
     const location = await getGpsLocation()
     const weather = await getWeather({location})
     setLocation(location)
@@ -135,7 +142,7 @@ export const WeatherProvider = ({ children }) => {
     // if (!location) return null
 
     // return fetch(
-    //   `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=metric&appid=${config.API_KEY}`,
+    //   `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=${unit}&appid=${config.API_KEY}`,
     //   { signal }
     // )
     // .then((res) => {
@@ -157,9 +164,72 @@ export const WeatherProvider = ({ children }) => {
     return JSON.parse(await AsyncStorage.getItem(JSON.stringify(location)))
   }
 
+  const share = async ({text}) => {
+    try {
+      const result = await Share.share({
+        message: text,
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  const changeUnit = async ({newU}) => {
+    if (newU == unit) return
+    setUnit(newU)
+    await AsyncStorage.setItem('unit', newU)
+  }
+
+  const getUnit = (type, unit) => {
+    switch (unit) {
+      case 'standard':
+        switch (type) {
+          case 'temp':
+            return 'K'
+          case 'wind':
+            return 'm/s'
+          case 'pressure':
+            return 'hPa'
+          default: break
+        }
+        break
+      case 'metric':
+        switch (type) {
+          case 'temp':
+            return '°C'
+          case 'wind':
+            return 'm/s'
+          case 'pressure':
+            return 'hPa'
+          default: break
+        }
+      case 'imperial':
+        switch (type) {
+          case 'temp':
+            return '°F'
+          case 'wind':
+            return 'mph'
+          case 'pressure':
+            return 'in'
+          default: break
+        }
+      default: break
+    }
+  }
+
   return (
-    <WeatherContext.Provider value={{location, setLocation, weather, setWeather, favs, setFavs, gps, setGps, fetching, setFetching,
-      getGpsLocation, getLocationByCity, getWeather}}>
+    <WeatherContext.Provider value={{location, setLocation, weather, setWeather, favs, setFavs, gps, setGps, fetching, setFetching, share,
+      getGpsLocation, getLocationByCity, getWeather, unit, changeUnit, getUnit}}>
       {children}
     </WeatherContext.Provider>
   );
@@ -173,6 +243,7 @@ export const FunctionalProvider = ({ children }) => {
 
   useEffect(() => {
     const init = async () => {
+      //set theme
       let theme = await AsyncStorage.getItem('theme')
 
       if (!theme) {
@@ -184,7 +255,6 @@ export const FunctionalProvider = ({ children }) => {
         setIsAuto(true)
         if (getAutoTheme() === 'light') setIsDarkMode(false)
         else setIsDarkMode(true)
-        return
       }
   
       if (theme === 'light') setIsDarkMode(false)
@@ -192,6 +262,7 @@ export const FunctionalProvider = ({ children }) => {
 
       setIsDarkMode(true)
 
+      //set language
       let lang = await AsyncStorage.getItem('lang')
       let auto = false
 
@@ -266,7 +337,8 @@ export const FunctionalProvider = ({ children }) => {
   }
 
   return (
-    <FunctionalContext.Provider value={{ isDarkMode, isAuto, setIsAuto, setIsDarkMode, getAutoTheme, changeTheme, lang, setLang, t, i18n, changeLanguage, getAutoLang, translateText }}>
+    <FunctionalContext.Provider value={{ isDarkMode, isAuto, setIsAuto, setIsDarkMode, getAutoTheme, changeTheme, lang, setLang, t, i18n, changeLanguage, getAutoLang,
+      translateText }}>
       {children}
     </FunctionalContext.Provider>
   );
