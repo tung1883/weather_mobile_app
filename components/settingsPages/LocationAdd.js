@@ -1,13 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, createIconSet } from '@expo/vector-icons';
 import * as Location from 'expo-location'
-import { cities, popularCities } from '../assets/citiList';
-import { lightStyles, darkStyles } from './defaultStyles';
-import { FunctionalContext, WeatherContext } from './Context';
-import { addCounter, putToFrontFavs } from '../functionalities/favoriteLocations';
 
-const SearchPage = ({navigation}) => {    
+import { cities, popularCities } from '../../assets/citiList';
+import { lightStyles, darkStyles } from '../defaultStyles';
+import { FunctionalContext, WeatherContext } from '../Context';
+import { addCounter, addFavorite, putToFrontFavs } from '../../functionalities/favoriteLocations';
+
+const LocationAdd = ({navigation}) => {    
     const goBack = navigation?.canGoBack()
     const { isDarkMode, toggleTheme, t, translateText} = useContext(FunctionalContext);
     let { setLocation, gps, setGps, getGpsLocation, getLocationByCity, getWeather, favs, setFavs, setWeather } = useContext(WeatherContext)
@@ -15,40 +16,6 @@ const SearchPage = ({navigation}) => {
     const [suggestions, setSuggestions] = useState(popularCities);
     const [listTitle, setListTitle] = useState(t('searchPage.popularSuggestion'))
     const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
-
-    const requestLocationPermission = async () => {
-        try {
-            if (isFetching) return
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            
-            if (status === 'granted') {
-                setIsFetching(true) 
-
-                if (gps?.location) {
-                    setLocation(gps.location)
-                    setWeather(gps.weather)
-                    putToFrontFavs({favs, setFavs, fav: {...gps, gps: true}})
-                    setIsFetching(false)
-                    return navigation.replace('Main')
-                }
-
-                const location = await getGpsLocation()
-                if (location) {
-                    const weather = await getWeather({location})
-                    setLocation(location)
-                    setWeather(weather)
-                    setGps({location, weather})
-                    putToFrontFavs({favs, setFavs, fav: {location, weather, gps: true}})
-                    setIsFetching(false)
-                    return navigation.replace('Main')
-                }
-
-                setIsFetching(false)
-            }
-        } catch (error) {
-            console.error('Error requesting location permission: ', error);
-        }
-    };
 
     const handleSearch = (text) => {
         setSearchQuery(text);
@@ -78,15 +45,10 @@ const SearchPage = ({navigation}) => {
         getLocationByCity(searchQuery)
         .then(async (result) => {
             if (!result) return setIsFetching(false)
-
             setIsFetching(true)
             const weather = await getWeather({location: result})
-            setLocation(result)
-            setWeather(weather)
-            addCounter({location: result, favs, setFavs})
-            putToFrontFavs({favs, setFavs, fav: {location: result, weather}})
+            addFavorite({favs, setFavs, newFav: {location: result, weather}})
             setIsFetching(false)
-            navigation.replace('Main')
         })
     }
 
@@ -103,15 +65,11 @@ const SearchPage = ({navigation}) => {
                     setIsFetching(true)
                     
                     const location = await getLocationByCity(item)
+                    const weather = await getWeather({location})
                     if (!location) return setIsFetching(false)
 
-                    const weather = await getWeather({location})
-                    setLocation(location)
-                    setWeather(weather)
-                    addCounter({location, favs, setFavs})
-                    putToFrontFavs({favs, setFavs, fav: {location, weather}})
+                    addFavorite({favs, setFavs, newFav: {location, weather}})
                     setIsFetching(false)
-                    navigation.replace('Main');
                 }}
             >
                 <Text style={[styles.item, isDarkMode && styles.darkItem]}>{item}</Text>
@@ -147,13 +105,6 @@ const SearchPage = ({navigation}) => {
                     )}
                 </View>
             </View>
-            <TouchableOpacity   
-                onPress={requestLocationPermission}
-                style={[styles.button, isDarkMode && styles.darkButton]}
-            >
-                <MaterialCommunityIcons name="navigation-variant" size={20} color="white" style={{margin: -3, padding: -3, marginRight: 5}}/>
-                <Text style={styles.buttonText}>{t('searchPage.currentLocation')}</Text>
-            </TouchableOpacity>
             <Text style={[{marginTop: 20, marginBottom: 5, fontSize: 16, fontWeight: 'bold', color: 'black'}, isDarkMode && { color: 'white' }]}>{listTitle}</Text>
             <FlatList
                 data={suggestions}
@@ -272,4 +223,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SearchPage;
+export default LocationAdd;

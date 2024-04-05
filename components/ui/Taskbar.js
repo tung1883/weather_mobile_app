@@ -43,7 +43,11 @@ export default Taskbar = ({navigation}) => {
   ]
 
   const renderLocation = ( {item, index} ) => {
-    if (!item.location.city || (index !== 0 && item.location.city == location.city)) {
+    // if (!item.location.city || (index !== 0 && item.location.city == location.city)) {
+    //   return <></>
+    // }
+
+    if (!item.location.city) {
       return <></>
     }
 
@@ -59,7 +63,7 @@ export default Taskbar = ({navigation}) => {
         style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8}}
     >
         {
-          (index === 0) ?
+          (index === 0 && JSON.stringify(item.location) == JSON.stringify(location)) ?
           <Text style={[{color: '#2D5DA1', fontSize: 16, fontWeight: 'bold'}, isDarkMode && { color: '#068FFF'}]}>{item.location.city}</Text> :
             <Text style={[{fontSize: 15}, isDarkMode && { color: 'white' }]}>{item.location.city}</Text> 
         }

@@ -1,78 +1,118 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Location from 'expo-location'
 
 import { lightStyles, darkStyles } from '../defaultStyles';
-import { FunctionalContext } from '../Context';
+import { FunctionalContext, WeatherContext } from '../Context';
 import Checkbox from 'expo-checkbox';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { putToFrontFavs, removeLocation } from '../../functionalities/favoriteLocations';
 
 const LocationSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
     const { isDarkMode, setIsAuto, getAutoTheme, setIsDarkMode, t } = useContext(FunctionalContext);
-    const [isSettingTheme, setIsSettingTheme] = useState(false)
+    const { location, favs, setFavs, setGps, getGpsLocation, getWeather, gps, setFetching } = useContext(WeatherContext)
+    const [checked, setChecked ] = useState(gps != null)
+    const [isFetching, setIsFetching] = useState(false)
 
     return (
         <>
             <View 
                 style={[styles.container, isDarkMode && styles.darkContainer]}
             >
-                <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 10, borderBottomColor: 'grey', borderBottomWidth: 0.5}}>
-                    {
-                        goBack &&
-                        <MaterialCommunityIcons 
-                            name="arrow-left" size={24} color={isDarkMode ? "white" : "black"}
-                            style={{margin: -3, padding: -3, marginRight: 15, paddingLeft: 20}}
-                            onPress={() => {navigation.goBack()}}
-                        />
-                    }
-                    <Text style={[{fontSize: 18, fontWeight: 'bold'}, isDarkMode && { color: 'white' }]}>{t('locationSettings.title')}</Text>
-                </View>
-                <View>
-                    <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 20,
-                        borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
-                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                            <MaterialCommunityIcons name='bell' color={isDarkMode ? '#FCDC2A' : '#FFD23F'} size={18} style={{paddingRight: 10}}/>
-                            <Text style={[{fontSize: 16}, isDarkMode && { color: 'white' }]}>{t('settings.noti')}</Text>
-                        </View>
-                        <MaterialCommunityIcons name='chevron-right' size={18} color={(isDarkMode) ? 'white' : 'black'}></MaterialCommunityIcons>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 10, borderBottomColor: 'grey', borderBottomWidth: 0.5}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        {
+                            goBack &&
+                            <MaterialCommunityIcons 
+                                name="arrow-left" size={24} color={isDarkMode ? "white" : "black"}
+                                style={{margin: -3, padding: -3, marginRight: 15, paddingLeft: 20}}
+                                onPress={() => {navigation.goBack()}}
+                            />
+                        }
+                        <Text style={[{fontSize: 18, fontWeight: 'bold'}, isDarkMode && { color: 'white' }]}>{t('locationSettings.title')}</Text>
+                    </View>
+                    <TouchableOpacity style={{paddingRight: 20}}
+                        onPress={() => {navigation.navigate('LocationAdd')}}
+                    >
+                        <MaterialCommunityIcons name='plus' size={22} color={(isDarkMode) ? 'white' : 'black'}></MaterialCommunityIcons>
                     </TouchableOpacity>
                 </View>
-            </View>
 
-            {isSettingTheme && <Modal visible={isSettingTheme} transparent animationType="fade">
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text style={{fontSize: 15, paddingBottom: 10, fontWeight: 'bold'}}>Select Theme</Text>
-                        <TouchableOpacity 
-                            onPress={async () => {
-                                setIsAuto(true)
-                                const theme = getAutoTheme()
-                                if (theme === 'light') setIsDarkMode(false)
-                                else setIsDarkMode(true)
+                <View>
+                    <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 20,
+                        borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <MaterialCommunityIcons name='navigation-variant' color='dodgerblue' size={18} style={{paddingRight: 10}}/>
+                            <Text style={[{fontSize: 16, fontWeight: 'bold'}, isDarkMode && { color: 'white' }]}>{t('locationSettings.current')}</Text>
+                        </View>
+                    <Checkbox 
+                        color='dodgerblue'
+                        value={checked} 
+                        onValueChange={async () => {
+                            if (checked) { //turn off gps
+                                setGps(null)
+                                setFavs(favs.filter((fav) => fav.gps !== true))
+                            } else { //turn on gps
+                                setIsFetching(true)
+                                const { status } = await Location.requestForegroundPermissionsAsync();
+            
+                                if (status === 'granted') {
+                                    const loc = await getGpsLocation()
+                                    if (loc) {
+                                        const weather = await getWeather({location: loc})
+                                        setGps({location: loc, weather})
 
-                                await AsyncStorage.setItem('theme', 'auto')
-                                setIsSettingTheme(false)
-                            }}
-                            style={{borderBottomWidth: 0.5, borderBottomColor: 'grey', paddingRight: 100, paddingVertical: 10}}>
-                            <Text style={{fontSize: 15}}>Default</Text></TouchableOpacity>
-                        <TouchableOpacity 
-                            onPress={async () => {
-                                setIsDarkMode(false)
-                                await AsyncStorage.setItem('theme', 'light')
-                                setIsSettingTheme(false)
-                            }}
-                            style={{borderBottomWidth: 0.5, borderBottomColor: 'grey', paddingRight: 100, paddingVertical: 10}}><Text>Light</Text></TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={async () => {
-                                setIsDarkMode(true)
-                                await AsyncStorage.setItem('theme', 'dark')
-                                setIsSettingTheme(false)
-                            }}
-                            style={{paddingRight: 100, paddingVertical: 5}}><Text>Dark</Text></TouchableOpacity>
+                                        if (JSON.stringify(location) == JSON.stringify(loc)) {
+                                            putToFrontFavs({favs, setFavs, fav: {location: loc, weather, gps: true}})
+                                        } else {
+                                            setFavs([...favs, {location: loc, weather, gps: true}])
+                                        }
+                                    }
+                                }
+
+                                setIsFetching(false)
+
+                            }
+                        setChecked(!checked)
+                        }}
+                    />
                     </View>
                 </View>
-            </Modal>}
+
+                {
+                    favs.map((fav, index) => {
+                        if (fav.gps) return
+
+                        return (
+                            <View key={index}>
+                                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 20,
+                                    borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
+                                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                        <MaterialCommunityIcons name='map-marker-star' color={isDarkMode ? 'white' : 'black'} size={18} style={{paddingRight: 10}}/>
+                                        <Text style={[{fontSize: 16}, isDarkMode && { color: 'white' }]}>{`${fav.location.city}, ${fav.location.country}`}</Text>
+                                    </View>
+                                <TouchableOpacity onPress={() => {
+                                    removeLocation({favs, setFavs, location: fav.location})
+                                }}>
+                                    <MaterialCommunityIcons name='window-close' size={20} color={(isDarkMode) ? 'white' : 'black'}></MaterialCommunityIcons>
+                                </TouchableOpacity>
+                                </View>
+                            </View>
+                        )
+                    })
+                }
+            </View>
+
+            <Modal visible={isFetching} transparent animationType="fade">
+                <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                    <ActivityIndicator size="large" color="black" />
+                    <Text style={styles.loadingText}>{t('searchPage.fetch')}</Text>
+                </View>
+                </View>
+            </Modal>
         </>
     );
 };

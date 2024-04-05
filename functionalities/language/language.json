@@ -60,6 +60,10 @@
                 "wind": "Wind",
                 "humid": "Humidity",
                 "rain": "Rain"
+            },
+            "locationSettings": {
+                "title": "Favorite Locations",
+                "current": "Use Current Location"
             }
         }
     },
@@ -125,6 +129,10 @@
                 "wind": "Tốc độ gió",
                 "humid": "Độ ẩm",
                 "rain": "Mưa"
+            },
+            "locationSettings": {
+                "title": "Vị trí yêu thích",
+                "current": "Dùng vị trí hiện tại"
             }
         }
     }

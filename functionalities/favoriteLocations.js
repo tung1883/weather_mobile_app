@@ -9,21 +9,21 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 
 //add locations which are added to the favs explicitly by the user
 export const addFavorite = async ({favs, setFavs, newFav}) => {
-    let isInfavs = false
-    favs.find((locationObj) => {
-      if (locationObj?.location === newFav) {
-        locationObj.favorite = true
-        isInfavs = true
-      }
-    })
+  let isInfavs = false
+  favs.find((fav) => {
+    if (JSON.stringify(fav?.location) == JSON.stringify(newFav.location)) {
+      fav.favorite = true
+      isInfavs = true
+    }
+  })
 
-    if (!isInfavs) {
-      favs.push({ newFav, counter: 0, favorite: true})
-    } 
+  if (!isInfavs) {
+    favs.push({ ...newFav, counter: 0, favorite: true})
+  } 
 
-    sortLocations(favs)
-    setFavs(favs)
-    await AsyncStorage.setItem('favoriteLocations', JSON.stringify(favs))
+  sortLocations(favs)
+  setFavs([...favs])
+  await AsyncStorage.setItem('favoriteLocations', JSON.stringify(favs.filter((fav) => fav.gps !== true)))
 }
 
 //add 1 counter if user visit a location
@@ -43,15 +43,15 @@ export const addCounter = async ({favs, setFavs, location}) => {
 
   sortLocations(favs)
   setFavs(favs)
-  await AsyncStorage.setItem('favoriteLocations', JSON.stringify(favs))
+  await AsyncStorage.setItem('favoriteLocations', JSON.stringify(favs.filter((fav) => fav.gps !== true)))
 } 
 
 export const removeLocation = async ({favs, setFavs, location}) => {
-  favs = favs.filter(obj => obj.city !== location.city || obj.country !== location.country)
+  favs = favs.filter(fav => JSON.stringify(fav.location) !== JSON.stringify(location))
   sortLocations(favs)
   setFavs(favs)
-  await AsyncStorage.setItem('favoriteLocations', JSON.stringify(favs))
-}
+  await AsyncStorage.setItem('favoriteLocations', JSON.stringify(favs.filter((fav) => fav.gps !== true)))
+} 
 
 export const getFavoriteLocations = async ({currentLoc, favs}) => {
   try {

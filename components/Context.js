@@ -17,6 +17,7 @@ export const WeatherProvider = ({ children }) => {
   const [weather, setWeather] = useState({})
   const [gps, setGps] = useState({})
   const [favs, setFavs] = useState([])
+  const [fetching, setFetching] = useState(false)
 
   useEffect(() => {
     init()
@@ -157,7 +158,7 @@ export const WeatherProvider = ({ children }) => {
   }
 
   return (
-    <WeatherContext.Provider value={{location, setLocation, weather, setWeather, favs, setFavs, gps, setGps,
+    <WeatherContext.Provider value={{location, setLocation, weather, setWeather, favs, setFavs, gps, setGps, fetching, setFetching,
       getGpsLocation, getLocationByCity, getWeather}}>
       {children}
     </WeatherContext.Provider>
