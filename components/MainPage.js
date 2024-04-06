@@ -17,7 +17,7 @@ const MainPage = ({ navigation }) => {
   const [formattedTime, setFormattedTime] = useState('');
   const intervals = useRef([])
   const [currentSection, setCurrentSection] = useState(0) //used to move between different weather sections, see sectionList in Footer.js
-
+  
   useEffect(() => {
     getTime()
 

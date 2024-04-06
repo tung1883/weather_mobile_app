@@ -9,9 +9,7 @@ const DailyForecast = ({ day }) => {
   const { t, isDarkMode } = useContext(FunctionalContext)
 
   function capitalizeEachWord(str) {
-    return str.replace(/\b\w/g, function(char) {
-      return char.toUpperCase();
-    });
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   return (
@@ -39,7 +37,8 @@ const DailyForecast = ({ day }) => {
 
 const styles = StyleSheet.create({
   dayContainer: {
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
     borderRadius: 10,
     margin: 10,
@@ -52,12 +51,13 @@ const styles = StyleSheet.create({
   },
   dateContainer: {
     textAlign: 'right',
+    maxWidth: 60,
     flex: 1,
   },
   weekDay: {
-    fontSize: 24,
+    fontSize: 20,
     textAlign: 'center',
-    marginVertical: 3,
+    marginVertical: 1,
   },
   iconTempView: {
     display: 'flex',

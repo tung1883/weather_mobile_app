@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { Appearance, Share } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location'
@@ -19,6 +19,7 @@ export const WeatherProvider = ({ children }) => {
   const [favs, setFavs] = useState([])
   const [fetching, setFetching] = useState(false)
   const [unit, setUnit] = useState()
+  const { lang, parsedLang } = useContext(FunctionalContext)
 
   useEffect(() => {
     init()
@@ -139,29 +140,29 @@ export const WeatherProvider = ({ children }) => {
 
   const getWeather = async ({location, current}) => {
     //TRUE API CALL
-    // if (!location) return null
+    if (!location) return null
 
-    // return fetch(
-    //   `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=${unit}&appid=${config.API_KEY}`,
-    //   { signal }
-    // )
-    // .then((res) => {
-    //   return res.json()
-    // })
-    // .then((data) => {
-    //   return data
-    // })
-    // .catch((err) => {
-    //   console.log("error", err);
-    //   return null
-    // });
+    return fetch(
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=${unit}&lang=${parsedLang(lang.lang)}&appid=${config.API_KEY}`,
+      { signal }
+    )
+    .then((res) => {
+      return res.json()
+    })
+    .then((data) => {
+      return data
+    })
+    .catch((err) => {
+      console.log("error", err);
+      return null
+    });
 
     //MOCK API CALL
-    if (current) {
-      location = await AsyncStorage.getItem('current')
-    }
+    // if (current) {
+    //   location = await AsyncStorage.getItem('current')
+    // }
     
-    return JSON.parse(await AsyncStorage.getItem(JSON.stringify(location)))
+    // return JSON.parse(await AsyncStorage.getItem(JSON.stringify(location)))
   }
 
   const share = async ({text}) => {
@@ -336,9 +337,14 @@ export const FunctionalProvider = ({ children }) => {
     return { auto: true, lang: Localization.getLocales()[0].languageCode}
   }
 
+  const parsedLang = (lang) => {
+    if (lang == 'vn') return 'vi'
+    return lang
+  }
+
   return (
     <FunctionalContext.Provider value={{ isDarkMode, isAuto, setIsAuto, setIsDarkMode, getAutoTheme, changeTheme, lang, setLang, t, i18n, changeLanguage, getAutoLang,
-      translateText }}>
+      parsedLang }}>
       {children}
     </FunctionalContext.Provider>
   );

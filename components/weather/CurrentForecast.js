@@ -34,7 +34,7 @@ const CurrentForecast = ({ currentWeather }) => {
         </View>
         <Text style={styles.description}>
           {currentWeather.current &&
-            currentWeather.current.weather[0].description}
+            currentWeather.current.weather[0].description.charAt(0).toUpperCase() + currentWeather.current.weather[0].description.slice(1)}
         </Text>
       </View>
       <View style={[styles.secondaryInfoContainer, isDarkMode && { backgroundColor: '#1E1E1E', borderColor: 'grey', borderWidth: 1 }]}>
@@ -108,8 +108,7 @@ const styles = StyleSheet.create({
   },
   description: {
     color: 'white',
-    fontSize: 15,
-    textTransform: 'capitalize',
+    fontSize: 15
   },
   secondaryInfoContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',

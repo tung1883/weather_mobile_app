@@ -71,6 +71,19 @@
             "locationSettings": {
                 "title": "Favorite Locations",
                 "current": "Use Current Location"
+            },
+            "health": {
+                "title": "Health Center",
+                "air": "Air Quality Index",
+                "good": "Good",
+                "moderate": "Moderate",
+                "hazardous": "Hazardous",
+                "notfound": "Data not found",
+                "allergy": "Allergy Outlook",
+                "grass": "Grass Pollen",
+                "weed": "Weed Pollen",
+                "tree": "Tree Pollen",
+                "none": "None"
             }
         }
     },
@@ -147,6 +160,19 @@
             "locationSettings": {
                 "title": "Vị trí yêu thích",
                 "current": "Dùng vị trí hiện tại"
+            },
+            "health": {
+                "title": "Trung tâm Sức khỏe",
+                "air": "Chất lượng không khí",
+                "good": "Tốt",
+                "moderate": "Trung bình",
+                "hazardous": "Xấu",
+                "notfound": "Không tìm thấy dữ liệu",
+                "allergy": "Cảnh báo dị ứng",
+                "grass": "Dị ứng cỏ",
+                "weed": "Dị ứng cỏ dại",
+                "tree": "Dị ứng cây",
+                "none": "Không"
             }
         }
     }
