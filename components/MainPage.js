@@ -73,7 +73,7 @@ const MainPage = ({ navigation }) => {
           </View>
 
           {/* body */}
-          <WeatherPage weather={weather} currentSection={currentSection}></WeatherPage>
+          <WeatherPage currentSection={currentSection}></WeatherPage>
 
           {/* footer */}
           <Footer currentSection={currentSection} setCurrentSection={setCurrentSection}/>

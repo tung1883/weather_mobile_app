@@ -66,7 +66,8 @@
                 "high": "High",
                 "wind": "Wind",
                 "humid": "Humidity",
-                "rain": "Rain"
+                "rain": "Rain",
+                "pressure": "Pressure"
             },
             "locationSettings": {
                 "title": "Favorite Locations",
@@ -78,12 +79,17 @@
                 "good": "Good",
                 "moderate": "Moderate",
                 "hazardous": "Hazardous",
-                "notfound": "Data not found",
+                "notfound": "No data for",
                 "allergy": "Allergy Outlook",
                 "grass": "Grass Pollen",
                 "weed": "Weed Pollen",
                 "tree": "Tree Pollen",
-                "none": "None"
+                "none": "None",
+                "viewmore": "View more"
+            },
+            "today": {
+                "forecastTitle": "Weather Forecast",
+                "precipTitle": "Precipitation"
             }
         }
     },
@@ -150,12 +156,13 @@
                 "theme": "Chế độ sáng tối "
             },
             "weather": {
-                "feels": "Cảm giác",
+                "feels": "Cảm giác như",
                 "low": "Thấp",
                 "high": "Cao",
                 "wind": "Tốc độ gió",
                 "humid": "Độ ẩm",
-                "rain": "Mưa"
+                "rain": "Mưa",
+                "pressure": "Áp suất"
             },
             "locationSettings": {
                 "title": "Vị trí yêu thích",
@@ -167,12 +174,17 @@
                 "good": "Tốt",
                 "moderate": "Trung bình",
                 "hazardous": "Xấu",
-                "notfound": "Không tìm thấy dữ liệu",
+                "notfound": "Không có dữ liệu cho",
                 "allergy": "Cảnh báo dị ứng",
                 "grass": "Dị ứng cỏ",
                 "weed": "Dị ứng cỏ dại",
                 "tree": "Dị ứng cây",
-                "none": "Không"
+                "none": "Không",
+                "viewmore": "Xem chi tiết"
+            },
+            "today": {
+                "forecastTitle": "Dự báo thời tiết",
+                "precipTitle": "Lượng mưa"
             }
         }
     }

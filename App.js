@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import MainPage from "./components/MainPage";
 import SearchPage from './components/SearchPage';
 import LoadingPage from './components/LoadingPage';

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import styled from "styled-components/native";
 import { StyleSheet, View, Text, Image } from "react-native";
+import { MaterialCommunityIcons, FontAwesome6 } from '@expo/vector-icons';
 
 import { FunctionalContext, WeatherContext } from "../Context";
 
@@ -35,28 +35,37 @@ const CurrentForecast = ({ currentWeather }) => {
         <Text style={styles.description}>
           {currentWeather.current &&
             currentWeather.current.weather[0].description.charAt(0).toUpperCase() + currentWeather.current.weather[0].description.slice(1)}
+          {currentWeather.current &&
+            ` | ${t('weather.feels')} ${Math.round(currentWeather.current.feels_like)}` + getUnit('temp', unit)
+          }
         </Text>
       </View>
       <View style={[styles.secondaryInfoContainer, isDarkMode && { backgroundColor: '#1E1E1E', borderColor: 'grey', borderWidth: 1 }]}>
         <View style={styles.row}>
           <View style={styles.detailsBox}>
-            <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.feels')}</Text>
+           <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+              <MaterialCommunityIcons name='weather-windy' color={isDarkMode ? 'white' : 'black' } size={20} style={{paddingRight: 5}}></MaterialCommunityIcons>
+              <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.wind')}</Text>
+            </View>
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
-              {currentWeather.current &&
-                Math.round(currentWeather.current.feels_like)}
-              {getUnit('temp', unit)}
+              {currentWeather.current && currentWeather.current.wind_speed} {getUnit('wind', unit)}
             </Text>
           </View>
           <View style={[styles.detailsBox, isDarkMode && { color: 'white'}]}>
-            <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.low')}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+              <FontAwesome6 name='temperature-low' color={isDarkMode ? 'white' : 'black' } size={20} style={{paddingRight: 5}}></FontAwesome6>
+              <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.low')}</Text>
+            </View>
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
               {currentWeather.daily &&
-                Math.round(currentWeather.daily[0].temp.min)}
-              {getUnit('temp', unit)}
+                Math.round(currentWeather.daily[0].temp.min) + getUnit('temp', unit)}
             </Text>
           </View>
           <View style={[styles.detailsBox, isDarkMode && { color: 'white'}]}>
-            <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.high')}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+              <MaterialCommunityIcons name='thermometer-high' color={isDarkMode ? 'white' : 'black' } size={20} style={{paddingRight: 5}}></MaterialCommunityIcons>
+              <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.high')}</Text>
+            </View>
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
               {currentWeather.daily &&
                 Math.round(currentWeather.daily[0].temp.max)}
@@ -66,21 +75,33 @@ const CurrentForecast = ({ currentWeather }) => {
         </View>
         <View style={styles.row}>
           <View style={styles.detailsBox}>
-            <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.wind')}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+              <FontAwesome6 name='arrows-to-circle' color={isDarkMode ? 'white' : 'black' } size={15} style={{paddingHorizontal: 5}}></FontAwesome6>
+              <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.pressure')}</Text>
+            </View>
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
-              {currentWeather.current && currentWeather.current.wind_speed} {getUnit('wind', unit)}
+              {currentWeather.current &&
+                Math.round(currentWeather.current.pressure) + ' '}
+              {getUnit('pressure', unit)}
             </Text>
+            
           </View>
           <View style={[styles.detailsBox, isDarkMode && { color: 'white'}]}>
-            <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.humid')}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+              <MaterialCommunityIcons name='air-humidifier' color={isDarkMode ? 'white' : 'black' } size={20} style={{paddingRight: 5}}></MaterialCommunityIcons>
+              <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.humid')}</Text>
+            </View>
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
               {currentWeather.current && currentWeather.current.humidity}%
             </Text>
           </View>
           <View style={[styles.detailsBox, isDarkMode && { color: 'white'}]}>
-            <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.rain')}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+              <MaterialCommunityIcons name='weather-rainy' color={isDarkMode ? 'white' : 'black' } size={20} style={{paddingRight: 5}}></MaterialCommunityIcons>
+              <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.rain')}</Text>
+            </View>
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
-              {currentWeather.daily > 0 ? currentWeather.daily[0].rain : "0"} MM
+              {currentWeather?.current?.rain ? currentWeather?.current?.rain : "0"} mm
             </Text>
           </View>
         </View>
@@ -145,18 +166,22 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-between',
     paddingVertical: 10,
-    paddingHorizontal: 30,
+    paddingHorizontal: 10,
   },
   detailsBox: {
     display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: 100
   },
   label: {
     fontSize: 18,
+    // fontWeight: 'bold'
   },
   details: {
     color: 'black',
     fontSize: 15,
-    textTransform: 'capitalize',
+    paddingHorizontal: 10
   },
 });
 

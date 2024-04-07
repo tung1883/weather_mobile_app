@@ -143,7 +143,7 @@ export const WeatherProvider = ({ children }) => {
     if (!location) return null
 
     return fetch(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=hourly,minutely&units=${unit}&lang=${parsedLang(lang.lang)}&appid=${config.API_KEY}`,
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=minutely&units=${unit}&lang=${parsedLang(lang.lang)}&appid=${config.API_KEY}`,
       { signal }
     )
     .then((res) => {

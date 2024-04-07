@@ -85,15 +85,15 @@ export default Health = () => {
     return (
         <View style={styles.currentView}>
             <View style={{marginTop: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <Text style={[{marginHorizontal: 20, fontSize: 20, fontWeight: 'bold'}, isDarkMode && {color: 'white'}]}>{t('health.title')}</Text>
+                <Text style={[{marginHorizontal: 20, fontSize: 20, fontWeight: 'bold'}, {color: 'white'}]}>{t('health.title')}</Text>
                 <TouchableOpacity 
                     style={{marginRight: 12, flexDirection: 'row', alignItems: 'center'}}
                     onPress={() => {
                         console.log("View more health details")
                     }}    
                 >
-                    <Text style={{color: (isDarkMode) ? 'dodgerblue' : '#2D5DA1', fontWeight: 'bold'}}>View more</Text>
-                    <MaterialCommunityIcons name={'chevron-right'} color={(isDarkMode) ? 'dodgerblue' : '#2D5DA1'} size={20} style={{paddingTop: 3}}></MaterialCommunityIcons>
+                    <Text style={{color: (isDarkMode) ? 'dodgerblue' : '#2D5DA1', fontWeight: 'bold'}}>{t('health.viewmore')}</Text>
+                    <MaterialCommunityIcons name={'chevron-right'} color={(isDarkMode) ? 'dodgerblue' : '#2D5DA1'} size={20} style={{paddingTop: 3}}/>
                 </TouchableOpacity>
             </View>
             <View style={[styles.secondaryInfoContainer, isDarkMode && { backgroundColor: '#1E1E1E', borderColor: 'grey', borderWidth: 1 }]}>
@@ -110,7 +110,9 @@ export default Health = () => {
                                 <Text style={[{fontSize: 13, paddingLeft: 10, paddingRight: 50, textAlign: 'justify', flexWrap: 'wrap'}, isDarkMode && {color: 'white'}]}>{health.rec}</Text>
                             </View>
                         </View> :
-                        <View style={{alignItems: 'center', justifyContent: 'center'}}><Text style={[{fontSize: 16, fontWeight: 'bold'}, isDarkMode && {color: 'white'}]}>{t('health.notfound')}</Text></View>
+                        <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                            <Text style={[{fontSize: 16, fontWeight: 'bold'}, isDarkMode && {color: 'white'}]}>{t('health.notfound') + ' ' + location.city}</Text>
+                        </View>
                     }
                     <GradientBar></GradientBar>
                 </View>
@@ -136,7 +138,9 @@ export default Health = () => {
                                     <Text style={[isDarkMode && {color: '#84CF33'}]}>{getPollen('grass')}</Text>
                                 </View>
                             </> :
-                            <View style={{alignItems: 'center', justifyContent: 'center'}}><Text style={[{fontSize: 16, fontWeight: 'bold'}, isDarkMode && {color: 'white'}]}>{t('health.notfound')}</Text></View>
+                            <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                                <Text style={[{fontSize: 16, fontWeight: 'bold'}, isDarkMode && {color: 'white'}]}>{t('health.notfound') + ' ' + location.city}</Text>
+                            </View>
                         }
                         
                     </View>

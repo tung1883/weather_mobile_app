@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { Text, StyleSheet, View, Image } from "react-native";
-import styled from "styled-components/native";
 import moment from "moment";
 import { FunctionalContext, WeatherContext } from "../Context";
 
@@ -72,6 +71,7 @@ const styles = StyleSheet.create({
   degreeView: {
     textAlign: 'center',
     flex: 1,
+    minWidth: 30
   },
   degree: {
     fontSize: 24,
