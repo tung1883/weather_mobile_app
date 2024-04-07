@@ -1,7 +1,6 @@
-import { Dimensions, StyleSheet, TouchableOpacity , View, ScrollView, Text, Pressable } from "react-native";
+import { Dimensions, StyleSheet, View, ScrollView, Text, Pressable } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import React, { useContext, useState } from "react";
-import { MaterialCommunityIcons,} from '@expo/vector-icons';
 import moment from "moment";
 
 import { FunctionalContext, WeatherContext } from "../Context";
@@ -30,7 +29,7 @@ export default Forecast = () => {
                         <Text style={[{fontWeight: 'bold', color: isDarkMode ? 'white' : 'black'}, !isDarkMode && type == 1 && { color: 'white' }]}>Hourly</Text>
                     </Pressable>
                 </View>
-                <Graph type={type}></Graph>
+                <ForecastInterface type={type}></ForecastInterface>
                 <View style={[{marginHorizontal: 10, borderBottomWidth: 0.5, borderBottomColor: '#EEEDEB'}, isDarkMode && { borderWidth: 1, borderBottomColor: 'grey' }]}></View>
                 <View contentContainerStyle={{ flexGrow: 1, borderWidth: 1 }} style={{ marginTop: 20, flex: 1 }}>
                     <View style={styles.futureForecastContainer}>
@@ -64,30 +63,27 @@ export default Forecast = () => {
     )
 }
 
-const styles = StyleSheet.create({
-    noWeather: {
-        flexGrow: 1
-    }, 
-    futureForecastContainer: {
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    currentView: {
-        width: '100%',
-        marginBottom: 20
-    },
-    secondaryInfoContainer: {
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        borderRadius: 20,
-        display: 'flex',
-        margin: 10,
-        marginHorizontal: 10,
-        width: '95%',
-        maxWidth: 478,
-        justifyContent: 'center',
-        alignItems: 'center'
-    }
-})
+const ForecastInterface = ({type}) => {
+    const { isDarkMode } = useContext(FunctionalContext)
+    const { weather, unit, getUnit} = useContext(WeatherContext) 
+
+    return (
+        <View style={styles.currentView}>
+            <LineGraph 
+                isDarkMode={isDarkMode}
+                labels={
+                    type ? weather.hourly.slice(0, 8).map((hour) => (new Date(hour.dt * 1000)).getHours() + ':00') 
+                    : weather.daily.map((day) => (moment(day.dt * 1000).format("ddd")))
+                }
+                data={
+                    type ? weather.hourly.slice(0, 8).map((hour) => Math.round(hour.temp))
+                    : weather.daily.map((day) => Math.round(day.temp.day))} unit={getUnit('temp', unit)
+                }
+            >
+            </LineGraph>
+        </View>
+    );
+};
 
 const LineGraph = ({data, unit, labels, isDarkMode}) => {
     return (
@@ -128,24 +124,27 @@ const LineGraph = ({data, unit, labels, isDarkMode}) => {
     )
 }
 
-const Graph = ({type}) => {
-    const { isDarkMode, t, lang, parsedLang } = useContext(FunctionalContext)
-    const { location, weather, unit, getUnit} = useContext(WeatherContext) 
-
-    return (
-        <View style={styles.currentView}>
-            <LineGraph 
-                isDarkMode={isDarkMode}
-                labels={
-                    type ? weather.hourly.slice(0, 8).map((hour) => (new Date(hour.dt * 1000)).getHours() + ':00') 
-                    : weather.daily.map((day) => (moment(day.dt * 1000).format("ddd")))
-                }
-                data={
-                    type ? weather.hourly.slice(0, 8).map((hour) => Math.round(hour.temp))
-                    : weather.daily.map((day) => Math.round(day.temp.day))} unit={getUnit('temp', unit)
-                }
-            >
-            </LineGraph>
-        </View>
-    );
-};
+const styles = StyleSheet.create({
+    noWeather: {
+        flexGrow: 1
+    }, 
+    futureForecastContainer: {
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    currentView: {
+        width: '100%',
+        marginBottom: 20
+    },
+    secondaryInfoContainer: {
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        borderRadius: 20,
+        display: 'flex',
+        margin: 10,
+        marginHorizontal: 10,
+        width: '95%',
+        maxWidth: 478,
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
+})

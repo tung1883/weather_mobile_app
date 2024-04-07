@@ -5,7 +5,7 @@ import CurrentForecast from "./CurrentForecast";
 import DailyForecast from "./DailyForecast";
 import Health from "../ui/Health";
 import { WeatherContext } from "../Context";
-import Graph from "../ui/Graph";
+import ForecastInterface from "../ui/ForecastInterface";
 import PrecipInterface from "../ui/PrecipInterface";
 
 export default TodayWeather = () => {
@@ -16,7 +16,7 @@ export default TodayWeather = () => {
             {weather && 
             <ScrollView>
                 <CurrentForecast currentWeather={weather} timezone={weather?.timezone} />
-                <Graph></Graph>
+                <ForecastInterface/>
                 <PrecipInterface></PrecipInterface>
                 <View contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
                     {/* <View style={styles.futureForecastContainer}>
