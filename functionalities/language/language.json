@@ -89,7 +89,10 @@
             },
             "today": {
                 "forecastTitle": "Weather Forecast",
-                "precipTitle": "Precipitation"
+                "precipTitle": "Precipitation",
+                "rain": "Rain",
+                "daily": "Daily",
+                "hourly": "Hourly"
             }
         }
     },
@@ -184,7 +187,10 @@
             },
             "today": {
                 "forecastTitle": "Dự báo thời tiết",
-                "precipTitle": "Lượng mưa"
+                "precipTitle": "Giáng thủy",
+                "rain": "Lượng mưa",
+                "daily": "Theo ngày",
+                "hourly": "Theo giờ"
             }
         }
     }

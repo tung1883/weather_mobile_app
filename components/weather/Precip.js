@@ -1,57 +1,53 @@
 import { Dimensions, StyleSheet, View, ScrollView, Text } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import moment from "moment";
+import { LinearGradient } from "expo-linear-gradient";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { FunctionalContext, WeatherContext } from "../Context";
-import DailyForecast from "./DailyForecast";
-import HourlyForecast from "./HourlyForecast";
 
 export default Precip = () => {
     const { weather } = useContext(WeatherContext)
     const { isDarkMode, t } = useContext(FunctionalContext)
-    const [type, setType] = useState(0) 
-
-    const data = [
-        { date: 'Mon', pop: 0.25},
-        { date: 'Tue', pop: 0.25},
-        { date: 'Wed', pop: 0.25},
-        { date: 'Thu', pop: 0.25},
-        { date: 'Fri', pop: 0.25},
-        { date: 'Sat', pop: 0.25},
-        { date: 'Sun', pop: 0.25}
-    ]
-
+    
     return (
         <>
             {weather &&
             <ScrollView>
-                <PrecipInterface></PrecipInterface>
-                <View style={[{marginHorizontal: 10, borderBottomWidth: 0.5, borderBottomColor: '#EEEDEB'}, isDarkMode && { borderWidth: 1, borderBottomColor: 'grey' }]}></View>
-                <Text style={[{marginLeft: 10, marginTop: 20, marginBottom: 10, fontSize: 20, fontWeight: 'bold'}, {color: 'white'}]}>{t('today.precipTitle')}</Text>
-                 <View style={{flexDirection: 'row', justifyContent: 'center', backgroundColor: '#696969', marginHorizontal: 10, borderRadius: 20, marginBottom: 20, paddingVertical: 20}}>
+                <Text style={[{marginLeft: 10, marginTop: 5, marginBottom: 10, fontSize: 20, fontWeight: 'bold'}, {color: 'white'}]}>{t('today.precipTitle')}</Text>
+                 <View style={{flexDirection: 'row', justifyContent: 'center', backgroundColor: isDarkMode ? '#696969' : 'rgba(255, 255, 255, 0.6)', marginHorizontal: 10, 
+                    borderRadius: 20, marginBottom: 20, paddingVertical: 20}}>
                     {
-                        data.map((day) => {
+                        weather?.daily?.slice(0, 7)?.map((day) => {
                             return (
-                                <View key={day.date} style={{height: 140, justifyContent: 'center', alignItems: 'center'}}>
-                                    <Text style={{color: 'white'}}>{day.date}</Text>
-                                    <View style={{height: 100, width: 10, paddingVertical: 10, paddingHorizontal: 25, alignItems: 'center' }}>
-                                        <View style={{backgroundColor: 'white', borderTopLeftRadius: 100, borderTopRightRadius: 100, flex: 20, width: 10}}/>
-                                        <View style={{backgroundColor: '#40A2E3', borderBottomLeftRadius: 100, borderBottomRightRadius: 100, flex: 80, width: 10}}/>
+                                <View key={day.dt} style={{height: 150, justifyContent: 'center', alignItems: 'center'}}>
+                                    <Text style={{color: isDarkMode ? 'white' : 'black'}}>{moment(day.dt * 1000).format("ddd")}</Text>
+                                    <View style={{height: 120, width: 8, paddingVertical: 10, paddingHorizontal: 25, alignItems: 'center'}}>
+                                        <View style={[{backgroundColor: 'white', borderTopLeftRadius: 100, borderTopRightRadius: 100, 
+                                            flex: 100 - day.pop * 100, width: 8}, day.pop == 0 && {borderBottomLeftRadius: 100, borderBottomRightRadius: 100}]}/>
+                                        <LinearGradient 
+                                            colors={['#C5FFF8', '#5FBDFF']} 
+                                            start={{x: 0, y: 0}}
+                                            end={{x: 1, y: 1}}
+                                            style={[{backgroundColor: '#40A2E3', borderBottomLeftRadius: 100, borderBottomRightRadius: 100, 
+                                                flex: day.pop * 100, width: 8}, day.pop == 1 && {borderTopRightRadius: 100, borderTopLeftRadius: 100}]}/>
                                     </View>
-                                    <Text style={{color: 'white'}}>{day.pop * 100}%</Text>
+                                    <Text style={{color: isDarkMode ? 'white' : 'black'}}>{day.pop * 100}%</Text>
                                 </View>
                             )
                         })
                     }
                 </View> 
+                <View style={[{marginHorizontal: 10, borderBottomWidth: 0.5, borderBottomColor: '#EEEDEB'}, isDarkMode && { borderWidth: 1, borderBottomColor: 'grey' }]}></View>
+                <PrecipInterface></PrecipInterface>
 
                 <View style={[{marginHorizontal: 10, borderBottomWidth: 0.5, borderBottomColor: '#EEEDEB'}, isDarkMode && { borderWidth: 1, borderBottomColor: 'grey' }]}></View>
                 <View contentContainerStyle={{ flexGrow: 1, borderWidth: 1 }} style={{ marginTop: 20, flex: 1 }}>
                     <View style={styles.futureForecastContainer}>
-                        {weather?.daily?.map((day, index) => {
+                        {weather?.hourly?.map((hour, index) => {
                             if (index !== 0) {
-                                return <DailyForecast key={day.dt} day={day} index={index} />;
+                                return <Hourly key={hour.dt} hour={hour} index={index} />;
                             }
                         })}
                     </View>
@@ -69,11 +65,11 @@ const PrecipInterface = () => {
 
     return (
         <View style={styles.currentView}>
-            <Text style={[{marginLeft: 10, marginBottom: 10, fontSize: 20, fontWeight: 'bold'}, {color: 'white'}]}>{t('today.precipTitle')}</Text>
+            <Text style={[{marginLeft: 10, marginBottom: 5, fontSize: 20, fontWeight: 'bold'}, {color: 'white'}]}>{t('today.rain')}</Text>
             <LineGraph 
                 isDarkMode={isDarkMode}
-                labels={weather.daily.map((day) => (moment(day.dt * 1000).format("ddd")))}
-                data={weather.daily.map((day) => (day.rain) ? day.rain : 0)}
+                labels={weather?.daily?.map((day) => (moment(day.dt * 1000).format("ddd")))}
+                data={weather?.daily?.map((day) => (day.rain) ? day.rain : 0)}
             >
             </LineGraph>
         </View>
@@ -92,9 +88,8 @@ const LineGraph = ({data, labels}) => {
                 height={260}
                 yAxisSuffix={'mm'}
                 chartConfig={{
-                    backgroundGradientFrom: '#008DDA',
-                    backgroundGradientTo:'#41C9E2',
-                    decimalPlaces: 2,
+                    backgroundGradientFrom: '#1D5D9B',
+                    backgroundGradientTo:'#75C2F6',
                     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     style: {
@@ -114,6 +109,40 @@ const LineGraph = ({data, labels}) => {
     )
 }
 
+const Hourly = ({ hour }) => {
+    const { unit, getUnit } = useContext(WeatherContext)
+    const { t, isDarkMode } = useContext(FunctionalContext)
+
+    const getDate = (dt) => {
+        const date = new Date(dt * 1000);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; 
+        const formattedDay = day < 10 ? '0' + day : day;
+        const formattedMonth = month < 10 ? '0' + month : month;
+        return `${formattedDay}/${formattedMonth}`;
+    }
+
+    function capitalizeEachWord(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    return (
+        <View style={[styles.dayContainer, isDarkMode && { backgroundColor: '#696969'}]}>
+        <View style={styles.dateContainer}>
+            <Text style={[styles.weekDay, { fontWeight: 'bold' }, isDarkMode && { color: 'white' }]}>{getDate(hour.dt)}</Text>
+            <Text style={[styles.weekDay, isDarkMode && { color: 'white' }]}>{(new Date(hour.dt * 1000)).getHours() + ':00'}</Text>
+        </View>
+        <View style={styles.iconTempView}>
+            <MaterialCommunityIcons name='weather-pouring' color='#00A9FF' size={25}/>
+            <Text style={[{fontSize: 15, marginLeft: 10}, isDarkMode && { color: 'white' }]}>{hour.pop * 100}%</Text>
+        </View>
+        <View style={styles.degreeView}>
+            <Text style={isDarkMode && { color: 'white'}}>{capitalizeEachWord(hour.weather[0].description)}</Text>
+        </View>
+        </View>
+    );
+};
+
 const styles = StyleSheet.create({
     noWeather: {
         flexGrow: 1
@@ -124,7 +153,8 @@ const styles = StyleSheet.create({
     },
     currentView: {
         width: '100%',
-        marginBottom: 20
+        marginBottom: 20,
+        marginTop: 20
     },
     secondaryInfoContainer: {
         backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -136,5 +166,51 @@ const styles = StyleSheet.create({
         maxWidth: 478,
         justifyContent: 'center',
         alignItems: 'center'
-    }
+    },
+    dayContainer: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    borderRadius: 10,
+    margin: 10,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    width: '95%',
+    maxWidth: 478,
+    },
+    dateContainer: {
+        textAlign: 'right',
+        maxWidth: 50,
+        flex: 1,
+    },
+    weekDay: {
+        fontSize: 14,
+        textAlign: 'center',
+        marginVertical: 1,
+    },
+    iconTempView: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 2,
+    },
+    weatherIcon: {
+        width: 50,
+        height: 50,
+    },
+    degreeView: {
+        textAlign: 'center',
+        flex: 1,
+        minWidth: 30,
+        marginLeft: 30
+    },
+    degree: {
+        fontSize: 20,
+    },
+    feelsLike: {
+        fontSize: 12,
+    },
 })

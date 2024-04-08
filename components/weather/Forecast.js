@@ -9,7 +9,7 @@ import HourlyForecast from "./HourlyForecast";
 
 export default Forecast = () => {
     const { weather } = useContext(WeatherContext)
-    const { isDarkMode } = useContext(FunctionalContext)
+    const { isDarkMode, t } = useContext(FunctionalContext)
     const [type, setType] = useState(0) //0: daily, 1: hourly
 
     return (
@@ -20,13 +20,13 @@ export default Forecast = () => {
                     borderColor: 'grey', borderRadius: 20, width: '95%', backgroundColor: isDarkMode ? '#1E1E1E' : 'white'}, isDarkMode && { borderWidth: 1.5, borderColor: 'grey'}]}>
                     <Pressable 
                         onPress={() => setType(0)}
-                        style={[{flex: 1, alignItems: 'center', borderRadius: 20, padding: 5}, type == 0 && { backgroundColor: isDarkMode ? '#696969' : '#0C359E' }]}>
-                        <Text style={[{fontWeight: 'bold', color: isDarkMode ? 'white' : 'black'}, !isDarkMode && type == 0 && { color: 'white' }]}>Daily</Text>
+                        style={[{flex: 1, alignItems: 'center', borderRadius: 20, padding: 5}, type == 0 && { backgroundColor: isDarkMode ? '#696969' : '#008DDA' }]}>
+                        <Text style={[{fontWeight: 'bold', color: isDarkMode ? 'white' : 'black'}, !isDarkMode && type == 0 && { color: 'white' }]}>{t('today.daily')}</Text>
                     </Pressable>
                     <Pressable 
                         onPress={() => setType(1)}
-                        style={[{flex: 1, alignItems: 'center', borderRadius: 20, padding: 5}, type == 1 && { backgroundColor: isDarkMode ? '#696969' : '#0C359E' }]}>
-                        <Text style={[{fontWeight: 'bold', color: isDarkMode ? 'white' : 'black'}, !isDarkMode && type == 1 && { color: 'white' }]}>Hourly</Text>
+                        style={[{flex: 1, alignItems: 'center', borderRadius: 20, padding: 5}, type == 1 && { backgroundColor: isDarkMode ? '#696969' : '#008DDA' }]}>
+                        <Text style={[{fontWeight: 'bold', color: isDarkMode ? 'white' : 'black'}, !isDarkMode && type == 1 && { color: 'white' }]}>{t('today.hourly')}</Text>
                     </Pressable>
                 </View>
                 <ForecastInterface type={type}></ForecastInterface>
@@ -99,8 +99,8 @@ const LineGraph = ({data, unit, labels, isDarkMode}) => {
                 yAxisSuffix={unit}
                 yAxisInterval={1} 
                 chartConfig={{
-                    backgroundGradientFrom: isDarkMode ? 'grey' : "#8EA7E9",
-                    backgroundGradientTo: isDarkMode ? 'black' : "#4682A9",
+                    backgroundGradientFrom: isDarkMode ? "#ffa726" : '#41C9E2',
+                    backgroundGradientTo: isDarkMode ? "#FF204E" : '#008DDA',
                     decimalPlaces: 2, // optional, defaults to 2dp
                     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -109,8 +109,7 @@ const LineGraph = ({data, unit, labels, isDarkMode}) => {
                     },
                     propsForDots: {
                         r: "3",
-                        strokeWidth: "2",
-                        stroke: "#ffa726"
+                        strokeWidth: "2"
                     }
                 }}
                 fromZero='true'

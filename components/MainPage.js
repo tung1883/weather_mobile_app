@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { ImageBackground, Text, TouchableOpacity, View, StyleSheet, Dimensions } from "react-native";
+import { ImageBackground, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import config from "../config";
 import darkBgImg from '../assets/dark_bg.png'
 import bgImg from '../assets/background_light.png'
-import { lightStyles, darkStyles } from "./defaultStyles";
+import Footer from "./ui/Footer";
 import WeatherPage from "./ui/WeatherPage";
 import Taskbar from "./ui/Taskbar";
 import { FunctionalContext, WeatherContext } from "./Context";
@@ -73,7 +72,7 @@ const MainPage = ({ navigation }) => {
           </View>
 
           {/* body */}
-          <WeatherPage currentSection={currentSection}></WeatherPage>
+          <WeatherPage currentSection={currentSection} setCurrentSection={setCurrentSection}></WeatherPage>
 
           {/* footer */}
           <Footer currentSection={currentSection} setCurrentSection={setCurrentSection}/>

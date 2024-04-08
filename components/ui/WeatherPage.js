@@ -1,14 +1,14 @@
 import TodayWeather from "../weather/TodayWeather"
 import Forecast from "../weather/Forecast"
-import { sectionList } from "./Footer"
-import { useEffect } from "react"
 import Precip from "../weather/Precip"
+import Sun from "../weather/Sun"
 
-export default WeatherPage = ({currentSection}) => {
+export default WeatherPage = ({currentSection, setCurrentSection}) => {
     switch (currentSection) {
-        case 0: return <TodayWeather></TodayWeather>
+        case 0: return <TodayWeather setCurrentSection={setCurrentSection}></TodayWeather>
         case 1: return <Forecast></Forecast>
         case 2: return <Precip></Precip>
-        default: return <></>
+        case 4: return <Sun></Sun>
+        default: return <TodayWeather setCurrentSection={setCurrentSection}/>
     }
 }

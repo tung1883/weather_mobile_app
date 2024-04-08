@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   },
   dateContainer: {
     textAlign: 'right',
-    maxWidth: 60,
+    maxWidth: 50,
     flex: 1,
   },
   weekDay: {
@@ -81,10 +81,11 @@ const styles = StyleSheet.create({
   degreeView: {
     textAlign: 'center',
     flex: 1,
-    minWidth: 30
+    minWidth: 30,
+    marginLeft: 30
   },
   degree: {
-    fontSize: 24,
+    fontSize: 20,
   },
   feelsLike: {
     fontSize: 12,

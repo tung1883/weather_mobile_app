@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import { Text, TouchableOpacity, View, StyleSheet, FlatList, Dimensions, Pressable } from "react-native";
+import { Text, View, StyleSheet, FlatList, Dimensions, Pressable } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { lightStyles, darkStyles } from "../defaultStyles";
+import { darkStyles } from "../defaultStyles";
 import { FunctionalContext } from "../Context";
 
 const SCREEN_WIDTH = Dimensions.get('window').width
@@ -14,7 +14,6 @@ export const sectionList = [
   { title: 'radar', icon: 'radar' },
   { title: 'sun', icon: 'weather-sunset' },
 ]
-
 
 export default Footer = ({currentSection, setCurrentSection}) => {
   const { t, isDarkMode } = useContext(FunctionalContext)

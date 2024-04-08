@@ -23,7 +23,7 @@ export const WeatherProvider = ({ children }) => {
 
   useEffect(() => {
     init()
-  }, [unit])
+  }, [unit, lang])
 
   const init = async () => {
     if (!unit) {
@@ -258,10 +258,8 @@ export const FunctionalProvider = ({ children }) => {
         else setIsDarkMode(true)
       }
   
-      if (theme === 'light') setIsDarkMode(false)
+      if (theme == 'light') setIsDarkMode(false)
       else setIsDarkMode(true)
-
-      setIsDarkMode(true)
 
       //set language
       let lang = await AsyncStorage.getItem('lang')

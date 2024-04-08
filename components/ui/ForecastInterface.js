@@ -6,7 +6,7 @@ import moment from "moment";
 
 import { FunctionalContext, WeatherContext } from "../Context";
 
-export default ForecastInterface = () => {
+export default ForecastInterface = ({setCurrentSection}) => {
     const { isDarkMode, t } = useContext(FunctionalContext)
     const { weather, unit, getUnit} = useContext(WeatherContext) 
 
@@ -16,9 +16,7 @@ export default ForecastInterface = () => {
                 <Text style={[{marginHorizontal: 20, fontSize: 20, fontWeight: 'bold'}, {color: 'white'}]}>{t('today.forecastTitle')}</Text>
                 <TouchableOpacity 
                     style={{marginRight: 12, flexDirection: 'row', alignItems: 'center'}}
-                    onPress={() => {
-                        console.log("View more health details")
-                    }}    
+                    onPress={() => { setCurrentSection(1) }}    
                 >
                     <Text style={{color: (isDarkMode) ? 'dodgerblue' : '#2D5DA1', fontWeight: 'bold'}}>{t('health.viewmore')}</Text>
                     <MaterialCommunityIcons name={'chevron-right'} color={(isDarkMode) ? 'dodgerblue' : '#2D5DA1'} size={20} style={{paddingTop: 3}}/>
@@ -26,8 +24,8 @@ export default ForecastInterface = () => {
             </View>
             <LineGraph 
                 isDarkMode={isDarkMode}
-                labels={weather.daily.map((day) => (moment(day.dt * 1000).format("ddd")))}
-                data={weather.daily.map((day) => Math.round(day.temp.day))} unit={getUnit('temp', unit)}>
+                labels={weather?.daily.map((day) => (moment(day.dt * 1000).format("ddd")))}
+                data={weather?.daily.map((day) => Math.round(day.temp.day))} unit={getUnit('temp', unit)}>
             </LineGraph>
         </View>
     );
@@ -46,8 +44,8 @@ const LineGraph = ({data, unit, labels, isDarkMode}) => {
                 yAxisSuffix={unit}
                 yAxisInterval={1} 
                 chartConfig={{
-                    backgroundGradientFrom: isDarkMode ? "#ffa726" : '#8EA7E9',
-                    backgroundGradientTo: isDarkMode ? "#FF204E" : '#7286D3',
+                    backgroundGradientFrom: isDarkMode ? "#ffa726" : '#41C9E2',
+                    backgroundGradientTo: isDarkMode ? "#FF204E" : '#008DDA',
                     decimalPlaces: 2, 
                     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
@@ -56,8 +54,7 @@ const LineGraph = ({data, unit, labels, isDarkMode}) => {
                     },
                     propsForDots: {
                         r: "3",
-                        strokeWidth: "2",
-                        stroke: "#ffa726"
+                        strokeWidth: "2"
                     }
                 }}
                 fromZero='true'
