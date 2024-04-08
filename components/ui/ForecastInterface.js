@@ -22,11 +22,14 @@ export default ForecastInterface = ({setCurrentSection}) => {
                     <MaterialCommunityIcons name={'chevron-right'} color={(isDarkMode) ? 'dodgerblue' : '#2D5DA1'} size={20} style={{paddingTop: 3}}/>
                 </TouchableOpacity>
             </View>
-            <LineGraph 
-                isDarkMode={isDarkMode}
-                labels={weather?.daily?.map((day) => (moment(day.dt * 1000).format("ddd")))}
-                data={weather?.daily?.map((day) => Math.round(day.temp.day))} unit={getUnit('temp', unit)}>
-            </LineGraph>
+            {
+                weather?.daily?.map && 
+                <LineGraph 
+                    isDarkMode={isDarkMode}
+                    labels={weather?.daily?.map((day) => (moment(day.dt * 1000).format("ddd")))}
+                    data={weather?.daily?.map((day) => Math.round(day.temp.day))} unit={getUnit('temp', unit)}>
+                </LineGraph>
+            }
         </View>
     );
 };
