@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import * as Location from 'expo-location';
-import styled from "styled-components/native";
 import MapImg from "../assets/google_map_icon.png"
 import { FunctionalContext } from "./Context";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default LocationPermissionPage = ({navigation}) => {
   const { t, isDarkMode } = useContext(FunctionalContext)
@@ -12,6 +12,7 @@ export default LocationPermissionPage = ({navigation}) => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       
       if (status === 'granted') {
+          await AsyncStorage.setItem('notFirstTime', 'true')
           navigation.replace('Main')
       }
 
@@ -38,7 +39,10 @@ export default LocationPermissionPage = ({navigation}) => {
             style={styles.button}
         >
             <Text 
-              onPress={() => navigation.replace('Search')}
+              onPress={async () => {
+                await AsyncStorage.setItem('notFirstTime', 'true')
+                navigation.replace('Search')
+              }}
               style={styles.buttonText}
             >{t('locationPermission.rejectButton')} </Text>
         </TouchableOpacity>
