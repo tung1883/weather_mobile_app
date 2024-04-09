@@ -2,8 +2,12 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { ImageBackground, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import darkBgImg from '../assets/dark_bg.png'
-import bgImg from '../assets/background_light.png'
+import bgImg1 from '../assets/light_bg_1.jpg'
+import bgImg2 from '../assets/light_bg_2.jpg'
+import bgImg3 from '../assets/light_bg_3.jpg'
+import darkBgImg1 from '../assets/dark_bg_1.png'
+import darkBgImg2 from '../assets/dark_bg_2.png'
+import darkBgImg3 from '../assets/dark_bg_3.png'
 import Footer from "./ui/Footer";
 import WeatherPage from "./ui/WeatherPage";
 import Taskbar from "./ui/Taskbar";
@@ -16,7 +20,13 @@ const MainPage = ({ navigation }) => {
   const [formattedTime, setFormattedTime] = useState('');
   const intervals = useRef([])
   const [currentSection, setCurrentSection] = useState(0) //used to move between different weather sections, see sectionList in Footer.js
-  
+  const bgList = (isDarkMode) ? [darkBgImg1, darkBgImg2, darkBgImg3] : [bgImg1, bgImg2, bgImg3]
+  const [bg, setBg] = useState(Math.floor(Math.random() * (bgList.length - 2)))
+
+  useEffect(() => {
+    setNextBg()
+  }, [])
+
   useEffect(() => {
     getTime()
 
@@ -42,10 +52,15 @@ const MainPage = ({ navigation }) => {
     intervals.current.push(setInterval(getTime, Math.ceil(date.getTime()  / 60000) * 60000 - date.getTime()))
   }
 
+  const setNextBg = () => {
+    setBg(bg => (bg + 1) % bgList.length)
+    setTimeout(setNextBg, 60 * 1000)
+  }
+  
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => setIsTaskbarOpen(false)} style={{ width: "100%", height: "100%" }} activeOpacity={1}>
-        <ImageBackground source={(isDarkMode) ? darkBgImg : bgImg} style={{ width: "100%", height: "100%" }}>
+        <ImageBackground source={bgList[bg]} style={{ width: "100%", height: "100%" }}>
           {/* header */}
           <View style={styles.header}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -92,12 +107,12 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center' 
+    justifyContent: 'center'
   }
 })
 

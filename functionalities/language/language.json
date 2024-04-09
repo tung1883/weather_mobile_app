@@ -61,7 +61,7 @@
                 "theme": "Change App Theme"
             },
             "weather": {
-                "feels": "Feels",
+                "feels": "Feels like",
                 "low": "Low",
                 "high": "High",
                 "wind": "Wind",

@@ -2,7 +2,7 @@ import { StyleSheet, View, ScrollView, Text, TouchableOpacity } from "react-nati
 import { useContext  } from "react";
 import { MaterialCommunityIcons} from '@expo/vector-icons';
 
-import CurrentForecast from "./CurrentForecast";
+import CurrentWeather from "./CurrentWeather";
 import Health from "../ui/Health";
 import { FunctionalContext, WeatherContext } from "../Context";
 import ForecastInterface from "../ui/ForecastInterface";
@@ -17,7 +17,7 @@ export default TodayWeather = ({setCurrentSection}) => {
         <>
             {weather && 
             <ScrollView>
-                <CurrentForecast currentWeather={weather} timezone={weather?.timezone} />
+                <CurrentWeather currentWeather={weather} timezone={weather?.timezone} />
                 <ForecastInterface setCurrentSection={setCurrentSection}/>
                 <PrecipInterface setCurrentSection={setCurrentSection}></PrecipInterface>
                 <View contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>

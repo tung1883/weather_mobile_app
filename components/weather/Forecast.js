@@ -1,11 +1,9 @@
-import { Dimensions, StyleSheet, View, ScrollView, Text, Pressable } from "react-native";
+import { Dimensions, StyleSheet, View, ScrollView, Text, Pressable, Image } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import React, { useContext, useState } from "react";
 import moment from "moment";
 
 import { FunctionalContext, WeatherContext } from "../Context";
-import DailyForecast from "./DailyForecast";
-import HourlyForecast from "./HourlyForecast";
 
 export default Forecast = () => {
     const { weather } = useContext(WeatherContext)
@@ -39,7 +37,7 @@ export default Forecast = () => {
                                 {
                                     weather?.hourly?.map((hour, index) => {
                                         if (index !== 0) {
-                                            return <HourlyForecast key={hour.dt} hour={hour} index={index} />;
+                                            return <Hourly key={hour.dt} hour={hour} index={index} />;
                                         }
                                     })
                                 }
@@ -48,7 +46,7 @@ export default Forecast = () => {
                                 {
                                     weather?.daily?.map((day, index) => {
                                         if (index !== 0) {
-                                            return <DailyForecast key={day.dt} day={day} index={index} />;
+                                            return <Daily key={day.dt} day={day} index={index} />;
                                         }
                                     })
                                 }
@@ -123,6 +121,85 @@ const LineGraph = ({data, unit, labels, isDarkMode}) => {
     )
 }
 
+const Daily = ({ day }) => {
+  const { unit, getUnit } = useContext(WeatherContext)
+  const { t, isDarkMode } = useContext(FunctionalContext)
+
+  function capitalizeEachWord(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  return (
+    <View style={[styles.dayContainer, isDarkMode && { backgroundColor: '#696969'}]}>
+      <View style={styles.dateContainer}>
+        <Text style={[styles.weekDay, isDarkMode && { color: 'white' }]}>{moment(day.dt * 1000).format("ddd")}</Text>
+      </View>
+      <View style={styles.iconTempView}>
+        <Image
+          style={styles.weatherIcon}
+          source={{
+            uri: `http://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png`,
+          }}
+          resizeMode={"contain"}
+        />
+        <Text style={isDarkMode && { color: 'white'}}>{capitalizeEachWord(day.weather[0].description)}</Text>
+      </View>
+      <View style={styles.degreeView}>
+        <Text style={[styles.degree, isDarkMode && { color: 'white'}]}>{Math.round(day.temp.max)}{getUnit('temp', unit)}</Text>
+        <Text style={[styles.feelsLike, isDarkMode && { color: 'white' }]}>{t('weather.feels')} {Math.round(day.feels_like.day)}{getUnit('temp', unit)}</Text>
+      </View>
+    </View>
+  );
+};
+
+const Hourly = ({ hour }) => {
+    const { unit, getUnit } = useContext(WeatherContext)
+    const { t, isDarkMode } = useContext(FunctionalContext)
+
+    const getDate = (dt) => {
+        const date = new Date(dt * 1000);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; 
+        const formattedDay = day < 10 ? '0' + day : day;
+        const formattedMonth = month < 10 ? '0' + month : month;
+        return `${formattedDay}/${formattedMonth}`;
+    }
+
+    const getHour = (dt) => {
+      let hour = new Date(dt * 1000).getHours()
+      return (hour < 10) ? '0' + hour + ':00' : hour + ':00'
+    }
+
+    function capitalizeEachWord(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    return (
+        <View style={[{paddingVertical: 10, paddingHorizontal: 10, backgroundColor: 'rgba(255, 255, 255, 0.6)', borderRadius: 10, margin: 10, display: 'flex',
+          flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', width: '95%', maxWidth: 478,
+        }, isDarkMode && { backgroundColor: '#696969'}]}>
+        <View style={{textAlign: 'right', maxWidth: 50, flex: 1}}>
+            <Text style={[{fontSize: 14, textAlign: 'center', marginVertical: 1,}, { fontWeight: 'bold' }, isDarkMode && { color: 'white' }]}>{getDate(hour.dt)}</Text>
+            <Text style={[{fontSize: 14, textAlign: 'center', marginVertical: 1}, isDarkMode && { color: 'white' }]}>{getHour(hour.dt)}</Text>
+        </View>
+        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', flex: 2}}>
+            <Image
+            style={{width: 50, height: 50}}
+            source={{
+                uri: `http://openweathermap.org/img/wn/${hour.weather[0].icon}@2x.png`,
+            }}
+            resizeMode={"contain"}
+            />
+            <Text style={isDarkMode && { color: 'white'}}>{capitalizeEachWord(hour.weather[0].description)}</Text>
+        </View>
+        <View style={{ textAlign: 'center', flex: 1, minWidth: 30, marginLeft: 30}}>
+            <Text style={[{fontSize: 30}, isDarkMode && { color: 'white'}]}>{Math.round(hour.temp)}{getUnit('temp', unit)}</Text>
+            <Text style={[{fontSize: 12}, isDarkMode && { color: 'white' }]}>{t('weather.feels')} {Math.round(hour.feels_like)}{getUnit('temp', unit)}</Text>
+        </View>
+        </View>
+    );
+};
+
 const styles = StyleSheet.create({
     noWeather: {
         flexGrow: 1
@@ -145,5 +222,50 @@ const styles = StyleSheet.create({
         maxWidth: 478,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    dayContainer: {
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        backgroundColor: 'rgba(255, 255, 255, 0.6)',
+        borderRadius: 10,
+        margin: 10,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+        width: '95%',
+        maxWidth: 478,
+    },
+    dateContainer: {
+        textAlign: 'right',
+        maxWidth: 50,
+        flex: 1,
+    },
+    weekDay: {
+        fontSize: 20,
+        textAlign: 'center',
+        marginVertical: 1,
+    },
+    iconTempView: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 2,
+    },
+    weatherIcon: {
+        width: 50,
+        height: 50,
+    },
+    degreeView: {
+        textAlign: 'center',
+        flex: 1,
+        minWidth: 30,
+        marginLeft: 30
+    },
+    degree: {
+        fontSize: 20,
+    },
+    feelsLike: {
+        fontSize: 12,
     }
 })
