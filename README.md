@@ -7,6 +7,7 @@ Make sure you have your own API keys and put them in the .env file, like this:
 ```
 API_KEY=OPEN_WEATHER_APP_KEY
 GOOGLE_KEY=GOOGLE_API_KEY
+PROJECT_ID=PROJECT_ID
 ```
 
 After cloning the project, run:
