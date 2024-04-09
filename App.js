@@ -26,7 +26,7 @@ const App = () => {
       const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
       
       if (notFirstTime === null) {
-        await AsyncStorage.setItem('favoriteLocations', JSON.stringify([]))
+        // await AsyncStorage.setItem('favoriteLocations', JSON.stringify([]))
         await AsyncStorage.setItem('theme', 'auto')
         await AsyncStorage.setItem('lang', 'auto')
         await AsyncStorage.setItem('unit', 'metric')

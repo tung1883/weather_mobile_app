@@ -36,7 +36,6 @@ export default PrecipInterface = ({setCurrentSection}) => {
 }
 
 const LineGraph = ({data, labels}) => {
-    console.log(data, labels)
     return (
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <LineChart

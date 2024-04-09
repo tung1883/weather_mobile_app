@@ -1,10 +1,9 @@
 import React, { useContext, useState } from 'react';
-import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { lightStyles, darkStyles } from '../defaultStyles';
-import { FunctionalContext } from '../Context';
-import Checkbox from 'expo-checkbox';
+import { FunctionalContext, WeatherContext } from '../Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SettingsPage = ({ navigation }) => {    

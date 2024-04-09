@@ -7,8 +7,9 @@ import { FunctionalContext, WeatherContext } from '../Context';
 import { putToFrontFavs } from '../../functionalities/favoriteLocations'
 
 export default Taskbar = ({navigation}) => {
-  const { location,  weather, share, setLocation, setWeather, getWeather, favs, setFavs, gps } = useContext(WeatherContext)
+  const { location, share, setLocation, setWeather, getWeather, favs, setFavs, gps } = useContext(WeatherContext)
   const { isDarkMode, t } = useContext(FunctionalContext)
+  const { unit, getUnit } = useContext(WeatherContext)
   const [isViewingMore, setIsViewingMore] = useState(false) //to change the UI when click "view more locations"
 
   useEffect(() => {
@@ -38,7 +39,7 @@ export default Taskbar = ({navigation}) => {
   ]
 
   const settingList = [
-    t('taskbar.settings'),  t('taskbar.adFree'), 'AdChoices', t('taskbar.help'),  t('taskbar.ads'),  t('taskbar.privacy'),  t('taskbar.about')
+    t('taskbar.settings'),  t('taskbar.help'), t('taskbar.privacy'),  t('taskbar.about')
   ]
 
   const renderLocation = ( {item, index} ) => {
@@ -69,7 +70,7 @@ export default Taskbar = ({navigation}) => {
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
         {item.gps === true && <MaterialCommunityIcons name='navigation-variant' color={(isDarkMode) ? "#068FFF" : '#2D5DA1'} size={20} style={{marginRight: 5}}/>}
         <Image style={{width: 35, height: 20}} source={{uri: `https://openweathermap.org/img/wn/${icon}@2x.png`}}></Image>
-        <Text style={[{minWidth: 30, textAlign: 'right'}, isDarkMode && { color: 'white' }]}>{temp + '°'}</Text>
+        <Text style={[{minWidth: 30, textAlign: 'right'}, isDarkMode && { color: 'white' }]}>{`${temp}${getUnit('temp', unit)}`}</Text>
         </View>
     </TouchableOpacity>
     )

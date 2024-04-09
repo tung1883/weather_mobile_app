@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { Text, StyleSheet, View, Image } from "react-native";
-import moment from "moment";
 import { FunctionalContext, WeatherContext } from "../Context";
 
 export default Hourly = ({ hour }) => {
@@ -16,6 +15,11 @@ export default Hourly = ({ hour }) => {
         return `${formattedDay}/${formattedMonth}`;
     }
 
+    const getHour = (dt) => {
+      let hour = new Date(dt * 1000).getHours()
+      return (hour < 10) ? '0' + hour + ':00' : hour + ':00'
+    }
+
     function capitalizeEachWord(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
@@ -24,7 +28,7 @@ export default Hourly = ({ hour }) => {
         <View style={[styles.dayContainer, isDarkMode && { backgroundColor: '#696969'}]}>
         <View style={styles.dateContainer}>
             <Text style={[styles.weekDay, { fontWeight: 'bold' }, isDarkMode && { color: 'white' }]}>{getDate(hour.dt)}</Text>
-            <Text style={[styles.weekDay, isDarkMode && { color: 'white' }]}>{(new Date(hour.dt * 1000)).getHours() + ':00'}</Text>
+            <Text style={[styles.weekDay, isDarkMode && { color: 'white' }]}>{getHour(hour.dt)}</Text>
         </View>
         <View style={styles.iconTempView}>
             <Image

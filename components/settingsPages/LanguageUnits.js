@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Checkbox from 'expo-checkbox'
-
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext, WeatherContext } from '../Context';
 import { langs } from '../../functionalities/language/langs';
@@ -10,7 +10,7 @@ import { langs } from '../../functionalities/language/langs';
 const LanguageUnitsPage = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
     const { isDarkMode, lang, t } = useContext(FunctionalContext)
-    const { unit, changeUnit } = useContext(WeatherContext)
+    const { unit, changeUnit, fetching, setFetching } = useContext(WeatherContext)
     const [selected, setSelected] = useState(unit)
 
     const units = [
@@ -64,6 +64,7 @@ const LanguageUnitsPage = ({ navigation }) => {
                                 <Text style={{color: 'white', fontSize: 14, color: 'grey', paddingTop: 8, paddingBottom: 12}}>{u.details}</Text>
                             </View>
                             <Checkbox color='dodgerblue' value={u.name === selected} onValueChange={() => {
+                                setFetching(true)
                                 setSelected(u.name)
                                 changeUnit({newU: u.name})
                             }}></Checkbox>
@@ -71,6 +72,15 @@ const LanguageUnitsPage = ({ navigation }) => {
                     )
                 })
             }
+            
+            <Modal visible={fetching} transparent animationType="fade">
+                <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                    <ActivityIndicator size="large" color="black" />
+                    <Text style={styles.loadingText}>{t('searchPage.fetch')}</Text>
+                </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -78,6 +88,7 @@ const LanguageUnitsPage = ({ navigation }) => {
 export const Language = ({navigation}) => {
     const goBack = navigation?.canGoBack()
     const { isDarkMode, lang, t, changeLanguage, getAutoLang } = useContext(FunctionalContext)
+    const { fetching, setFetching } = useContext(WeatherContext)
     const [selected, setSelected] = useState((lang.auto) ? 'auto' : lang.lang)
     const [isSaving, setIsSaving] = useState(false)
 
@@ -103,6 +114,7 @@ export const Language = ({navigation}) => {
                 { isSaving && 
                     <TouchableOpacity
                         onPress={() => {
+                            setFetching(true)
                             setIsSaving(false)
                             if (selected === 'auto') changeLanguage(getAutoLang())
                             else changeLanguage({auto: false, lang: selected})
@@ -116,7 +128,7 @@ export const Language = ({navigation}) => {
                 langs.map((item, index) => {
                     return (
                         <TouchableOpacity 
-                            key={index} onPress={() => setSelected(item)}
+                            key={index} onPress={() => { setSelected(item) }}
                             style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
                                 paddingVertical: 20, borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
                             <View>

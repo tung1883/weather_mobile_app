@@ -38,7 +38,7 @@
                 "today": "today",
                 "forecast": "forecast",
                 "precip": "precip",
-                "radar": "radadr",
+                "radar": "radar",
                 "sun": "sun"
             },
             "taskbar": {
@@ -93,6 +93,25 @@
                 "rain": "Rain",
                 "daily": "Daily",
                 "hourly": "Hourly"
+            },
+            "sun": {
+                "title": "Sun",
+                "moon": "Moon",
+                "length": "Length of day",
+                "remain": "Remaining day light",
+                "moonrise": "Moonrise",
+                "moonset": "Moonset",
+                "sunrise": "Sunrise",
+                "sunset": "Sunset",
+                "new-moon": "New Moon",
+                "waning-crescent": "Waning Crescent",
+                "first-quarter": "First Quarter",
+                "waning-gibbous": "Waning Gibbous",
+                "full-moon": "Full Moon",
+                "waxing-crescent": "Waxing Crescent",
+                "waxing-gibbous": "Waxing Gibbous",
+                "last-quarter": "Last Quarter",
+                "today": "Today"
             }
         }
     },
@@ -191,6 +210,25 @@
                 "rain": "Lượng mưa",
                 "daily": "Theo ngày",
                 "hourly": "Theo giờ"
+            },
+            "sun": {
+                "title": "Mặt trời",
+                "moon": "Mặt trăng",
+                "length": "Thời gian ban ngày",
+                "remain": "Thời gian ban ngày còn lại",
+                "moonrise": "Trăng mọc",
+                "moonset": "Trăng lặn",
+                "sunrise": "Mặt trời mọc",
+                "sunset": "Mặt trời lặn",
+                "new-moon": "New Moon",
+                "waning-crescent": "Waning Crescent",
+                "first-quarter": "First Quarter",
+                "waning-gibbous": "Waning Gibbous",
+                "full-moon": "Full Moon",
+                "waxing-crescent": "Waxing Crescent",
+                "waxing-gibbous": "Waxing Gibbous",
+                "last-quarter": "Last Quarter",
+                "today": "Hôm nay"
             }
         }
     }

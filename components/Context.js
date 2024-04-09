@@ -55,6 +55,7 @@ export const WeatherProvider = ({ children }) => {
       if (index == favs.length - 1) setFavs([...favs])
     })
 
+    setFetching(false)
     //store data to AsyncStorage to reduce api calls
     // { 
     //   //key: name from cities -> value: location
