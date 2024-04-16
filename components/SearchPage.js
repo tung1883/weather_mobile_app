@@ -2,6 +2,8 @@ import React, { useContext, useState } from 'react';
 import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location'
+import MapView from 'react-native-maps';
+
 import { cities, popularCities } from '../assets/citiList';
 import { lightStyles, darkStyles } from './defaultStyles';
 import { FunctionalContext, WeatherContext } from './Context';
@@ -160,15 +162,17 @@ const SearchPage = ({navigation}) => {
                 renderItem={({item, index}) => renderItem({ item, index })}
                 keyExtractor={(item) => item}
                 style={styles.list}
-            />
-            <Modal visible={isFetching} transparent animationType="fade">
-                <View style={styles.modalContainer}>
+                />
+            <Modal visible={true} transparent animationType="fade">
+                <MapView style={{width: '120%', height: '120%'}}></MapView>
+                {/* <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     <ActivityIndicator size="large" color="black" />
                     <Text style={styles.loadingText}>{t('searchPage.fetch')}</Text>
                 </View>
-                </View>
+                </View> */}
             </Modal>
+
         </View>
     );
 };

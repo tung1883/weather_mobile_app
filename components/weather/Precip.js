@@ -33,7 +33,7 @@ export default Precip = () => {
                                             style={[{backgroundColor: '#40A2E3', borderBottomLeftRadius: 100, borderBottomRightRadius: 100, 
                                                 flex: day.pop * 100, width: 8}, day.pop == 1 && {borderTopRightRadius: 100, borderTopLeftRadius: 100}]}/>
                                     </View>
-                                    <Text style={{color: isDarkMode ? 'white' : 'black'}}>{day.pop * 100}%</Text>
+                                    <Text style={{color: isDarkMode ? 'white' : 'black'}}>{Math.round(day.pop * 100)}%</Text>
                                 </View>
                             )
                         })
@@ -134,7 +134,7 @@ const Hourly = ({ hour }) => {
         </View>
         <View style={styles.iconTempView}>
             <MaterialCommunityIcons name='weather-pouring' color='#00A9FF' size={25}/>
-            <Text style={[{fontSize: 15, marginLeft: 10}, isDarkMode && { color: 'white' }]}>{hour.pop * 100}%</Text>
+            <Text style={[{fontSize: 15, marginLeft: 10}, isDarkMode && { color: 'white' }]}>{Math.round(hour.pop * 100)}%</Text>
         </View>
         <View style={styles.degreeView}>
             <Text style={isDarkMode && { color: 'white'}}>{capitalizeEachWord(hour.weather[0].description)}</Text>

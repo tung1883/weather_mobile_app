@@ -230,7 +230,7 @@ export const WeatherProvider = ({ children }) => {
   }
 
   return (
-    <WeatherContext.Provider value={{location, setLocation, weather, setWeather, favs, setFavs, gps, setGps, fetching, setFetching, share,
+    <WeatherContext.Provider value={{location, setLocation, weather, setWeather, favs, setFavs, gps, setGps, fetching, setFetching, share, init,
       getGpsLocation, getLocationByCity, getWeather, unit, changeUnit, getUnit}}>
       {children}
     </WeatherContext.Provider>
