@@ -8,11 +8,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default LocationPermissionPage = ({navigation}) => {
   const { t, isDarkMode } = useContext(FunctionalContext)
   const { init, location, weather } = useContext(WeatherContext)
-  const [ isFetching, setIsFetching ] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)
 
   const requestLocationPermission = async () => {
       try {
-        let { status } = await Location.getForegroundPermissionsAsync()
+        let { status } = await Location.requestForegroundPermissionsAsync()
 
         if (status == 'granted') {
             await AsyncStorage.setItem('notFirstTime', 'true')

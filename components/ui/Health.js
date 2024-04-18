@@ -7,81 +7,8 @@ import config from "../../config";
 
 export default Health = () => {
     const { isDarkMode, t, lang, parsedLang } = useContext(FunctionalContext)
-    const { location } = useContext(WeatherContext)
-    const [health, setHealth] = useState(null)
-
-    useEffect(() => {
-        healthFetch()
-    }, [lang, location])
-
-    const getIndexColor = (index) => {
-        switch (true) {
-            case index <= 50: return '#83A95C'
-            case index <= 100: return '#3E7C17'
-            case index <= 150: return '#125C13'
-            case index <= 200: return '#DC6B19'
-            case index <= 300: return '#B80000'
-            case index > 300: return '#820300'
-            default: return (isDarkMode ? 'white' : 'black')
-        }
-    }
-
-    const getPollen = (type) => {
-        if (!health || health?.pollen?.length == 0) return t('health.none')
-
-        if (type == 'grass') return health.pollen.filter((pollen) => pollen.code == 'GRASS')[0].info
-        if (type == 'weed') return health.pollen.filter((pollen) => pollen.code == 'WEED')[0].info
-        if (type == 'tree') return health.pollen.filter((pollen) => pollen.code == 'TREE')[0].info
-    }
-
-    const healthFetch = async () => {
-        if (!location || !lang) return
-
-        let temp = null
-
-        fetch(`https://airquality.googleapis.com/v1/currentConditions:lookup?key=${config.GOOGLE_KEY}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }, 
-            body: JSON.stringify({
-                "universalAqi": true,
-                "location": {
-                    "latitude": location.lat,
-                    "longitude": location.long
-                },
-                "extraComputations": [
-                    "HEALTH_RECOMMENDATIONS"
-                ],
-                "languageCode": parsedLang(lang.lang)
-            })
-        }).then((res) => {
-            return res.json()
-        }).then((data) => {
-            if (!data) return
-
-            temp = {
-                index: data.indexes[0].aqi,
-                quality: data.indexes[0].category,
-                rec: data.healthRecommendations.generalPopulation,
-                pollen: []
-            }
-        }).then(() => {
-            return fetch(`https://pollen.googleapis.com/v1/forecast:lookup?key=${config.GOOGLE_KEY}&location.longitude=${location.long}&location.latitude=${location.lat}&languageCode=${parsedLang(lang.lang)}&days=1`)
-        }).then((res) => {
-            return res.json()
-        }).then((data) => {
-            if (!data?.error) {
-                pollenList = data.dailyInfo[0].pollenTypeInfo.filter((pollen) => pollen.code == 'GRASS' || pollen.code == 'WEED' || pollen.code == 'TREE')
-                temp.pollen = pollenList.map((pollen) => { return { code: pollen.code, info: (pollen?.indexInfo?.category) ? pollen?.indexInfo?.category : t('health.none')} })
-            }
-
-            setHealth(temp)
-        }).catch((err) => {
-            console.log("healthFetchError: " + err)
-        })
-    }
-
+    const { location, health, getIndexColor, getPollen } = useContext(WeatherContext)
+    
     return (
         <View style={styles.currentView}>
             <View style={{marginTop: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>

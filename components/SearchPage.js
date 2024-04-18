@@ -163,14 +163,13 @@ const SearchPage = ({navigation}) => {
                 keyExtractor={(item) => item}
                 style={styles.list}
                 />
-            <Modal visible={true} transparent animationType="fade">
-                <MapView style={{width: '120%', height: '120%'}}></MapView>
-                {/* <View style={styles.modalContainer}>
+            <Modal visible={isFetching} transparent animationType="fade">
+                <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     <ActivityIndicator size="large" color="black" />
                     <Text style={styles.loadingText}>{t('searchPage.fetch')}</Text>
                 </View>
-                </View> */}
+                </View>
             </Modal>
 
         </View>

@@ -15,6 +15,7 @@ import LanguageUnitsPage, { Language } from './components/settingsPages/Language
 import { FunctionalProvider, WeatherProvider } from './components/Context';
 import LocationAdd from './components/settingsPages/LocationAdd';
 import Indicator from './components/ui/Indicator';
+import HealthPage from './components/weather/HealthPage';
 
 const Stack = createStackNavigator();
 
@@ -26,7 +27,7 @@ const App = () => {
       const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
       
       if (notFirstTime === null) {
-        // await AsyncStorage.setItem('favoriteLocations', JSON.stringify([]))
+        await AsyncStorage.setItem('favoriteLocations', JSON.stringify([]))
         await AsyncStorage.setItem('theme', 'auto')
         await AsyncStorage.setItem('lang', 'auto')
         await AsyncStorage.setItem('unit', 'metric')
@@ -47,11 +48,10 @@ const App = () => {
               <MainPage {...navigation}/>
               <Indicator></Indicator>
             </>}</Stack.Screen>
+            <Stack.Screen name='HealthPage' options={{headerShown: false}}>{(navigation) => <HealthPage {...navigation}></HealthPage>}</Stack.Screen>
             <Stack.Screen name='Settings' options={{headerShown: false}}>{(navigation) => <Settings {...navigation}/>}</Stack.Screen>
             <Stack.Screen name='WidgetSettings' options={{headerShown: false}}>{(navigation) => <WidgetSettings {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='LocationSettings' options={{headerShown: false}}>{(navigation) => <>
-                <LocationSettings {...navigation}/>
-            </>}</Stack.Screen>
+            <Stack.Screen name='LocationSettings' options={{headerShown: false}}>{(navigation) => <LocationSettings {...navigation}/>}</Stack.Screen>
             <Stack.Screen name='LocationAdd' options={{headerShown: false}}>{(navigation) => <LocationAdd {...navigation}/>}</Stack.Screen>
             <Stack.Screen name='NotificationSettings' options={{headerShown: false}}>{(navigation) => <NotificationSettings {...navigation}/>}</Stack.Screen>
             <Stack.Screen name='LanguageUnits' options={{headerShown: false}}>{(navigation) => <LanguageUnitsPage {...navigation}></LanguageUnitsPage>}</Stack.Screen>

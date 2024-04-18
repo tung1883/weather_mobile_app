@@ -13,49 +13,55 @@ export const FunctionalContext = createContext();
 export const WeatherContext = createContext()
 
 export const WeatherProvider = ({ children }) => {
+  const { lang, parsedLang, t } = useContext(FunctionalContext)
   const [location, setLocation] = useState({});
   const [weather, setWeather] = useState({})
   const [gps, setGps] = useState({})
   const [favs, setFavs] = useState([])
   const [fetching, setFetching] = useState(false)
   const [unit, setUnit] = useState()
-  const { lang, parsedLang } = useContext(FunctionalContext)
+  const [health, setHealth] = useState(null)
 
   useEffect(() => {
     init()
   }, [unit, lang])
 
   const init = async () => {
-    if (!unit) {
-      let u = await AsyncStorage.getItem('unit')
-      setUnit(u)
-      return 
-    }
-
-    const location = await getGpsLocation()
-    const weather = await getWeather({location})
-    setLocation(location)
-    setWeather(weather)
-    setGps({location, weather})
-    await AsyncStorage.setItem('current', JSON.stringify(location))
+    try {
+      if (!unit) {
+        let u = await AsyncStorage.getItem('unit')
+        setUnit(u)
+        return 
+      }
   
-    let favs = JSON.parse(await AsyncStorage.getItem('favoriteLocations'))
-    if (location) favs = [{location, weather, gps: true}, ...favs]
-    
-    favs.forEach(async (fav, index) => {
-      if (!fav?.location?.city) {
-        favs.splice(index, 1)
-      }
+      const location = await getGpsLocation()
+      const weather = await getWeather({location})
+      setLocation(location)
+      setWeather(weather)
+      setGps({location, weather})
+      await AsyncStorage.setItem('current', JSON.stringify(location))
 
-      if (!fav?.weather) {
-        const weather = await getWeather({location: fav.location})
-        fav.weather = weather
-      }
+      let favs = JSON.parse(await AsyncStorage.getItem('favoriteLocations'))
+      if (location) favs = [{location, weather, gps: true}, ...favs]
       
-      if (index == favs.length - 1) setFavs([...favs])
-    })
-
-    setFetching(false)
+      favs?.forEach(async (fav, index) => {
+        if (!fav?.location?.city) {
+          favs.splice(index, 1)
+        }
+  
+        if (!fav?.weather) {
+          const weather = await getWeather({location: fav.location})
+          fav.weather = weather
+        }
+        
+        if (index == favs.length - 1) setFavs([...favs])
+      })
+  
+      healthFetch({location, weather})
+      setFetching(false)
+    } catch (err) {
+      console.log('init Error: ' + err)
+    }
     //store data to AsyncStorage to reduce api calls
     // { 
     //   //key: name from cities -> value: location
@@ -229,9 +235,82 @@ export const WeatherProvider = ({ children }) => {
     }
   }
 
+  //health functionalities
+  const getIndexColor = (index) => {
+        switch (true) {
+            case index <= 50: return '#83A95C'
+            case index <= 100: return '#3E7C17'
+            case index <= 150: return '#125C13'
+            case index <= 200: return '#DC6B19'
+            case index <= 300: return '#B80000'
+            case index > 300: return '#820300'
+            default: return (isDarkMode ? 'white' : 'black')
+        }
+    }
+
+    const getPollen = (type) => {
+        if (!health || health?.pollen?.length == 0) return t('health.none')
+
+        if (type == 'grass') return health.pollen.filter((pollen) => pollen.code == 'GRASS')[0].info
+        if (type == 'weed') return health.pollen.filter((pollen) => pollen.code == 'WEED')[0].info
+        if (type == 'tree') return health.pollen.filter((pollen) => pollen.code == 'TREE')[0].info
+    }
+
+    const healthFetch = async ({location, weather}) => {
+        if (!location || !lang) return
+
+        let temp = null
+
+        fetch(`https://airquality.googleapis.com/v1/currentConditions:lookup?key=${config.GOOGLE_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }, 
+            body: JSON.stringify({
+                "universalAqi": true,
+                "location": {
+                    "latitude": location.lat,
+                    "longitude": location.long
+                },
+                "extraComputations": [
+                    "HEALTH_RECOMMENDATIONS",
+                    "POLLUTANT_CONCENTRATION",
+                ],
+                "languageCode": parsedLang(lang.lang)
+            })
+        }).then((res) => {
+            return res.json()
+        }).then((data) => {
+            if (!data) return
+
+            temp = {
+                index: data.indexes[0].aqi,
+                quality: data.indexes[0].category,
+                rec: data.healthRecommendations.generalPopulation,
+                pollen: [],
+                pollutants: data.pollutants
+            }
+        }).then(() => {
+            return fetch(`https://pollen.googleapis.com/v1/forecast:lookup?key=${config.GOOGLE_KEY}&location.longitude=${location.long}&location.latitude=${location.lat}&languageCode=${parsedLang(lang.lang)}&days=1`)
+        }).then((res) => {
+            return res.json()
+        }).then((data) => {
+            if (!data?.error) {
+              pollenList = data.dailyInfo[0].pollenTypeInfo.filter((pollen) => pollen.code == 'GRASS' || pollen.code == 'WEED' || pollen.code == 'TREE')
+              temp.pollen = pollenList.map((pollen) => { return { code: pollen.code, info: (pollen?.indexInfo?.category) ? pollen?.indexInfo?.category : t('health.none')} })
+
+            }
+
+            setHealth(temp)
+        }).catch((err) => {
+            console.log("healthFetchError: " + err)
+        })
+    }
+
   return (
     <WeatherContext.Provider value={{location, setLocation, weather, setWeather, favs, setFavs, gps, setGps, fetching, setFetching, share, init,
-      getGpsLocation, getLocationByCity, getWeather, unit, changeUnit, getUnit}}>
+      getGpsLocation, getLocationByCity, getWeather, unit, changeUnit, getUnit, health, getIndexColor, getPollen
+    }}>
       {children}
     </WeatherContext.Provider>
   );
