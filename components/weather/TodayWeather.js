@@ -9,7 +9,7 @@ import ForecastInterface from "../ui/ForecastInterface";
 import PrecipInterface from "../ui/PrecipInterface";
 import Sunrise from "../ui/Sunrise";
 
-export default TodayWeather = ({setCurrentSection}) => {
+export default TodayWeather = ({setCurrentSection, navigation}) => {
     const { weather } = useContext(WeatherContext)
     const { t, isDarkMode } = useContext(FunctionalContext)
 
@@ -22,7 +22,7 @@ export default TodayWeather = ({setCurrentSection}) => {
                 <PrecipInterface setCurrentSection={setCurrentSection}></PrecipInterface>
                 <View contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
                 </View>
-                <Health></Health>
+                <Health navigation={navigation}></Health>
                 <View style={{width: '100%', marginBottom: 20}}>
                     <View style={{marginTop: 20, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                     <Text style={[{marginHorizontal: 20, fontSize: 20, fontWeight: 'bold'}, {color: 'white'}]}>{t('sun.title')}</Text>

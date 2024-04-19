@@ -36,7 +36,7 @@ export default CurrentWeather = ({ currentWeather }) => {
           </Text>
         </Text>
       </View>
-      <View style={[styles.secondaryInfoContainer, isDarkMode && { backgroundColor: '#1E1E1E', borderColor: 'grey', borderWidth: 1 }]}>
+      <View style={[styles.secondaryInfoContainer, isDarkMode && { backgroundColor: '#696969' }]}>
         <View style={styles.row}>
           <View style={styles.detailsBox}>
            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>

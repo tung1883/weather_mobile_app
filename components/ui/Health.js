@@ -5,7 +5,7 @@ import { MaterialCommunityIcons, FontAwesome6} from '@expo/vector-icons';
 import { FunctionalContext, WeatherContext } from "../Context";
 import config from "../../config";
 
-export default Health = () => {
+export default Health = ({navigation}) => {
     const { isDarkMode, t, lang, parsedLang } = useContext(FunctionalContext)
     const { location, health, getIndexColor, getPollen } = useContext(WeatherContext)
     
@@ -16,7 +16,7 @@ export default Health = () => {
                 <TouchableOpacity 
                     style={{marginRight: 12, flexDirection: 'row', alignItems: 'center'}}
                     onPress={() => {
-                        console.log("View more health details")
+                        navigation.navigate('HealthPage')
                     }}    
                 >
                     <Text style={{color: (isDarkMode) ? 'dodgerblue' : '#2D5DA1', fontWeight: 'bold'}}>{t('health.viewmore')}</Text>

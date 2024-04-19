@@ -20,7 +20,7 @@ const MainPage = ({ navigation }) => {
   const [formattedTime, setFormattedTime] = useState('');
   const intervals = useRef([])
   const [currentSection, setCurrentSection] = useState(0) //used to move between different weather sections, see sectionList in Footer.js
-  const bgList = (isDarkMode) ? [darkBgImg1, darkBgImg2, darkBgImg3] : [bgImg1, bgImg2, bgImg3]
+  const bgList = (isDarkMode) ? [darkBgImg1, darkBgImg2] : [bgImg1, bgImg2, bgImg3]
   const [bg, setBg] = useState(Math.floor(Math.random() * (bgList.length - 1)))
   
   useEffect(() => {
@@ -87,7 +87,7 @@ const MainPage = ({ navigation }) => {
           </View>
 
           {/* body */}
-          <WeatherPage currentSection={currentSection} setCurrentSection={setCurrentSection}></WeatherPage>
+          <WeatherPage currentSection={currentSection} setCurrentSection={setCurrentSection} navigation={navigation}></WeatherPage>
 
           {/* footer */}
           <Footer currentSection={currentSection} setCurrentSection={setCurrentSection}/>

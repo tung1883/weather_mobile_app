@@ -298,7 +298,6 @@ export const WeatherProvider = ({ children }) => {
             if (!data?.error) {
               pollenList = data.dailyInfo[0].pollenTypeInfo.filter((pollen) => pollen.code == 'GRASS' || pollen.code == 'WEED' || pollen.code == 'TREE')
               temp.pollen = pollenList.map((pollen) => { return { code: pollen.code, info: (pollen?.indexInfo?.category) ? pollen?.indexInfo?.category : t('health.none')} })
-
             }
 
             setHealth(temp)
