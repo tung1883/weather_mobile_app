@@ -83,8 +83,8 @@ export default Sunrise = ({animationDuration}) => {
           </View>
         </View>
         <View style={{padding: 20, paddingBottom: 10}}>
-          <Text style={{paddingBottom: 10, color: isDarkMode ? 'white' : 'black'}}>{t('sun.length')} - <Text style={{color: '#E9B824'}}>{getTimeDifference(weather?.daily[0].sunrise, weather?.daily[0]?.sunset)}</Text></Text>
-          <Text style={{color: isDarkMode ? 'white' : 'black'}}>{t('sun.remain')} - <Text style={{color: '#E9B824'}}>{getTimeDifference((Date.now() / 1000 > weather?.daily[0].sunrise) ? Date.now() / 1000 : weather?.daily[0].sunrise , weather?.daily[0]?.sunset)}</Text></Text>
+          <Text style={{paddingBottom: 10, color: isDarkMode ? 'white' : 'black'}}>{t('sun.length')} - <Text style={{color: '#E9B824'}}>{getTimeDifference(weather?.daily[0]?.sunrise, weather?.daily[0]?.sunset)}</Text></Text>
+          <Text style={{color: isDarkMode ? 'white' : 'black'}}>{t('sun.remain')} - <Text style={{color: '#E9B824'}}>{getTimeDifference((Date.now() / 1000 > weather?.daily[0]?.sunrise) ? Date.now() / 1000 : weather?.daily[0]?.sunrise , weather?.daily[0]?.sunset)}</Text></Text>
         </View>
       </View>
   );
