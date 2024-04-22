@@ -13,19 +13,40 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.yourcompany.yourappname",
-      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": []
+      "permissions": [],
+      "package": "com.vu02102003.sample1"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-localization"
-    ]
+      "expo-localization",
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "Hello",
+              "label": "My Hello Widget",
+              "minWidth": "320dp",
+              "minHeight": "120dp",
+              "description": "This is my first widget",
+              "previewImage": "./assets/widget-preview/hello.png",
+              "updatePeriodMillis": 1800000
+            }
+          ]
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1a2bb95b-c947-4601-adfe-2139b198fa9b"
+      }
+    }
   }
 }
+

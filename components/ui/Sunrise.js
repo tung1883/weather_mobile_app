@@ -10,6 +10,7 @@ export default Sunrise = ({animationDuration}) => {
   const { isDarkMode, t} = useContext(FunctionalContext)
 
   let sunPercent = (Date.now() / 1000 - weather?.daily[0]?.sunrise) / (weather?.daily[0]?.sunset - weather?.daily[0]?.sunrise)
+
   const ballAnimatedValue = useRef(new Animated.Value(0)).current;
 
   const getTime = (dt) => {
@@ -31,9 +32,11 @@ export default Sunrise = ({animationDuration}) => {
   }
 
   useEffect(() => {
-    const remainDayLight = (Date.now() / 1000 > weather?.daily[0].sunrise) ? weather?.daily[0]?.sunset - Date.now() / 1000 : weather?.daily[0]?.sunset - weather?.daily[0].sunrise
-    const dayLength = weather?.daily[0]?.sunset - weather?.daily[0]?.sunrise
-    let angleTilt = (dayLength - remainDayLight) / dayLength * 180;
+    let angleTilt = (weather?.daily[0]?.sunset - Date.now() / 1000) / (weather?.daily[0]?.sunset - weather?.daily[0].sunrise)
+    if (angleTilt < 0) angleTilt = 1
+    if (angleTilt > 1) angleTilt = 0
+    angleTilt = angleTilt * 180
+
 
     ballAnimatedValue.addListener((val) => {
       setTempDeg((angleTilt * val.value) + 'deg');
