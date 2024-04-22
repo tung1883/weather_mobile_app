@@ -10,7 +10,6 @@ export default Sunrise = ({animationDuration}) => {
   const { isDarkMode, t} = useContext(FunctionalContext)
 
   let sunPercent = (Date.now() / 1000 - weather?.daily[0]?.sunrise) / (weather?.daily[0]?.sunset - weather?.daily[0]?.sunrise)
-  sunPercent = 1
   const ballAnimatedValue = useRef(new Animated.Value(0)).current;
 
   const getTime = (dt) => {
