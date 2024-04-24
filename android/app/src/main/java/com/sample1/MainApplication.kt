@@ -1,4 +1,4 @@
-package com.vu02102003.sample1
+package com.sample1
 
 import android.app.Application
 import android.content.res.Configuration

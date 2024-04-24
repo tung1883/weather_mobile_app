@@ -32,7 +32,7 @@ export default Sunrise = ({animationDuration}) => {
   }
 
   useEffect(() => {
-    let angleTilt = (weather?.daily[0]?.sunset - Date.now() / 1000) / (weather?.daily[0]?.sunset - weather?.daily[0].sunrise)
+    let angleTilt = (weather?.daily[0]?.sunset - Date.now() / 1000) / (weather?.daily[0]?.sunset - weather?.daily[0]?.sunrise)
     if (angleTilt < 0) angleTilt = 1
     if (angleTilt > 1) angleTilt = 0
     angleTilt = angleTilt * 180

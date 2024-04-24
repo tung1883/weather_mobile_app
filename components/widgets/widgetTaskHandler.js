@@ -6,33 +6,35 @@ const nameToWidget = {
   Hello: HelloWidget,
 };
 
-export async function widgetTaskHandler () {
+export async function widgetTaskHandler (props) {
   const widgetInfo = props.widgetInfo;
   const Widget =
     nameToWidget[widgetInfo.widgetName];
+  
 
   switch (props.widgetAction) {
     case 'WIDGET_ADDED':
-      props.renderWidget(<Widget />);
+      props.renderWidget(<HelloWidget />);
       break;
 
     case 'WIDGET_UPDATE':
-      // Not needed for now
+      props.renderWidget(<HelloWidget />);
       break;
 
     case 'WIDGET_RESIZED':
-      // Not needed for now
+      props.renderWidget(<HelloWidget />);
       break;
 
     case 'WIDGET_DELETED':
-      // Not needed for now
+      props.renderWidget(<HelloWidget />);
       break;
 
     case 'WIDGET_CLICK':
-      // Not needed for now
+      props.renderWidget(<HelloWidget />);
       break;
 
     default:
+      props.renderWidget(<HelloWidget />);
       break;
   }
 }

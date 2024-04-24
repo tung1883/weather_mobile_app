@@ -9,7 +9,7 @@ export function HelloWidgetPreviewScreen() {
     <View style={styles.container}>
       <WidgetPreview
         renderWidget={() => <HelloWidget />}
-        width={320}
+        width={200}
         height={200}
       />
     </View>
