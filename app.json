@@ -32,8 +32,8 @@
             {
               "name": "Hello",
               "label": "My Hello Widget",
-              "minWidth": "5dp",
-              "minHeight": "5dp",
+              "minWidth": "180dp",
+              "minHeight": "60dp",
               "description": "This is my first widget",
               "previewImage": "./assets/widget-preview/hello.png",
               "updatePeriodMillis": 1800000
@@ -41,12 +41,7 @@
           ]
         }
       ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "1a2bb95b-c947-4601-adfe-2139b198fa9b"
-      }
-    }
+    ]
   }
 }
 

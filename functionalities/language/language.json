@@ -12,6 +12,7 @@
                 "currentLocation": "Use Current Location",
                 "popularSuggestion": "Popular Cities",
                 "searchSuggestion": "Suggestions",
+                "mapPlaceholder": "Enter a location",
                 "fetch": "Fetching weather data.."
             },
             "languageAndUnitsPage": {
@@ -129,6 +130,7 @@
                 "currentLocation": "Sử dụng vị trí hiện tại",
                 "popularSuggestion": "Các thành phố nổi tiếng",
                 "searchSuggestion": "Gợi ý",
+                "mapPlaceholder": "Nhập tên địa điểm",
                 "fetch": "Đang tải dữ liệu.."
             },
             "languageAndUnitsPage": {
