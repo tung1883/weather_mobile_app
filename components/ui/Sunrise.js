@@ -14,7 +14,7 @@ export default Sunrise = ({animationDuration}) => {
   const ballAnimatedValue = useRef(new Animated.Value(0)).current;
 
   const getTime = (dt) => {
-    if (!weather?.timezone_offset) return '00:00'
+    if (!weather || !weather?.timezone_offset) return '00:00'
     date = (dt) ? new Date(dt * 1000) : new Date()
     let locationTime= new Date(date.getTime() + date.getTimezoneOffset() * 60000 + (1000 * weather?.timezone_offset))
     let hour = locationTime.getHours();

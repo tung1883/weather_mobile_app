@@ -30,12 +30,19 @@
         {
           "widgets": [
             {
-              "name": "Hello",
-              "label": "My Hello Widget",
+              "name": "Small",
+              "label": "Small Widget",
               "minWidth": "180dp",
-              "minHeight": "60dp",
-              "description": "This is my first widget",
-              "previewImage": "./assets/widget-preview/hello.png",
+              "minHeight": "30dp",
+              "previewImage": "./assets/widget-preview/small.png",
+              "updatePeriodMillis": 1800000
+            },
+            {
+              "name": "Big",
+              "label": "Big Widget",
+              "minWidth": "240dp",
+              "minHeight": "80dp",
+              "previewImage": "./assets/widget-preview/big.png",
               "updatePeriodMillis": 1800000
             }
           ]

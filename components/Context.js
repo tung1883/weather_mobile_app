@@ -145,7 +145,7 @@ export const WeatherProvider = ({ children }) => {
     }
   };
 
-  const getWeather = async ({location, current}) => {
+  const getWeather = async ({location}) => {
     //TRUE API CALL
     if (!location) return null
 
@@ -163,13 +163,6 @@ export const WeatherProvider = ({ children }) => {
       console.log("error", err);
       return null
     });
-
-    //MOCK API CALL
-    // if (current) {
-    //   location = await AsyncStorage.getItem('current')
-    // }
-    
-    // return JSON.parse(await AsyncStorage.getItem(JSON.stringify(location)))
   }
 
   const share = async ({text}) => {

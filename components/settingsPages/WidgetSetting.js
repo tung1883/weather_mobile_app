@@ -1,14 +1,17 @@
 import React, { useContext, useState } from 'react';
-import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
+import { View, Dimensions,  Text, StyleSheet, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext } from '../Context';
+import { requestWidgetUpdate } from 'react-native-android-widget';
+import { SmallWidget } from '../widgets/SmallWidget'
+
+const screenWidth = Dimensions.get('window').width;
 
 const WidgetSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, toggleTheme } = useContext(FunctionalContext);
-    const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
+    const { isDarkMode, toggleTheme, t, translateText} = useContext(FunctionalContext);
 
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
@@ -21,24 +24,35 @@ const WidgetSettings = ({ navigation }) => {
                         onPress={() => {navigation.goBack()}}
                     />
                 }
-                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Widgets</Text>
+                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>{t('widgetSettings.title')}</Text>
             </View>
             <View>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
-                    </View>
-                </TouchableOpacity>
+            <View>
+                <View style={{marginTop: 20, marginBottom: 10, marginHorizontal: 10, padding: 20, borderRadius: 10, backgroundColor: '#31363F', alignItems: 'center'}}>
+                    <Image
+                        source={require('../../assets/widget-preview/small.png')}
+                        style={{
+                            width: (screenWidth - 60) / 1.5,
+                            height: (screenWidth - 60) / 1.5 * 377 / 751
+                        }}
+                    >
+                    </Image>
+                </View>
+                <Text style={{color: 'white', textAlign: 'center'}}>{t('widgetSettings.small')}</Text>
+                <View style={{marginTop: 30, marginBottom: 10, marginHorizontal: 10, padding: 20, borderRadius: 10, backgroundColor: '#31363F', alignItems: 'center'}}>
+                    <Image
+                        source={require('../../assets/widget-preview/big.png')}
+                        style={{
+                            width: (screenWidth - 60),
+                            height: (screenWidth - 60) * 641 / 809
+                        }}
+                    >
+                    </Image>
+                </View>
+                <Text style={{color: 'white', textAlign: 'center'}}>{t('widgetSettings.big')}</Text>
+                <Text style={{color: 'white', textAlign: 'center', marginHorizontal: 10, fontWeight: 'bold', marginTop: 30}}>{t('widgetSettings.note1')}</Text>
+                <Text style={{color: 'white', textAlign: 'center', marginHorizontal: 10, fontWeight: 'bold'}}>{t('widgetSettings.note2')}</Text>
+            </View>
             </View>
         </View>
     );

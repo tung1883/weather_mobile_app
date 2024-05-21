@@ -27,7 +27,7 @@ export default PrecipInterface = ({setCurrentSection}) => {
                 <LineGraph 
                     isDarkMode={isDarkMode}
                     labels={weather?.daily?.map((day) => (moment(day.dt * 1000).format("ddd")))}
-                    data={weather?.daily?.map((day) => (day.rain) ? day.rain : 0)}
+                    data={weather?.daily?.map((day) => (day?.rain) ? day?.rain : 0)}
                 >
                 </LineGraph>
             }

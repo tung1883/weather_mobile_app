@@ -36,3 +36,5 @@ to-do.md
 
 # typescript
 *.tsbuildinfo
+
+android_bugs/
