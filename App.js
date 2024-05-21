@@ -40,7 +40,7 @@ const App = () => {
     <FunctionalProvider>
       <WeatherProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Loading">
+          <Stack.Navigator initialRouteName="Search">
             <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
             <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
             <Stack.Screen name="Search" options={{ headerShown: false }}>{(navigation) => <SearchPage {...navigation}/>}</Stack.Screen>
