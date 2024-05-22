@@ -1,17 +1,15 @@
-import React, { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { View, Dimensions,  Text, StyleSheet, Image } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext } from '../Context';
-import { requestWidgetUpdate } from 'react-native-android-widget';
-import { SmallWidget } from '../widgets/SmallWidget'
 
 const screenWidth = Dimensions.get('window').width;
 
 const WidgetSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, toggleTheme, t, translateText} = useContext(FunctionalContext);
+    const { isDarkMode, t, translateText} = useContext(FunctionalContext);
 
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
@@ -24,11 +22,11 @@ const WidgetSettings = ({ navigation }) => {
                         onPress={() => {navigation.goBack()}}
                     />
                 }
-                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>{t('widgetSettings.title')}</Text>
+                <Text style={{color: isDarkMode ? 'white' : 'black', fontSize: 18, fontWeight: 'bold'}}>{t('widgetSettings.title')}</Text>
             </View>
             <View>
             <View>
-                <View style={{marginTop: 20, marginBottom: 10, marginHorizontal: 10, padding: 20, borderRadius: 10, backgroundColor: '#31363F', alignItems: 'center'}}>
+                <View style={{marginTop: 20, marginBottom: 10, marginHorizontal: 10, padding: 20, borderRadius: 10, backgroundColor: isDarkMode ? '#31363F' : '#B4B4B8', alignItems: 'center'}}>
                     <Image
                         source={require('../../assets/widget-preview/small.png')}
                         style={{
@@ -38,8 +36,8 @@ const WidgetSettings = ({ navigation }) => {
                     >
                     </Image>
                 </View>
-                <Text style={{color: 'white', textAlign: 'center'}}>{t('widgetSettings.small')}</Text>
-                <View style={{marginTop: 30, marginBottom: 10, marginHorizontal: 10, padding: 20, borderRadius: 10, backgroundColor: '#31363F', alignItems: 'center'}}>
+                <Text style={{color: isDarkMode ? 'white' : 'black', textAlign: 'center'}}>{t('widgetSettings.small')}</Text>
+                <View style={{marginTop: 30, marginBottom: 10, marginHorizontal: 10, padding: 20, borderRadius: 10, backgroundColor: isDarkMode ? '#31363F' : '#B4B4B8', alignItems: 'center'}}>
                     <Image
                         source={require('../../assets/widget-preview/big.png')}
                         style={{
@@ -49,9 +47,9 @@ const WidgetSettings = ({ navigation }) => {
                     >
                     </Image>
                 </View>
-                <Text style={{color: 'white', textAlign: 'center'}}>{t('widgetSettings.big')}</Text>
-                <Text style={{color: 'white', textAlign: 'center', marginHorizontal: 10, fontWeight: 'bold', marginTop: 30}}>{t('widgetSettings.note1')}</Text>
-                <Text style={{color: 'white', textAlign: 'center', marginHorizontal: 10, fontWeight: 'bold'}}>{t('widgetSettings.note2')}</Text>
+                <Text style={{color: isDarkMode ? 'white' : 'black', textAlign: 'center'}}>{t('widgetSettings.big')}</Text>
+                <Text style={{color: isDarkMode ? 'white' : 'black', textAlign: 'center', marginHorizontal: 10, fontWeight: 'bold', marginTop: 30}}>{t('widgetSettings.note1')}</Text>
+                <Text style={{color: isDarkMode ? 'white' : 'black', textAlign: 'center', marginHorizontal: 10, fontWeight: 'bold'}}>{t('widgetSettings.note2')}</Text>
             </View>
             </View>
         </View>

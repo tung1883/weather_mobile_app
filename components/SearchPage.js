@@ -182,25 +182,24 @@ const SearchPage = ({navigation}) => {
                         </View>
                         <MaterialCommunityIcons name="check" size={24} color="black" style={{marginLeft: 5, marginRight: 5, display: mapFetching ? 'none' : 'flex'}} 
                             onPress={async () => { 
-                                console.log((await getWeather({location: await getLocationByCity('Hanoi')})).current.weather)
-                                // if (!markerCoordinate) return
-                                // setMapFetching(true)
-                                // const { city }= await getLocationDetails({lat: markerCoordinate.latitude, long: markerCoordinate.longitude})
-                                // if (!city) return setMapFetching(false)
+                                if (!markerCoordinate) return
+                                setMapFetching(true)
+                                const { city }= await getLocationDetails({lat: markerCoordinate.latitude, long: markerCoordinate.longitude})
+                                if (!city) return setMapFetching(false)
 
-                                // getLocationByCity(city)
-                                // .then(async (result) => {
-                                //     if (!result) return setMapFetching(false)
+                                getLocationByCity(city)
+                                .then(async (result) => {
+                                    if (!result) return setMapFetching(false)
 
-                                //     setMapFetching(true)
-                                //     const weather = await getWeather({location: result})
-                                //     setLocation(result)
-                                //     setWeather(weather)
-                                //     addCounter({location: result, favs, setFavs})
-                                //     putToFrontFavs({favs, setFavs, fav: {location: result, weather}})
-                                //     setMapFetching(false)
-                                //     navigation.replace('Main')
-                                // })
+                                    setMapFetching(true)
+                                    const weather = await getWeather({location: result})
+                                    setLocation(result)
+                                    setWeather(weather)
+                                    addCounter({location: result, favs, setFavs})
+                                    putToFrontFavs({favs, setFavs, fav: {location: result, weather}})
+                                    setMapFetching(false)
+                                    navigation.replace('Main')
+                                })
                             }}
                         />
                         {mapFetching && <ActivityIndicator color='black' size={24} style={{marginLeft: 5, marginRight: 5}}></ActivityIndicator>}
@@ -211,6 +210,7 @@ const SearchPage = ({navigation}) => {
                     </Pressable>
                     <MapView
                         provider={PROVIDER_GOOGLE}
+                        userInterfaceStyle={isDarkMode ? 'dark' : 'light'}
                         style={{width: '200%', height: '200%'}}
                         onPress={(e) => {
                             setMapSearchQuery(`{${e.nativeEvent.coordinate.latitude.toFixed(1)}, ${e.nativeEvent.coordinate.longitude.toFixed(1)}}`)
