@@ -30,6 +30,7 @@ Notifications.setNotificationHandler({
 });
 
 async function sendPushNotification(expoPushToken) {
+
   const message = {
     to: expoPushToken,
     sound: 'default',
@@ -56,7 +57,7 @@ function handleRegistrationError(errorMessage) {
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'android') {
-    console.group('jehre1')
+    
     Notifications.setNotificationChannelAsync('default', {
       name: 'default',
       importance: Notifications.AndroidImportance.MAX,
@@ -121,6 +122,17 @@ const App = () => {
       Notifications.addNotificationResponseReceivedListener((response) => {
         console.log(response);
       });
+      const sendMorningNotification = async () => {
+        const currentDate = new Date();
+        if (currentDate.getHours() === 10 && currentDate.getMinutes() === 56) {
+          // Gửi thông báo
+          await sendPushNotification("ExponentPushToken[r1o3YBOKagEY8FPOyC7_f0]");
+        }
+      };
+
+    
+      // Kiểm tra mỗi phút
+      const intervalId = setInterval(sendMorningNotification, 60000);
 
     return () => {
       notificationListener.current &&
@@ -129,7 +141,9 @@ const App = () => {
         );
       responseListener.current &&
         Notifications.removeNotificationSubscription(responseListener.current);
+      clearInterval(intervalId);
     };
+  
   }, []);
 
   useEffect(() => {
@@ -147,6 +161,22 @@ const App = () => {
     }) ()
 
   }, [])
+
+  useEffect(() => {
+    // Gửi thông báo khi ứng dụng được mở
+    const sendImmediateNotification = async () => {
+      try {
+        // Gửi thông báo ngay lập tức khi ứng dụng được mở
+        await sendPushNotification("ExponentPushToken[r1o3YBOKagEY8FPOyC7_f0]");
+      } catch (error) {
+        console.error("Error sending immediate notification:", error);
+      }
+    };
+  
+
+    // Gọi hàm gửi thông báo ngay khi component App được render
+    sendImmediateNotification();
+  }, []);
 
   return (
     <FunctionalProvider>
