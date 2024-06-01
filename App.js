@@ -16,6 +16,7 @@ import { FunctionalProvider, WeatherProvider } from './components/Context';
 import LocationAdd from './components/settingsPages/LocationAdd';
 import Indicator from './components/ui/Indicator';
 import HealthPage from './components/weather/HealthPage';
+import PushNotification from './components/PushNotification';
 
 const Stack = createStackNavigator();
 
@@ -56,6 +57,7 @@ const App = () => {
             <Stack.Screen name='NotificationSettings' options={{headerShown: false}}>{(navigation) => <NotificationSettings {...navigation}/>}</Stack.Screen>
             <Stack.Screen name='LanguageUnits' options={{headerShown: false}}>{(navigation) => <LanguageUnitsPage {...navigation}></LanguageUnitsPage>}</Stack.Screen>
             <Stack.Screen name='Language' options={{headerShown: false}}>{(navigation) => <Language {...navigation}></Language>}</Stack.Screen>
+            <Stack.Screen name='PushNotification' options={{headerShown: false}}>{(navigation) => <PushNotification {...navigation}></PushNotification>}</Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>
       </WeatherProvider>
