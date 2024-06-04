@@ -56,7 +56,6 @@ function handleRegistrationError(errorMessage) {
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'android') {
-    console.group('jehre1')
     Notifications.setNotificationChannelAsync('default', {
       name: 'default',
       importance: Notifications.AndroidImportance.MAX,
@@ -107,7 +106,6 @@ const App = () => {
   useEffect(() => {
     registerForPushNotificationsAsync()
       .then((token) => {
-        console.log(token)
         setExpoPushToken(token ?? '')
       })
       .catch((error) => setExpoPushToken(`${error}`));
@@ -135,7 +133,7 @@ const App = () => {
   useEffect(() => {
     (async () => {
       //check if the user uses the app for the first time
-      AsyncStorage.removeItem('notFirstTime') //uncomment this to be first time user
+      // AsyncStorage.removeItem('notFirstTime') //uncomment this to be first time user
       const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
       
       if (notFirstTime === null) {
@@ -149,30 +147,33 @@ const App = () => {
   }, [])
 
   return (
-    <FunctionalProvider>
-      <WeatherProvider>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Search">
-            <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
-            <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
-            <Stack.Screen name="Search" options={{ headerShown: false }}>{(navigation) => <SearchPage {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name="Main" options={{ headerShown: false }}>{(navigation) => <>
-              <MainPage {...navigation}/>
-              <Indicator></Indicator>
-            </>}</Stack.Screen>
-            <Stack.Screen name='HealthPage' options={{headerShown: false}}>{(navigation) => <HealthPage {...navigation}></HealthPage>}</Stack.Screen>
-            <Stack.Screen name='Settings' options={{headerShown: false}}>{(navigation) => <Settings {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='WidgetSettings' options={{headerShown: false}}>{(navigation) => <WidgetSettings {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='LocationSettings' options={{headerShown: false}}>{(navigation) => <LocationSettings {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='LocationAdd' options={{headerShown: false}}>{(navigation) => <LocationAdd {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='NotificationSettings' options={{headerShown: false}}>{(navigation) => <NotificationSettings {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='LanguageUnits' options={{headerShown: false}}>{(navigation) => <LanguageUnitsPage {...navigation}></LanguageUnitsPage>}</Stack.Screen>
-            <Stack.Screen name='Language' options={{headerShown: false}}>{(navigation) => <Language {...navigation}></Language>}</Stack.Screen>
-            <Stack.Screen name='PushNotification' options={{headerShown: false}}>{(navigation) => <PushNotification {...navigation}></PushNotification>}</Stack.Screen>
-          </Stack.Navigator>
-        </NavigationContainer>
-      </WeatherProvider>
-    </FunctionalProvider>
+    <Pressable style={{margin: 50}} onPress={async () => { await sendPushNotification(expoPushToken) }}>
+      <Text>test</Text>
+    </Pressable>
+    // <FunctionalProvider>
+    //   <WeatherProvider>
+    //     <NavigationContainer>
+    //       <Stack.Navigator initialRouteName="Search">
+    //         <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
+    //         <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
+    //         <Stack.Screen name="Search" options={{ headerShown: false }}>{(navigation) => <SearchPage {...navigation}/>}</Stack.Screen>
+    //         <Stack.Screen name="Main" options={{ headerShown: false }}>{(navigation) => <>
+    //           <MainPage {...navigation}/>
+    //           <Indicator></Indicator>
+    //         </>}</Stack.Screen>
+    //         <Stack.Screen name='HealthPage' options={{headerShown: false}}>{(navigation) => <HealthPage {...navigation}></HealthPage>}</Stack.Screen>
+    //         <Stack.Screen name='Settings' options={{headerShown: false}}>{(navigation) => <Settings {...navigation}/>}</Stack.Screen>
+    //         <Stack.Screen name='WidgetSettings' options={{headerShown: false}}>{(navigation) => <WidgetSettings {...navigation}/>}</Stack.Screen>
+    //         <Stack.Screen name='LocationSettings' options={{headerShown: false}}>{(navigation) => <LocationSettings {...navigation}/>}</Stack.Screen>
+    //         <Stack.Screen name='LocationAdd' options={{headerShown: false}}>{(navigation) => <LocationAdd {...navigation}/>}</Stack.Screen>
+    //         <Stack.Screen name='NotificationSettings' options={{headerShown: false}}>{(navigation) => <NotificationSettings {...navigation}/>}</Stack.Screen>
+    //         <Stack.Screen name='LanguageUnits' options={{headerShown: false}}>{(navigation) => <LanguageUnitsPage {...navigation}></LanguageUnitsPage>}</Stack.Screen>
+    //         <Stack.Screen name='Language' options={{headerShown: false}}>{(navigation) => <Language {...navigation}></Language>}</Stack.Screen>
+    //         <Stack.Screen name='PushNotification' options={{headerShown: false}}>{(navigation) => <PushNotification {...navigation}></PushNotification>}</Stack.Screen>
+    //       </Stack.Navigator>
+    //     </NavigationContainer>
+    //   </WeatherProvider>
+    // </FunctionalProvider>
   );
 };
 

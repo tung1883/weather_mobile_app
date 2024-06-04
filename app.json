@@ -18,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "permissions": [],
-      "package": "com.sample1",
+      "package": "com.vu02102003.sample1",
       "googleServicesFile": "./android/app/google-services.json"
     },
     "web": {
@@ -49,7 +49,12 @@
           ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1a2bb95b-c947-4601-adfe-2139b198fa9b"
+      }
+    }
   }
 }
 
