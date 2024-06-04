@@ -1,7 +1,6 @@
 import { FlexWidget, ImageWidget, TextWidget } from 'react-native-android-widget';
 
 export function SmallWidget({weather, location, icon, date}) {
-
   return (
     <FlexWidget
       style={{
@@ -12,7 +11,7 @@ export function SmallWidget({weather, location, icon, date}) {
       }}
     >
       {
-        location && weather && icaon && date ?
+        location && weather && icon && date ?
         <FlexWidget
           style={{
             height: 'match_parent',

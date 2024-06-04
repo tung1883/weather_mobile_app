@@ -13,14 +13,15 @@ export default Sunrise = ({animationDuration}) => {
 
   const ballAnimatedValue = useRef(new Animated.Value(0)).current;
 
-  const getTime = (dt) => {
-    if (!weather || !weather?.timezone_offset) return '00:00'
-    date = (dt) ? new Date(dt * 1000) : new Date()
-    let locationTime= new Date(date.getTime() + date.getTimezoneOffset() * 60000 + (1000 * weather?.timezone_offset))
-    let hour = locationTime.getHours();
-    let minutes = locationTime.getMinutes()
+  const getTime = () => {
+    return '00:00'
+    // if (!weather || !weather.timezone_offset) return '00:00'
+    // let date = (dt) ? new Date(dt * 1000) : new Date()
+    // let locationTime= new Date(date.getTime() + date.getTimezoneOffset() * 60000 + (1000 * weather.timezone_offset))
+    // let hour = locationTime.getHours();
+    // let minutes = locationTime.getMinutes()
 
-    return `${(hour < 10) ? '0' + hour : hour}:${((minutes< 10)) ? '0' + minutes : minutes}`
+    // return `${(hour < 10) ? '0' + hour : hour}:${((minutes< 10)) ? '0' + minutes : minutes}`
   }
 
   function getTimeDifference(startDate, endDate) {
@@ -57,36 +58,42 @@ export default Sunrise = ({animationDuration}) => {
   }
 
   return (
-      <View style={{paddingVertical: 10, justifyContent: 'center', backgroundColor: isDarkMode ? '#696969' : 'rgba(255, 255, 255, 0.6)', marginHorizontal: 10, borderRadius: 20}}>
-        <Text style={{padding: 10, paddingLeft: 20, fontSize: 16, fontWeight: 'bold', color: isDarkMode ? 'white' : 'black'}}>{t('sun.title').toUpperCase()}</Text>
-        <View style = {[styles.miniContainer]}>
-          <View style = {[styles.arc]} />
-            <Image style={[styles.globe]} source={require('../../assets/globe.png')} />
-            <Animated.View style = {[styles.sunView, {transform: [{rotate: tempDeg}]}]}>
-              <MaterialCommunityIcons style={[styles.sun]} name='white-balance-sunny' size={20} color='#FAEF5D'></MaterialCommunityIcons>
-            </Animated.View>
-            <View style = {[styles.greenView]}>
-              <View style = {[styles.greenFillView]}>
-                <Animated.View style = {[styles.greenFill]} />
+    <>
+      {
+        weather ?
+        <View style={{paddingVertical: 10, justifyContent: 'center', backgroundColor: isDarkMode ? '#696969' : 'rgba(255, 255, 255, 0.6)', marginHorizontal: 10, borderRadius: 20}}>
+          <Text style={{padding: 10, paddingLeft: 20, fontSize: 16, fontWeight: 'bold', color: isDarkMode ? 'white' : 'black'}}>{t('sun.title').toUpperCase()}</Text>
+          <View style = {[styles.miniContainer]}>
+            <View style = {[styles.arc]} />
+              <Image style={[styles.globe]} source={require('../../assets/globe.png')} />
+              <Animated.View style = {[styles.sunView, {transform: [{rotate: tempDeg}]}]}>
+                <MaterialCommunityIcons style={[styles.sun]} name='white-balance-sunny' size={20} color='#FAEF5D'></MaterialCommunityIcons>
+              </Animated.View>
+              <View style = {[styles.greenView]}>
+                <View style = {[styles.greenFillView]}>
+                  <Animated.View style = {[styles.greenFill]} />
+                </View>
               </View>
+              <View style = {[styles.borderBottom, { borderColor: isDarkMode ? 'white' : 'grey'}]} />
+          </View>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 5}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', marginLeft: 30}}>
+              <MaterialCommunityIcons name='arrow-up' size={18} color={isDarkMode ? 'white' : 'black'}></MaterialCommunityIcons>
+              <Text style={{marginLeft: 2, color: isDarkMode ? 'white' : 'black'}}>00:00</Text>
             </View>
-            <View style = {[styles.borderBottom, { borderColor: isDarkMode ? 'white' : 'grey'}]} />
-        </View>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between', paddingTop: 5}}>
-          <View style={{flexDirection: 'row', alignItems: 'center', marginLeft: 30}}>
-            <MaterialCommunityIcons name='arrow-up' size={18} color={isDarkMode ? 'white' : 'black'}></MaterialCommunityIcons>
-            <Text style={{marginLeft: 2, color: isDarkMode ? 'white' : 'black'}}>{getTime(weather?.daily[0]?.sunrise)}</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center', marginRight: 30}}>
+              <Text style={{marginRight: 2, color: isDarkMode ? 'white' : 'black'}}>00:00</Text>
+              <MaterialCommunityIcons name='arrow-down' size={18} color={isDarkMode ? 'white' : 'black'}></MaterialCommunityIcons>
+            </View>
           </View>
-          <View style={{flexDirection: 'row', alignItems: 'center', marginRight: 30}}>
-            <Text style={{marginRight: 2, color: isDarkMode ? 'white' : 'black'}}>{getTime(weather?.daily[0]?.sunset)}</Text>
-            <MaterialCommunityIcons name='arrow-down' size={18} color={isDarkMode ? 'white' : 'black'}></MaterialCommunityIcons>
+          <View style={{padding: 20, paddingBottom: 10}}>
+            <Text style={{paddingBottom: 10, color: isDarkMode ? 'white' : 'black'}}>{t('sun.length')} - <Text style={{color: '#E9B824'}}>{getTimeDifference(weather?.daily[0]?.sunrise, weather?.daily[0]?.sunset)}</Text></Text>
+            <Text style={{color: isDarkMode ? 'white' : 'black'}}>{t('sun.remain')} - <Text style={{color: '#E9B824'}}>{getTimeDifference((Date.now() / 1000 > weather?.daily[0]?.sunrise) ? Date.now() / 1000 : weather?.daily[0]?.sunrise , weather?.daily[0]?.sunset)}</Text></Text>
           </View>
         </View>
-        <View style={{padding: 20, paddingBottom: 10}}>
-          <Text style={{paddingBottom: 10, color: isDarkMode ? 'white' : 'black'}}>{t('sun.length')} - <Text style={{color: '#E9B824'}}>{getTimeDifference(weather?.daily[0]?.sunrise, weather?.daily[0]?.sunset)}</Text></Text>
-          <Text style={{color: isDarkMode ? 'white' : 'black'}}>{t('sun.remain')} - <Text style={{color: '#E9B824'}}>{getTimeDifference((Date.now() / 1000 > weather?.daily[0]?.sunrise) ? Date.now() / 1000 : weather?.daily[0]?.sunrise , weather?.daily[0]?.sunset)}</Text></Text>
-        </View>
-      </View>
+        : <View></View>
+      }
+    </>
   );
 }
 

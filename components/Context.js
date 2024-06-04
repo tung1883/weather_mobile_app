@@ -62,33 +62,6 @@ export const WeatherProvider = ({ children }) => {
     } catch (err) {
       console.log('init Error: ' + err)
     }
-    //store data to AsyncStorage to reduce api calls
-    // { 
-    //   //key: name from cities -> value: location
-    //   //key: current -> value: current location
-    //   //key: location -> value: weather 
-    //   cities.forEach(async (city) => {
-    //     const location = await getLocationByCity(city)
-    //     if (!location) return 
-
-    //     const weather = await getWeather({location})
-    //     await AsyncStorage.setItem(city, JSON.stringify(location))
-    //     await AsyncStorage.setItem(JSON.stringify(location), JSON.stringify(weather))
-    //   })
-
-    //   const location = await getGpsLocation()
-    //   const weather = await getWeather({location})
-    //   await AsyncStorage.setItem('current', JSON.stringify(location))
-    //   await AsyncStorage.setItem(JSON.stringify(location), JSON.stringify(weather))
-
-    ////print all values
-    //   const keys = await AsyncStorage.getAllKeys()
-    //   keys.forEach(async (key) => {
-    //     if (key !== 'current') return
-    //     console.log("KEY: " + key + " VALUE: " + await AsyncStorage.getItem(key))
-    //     console.log(" -------------------------- ")
-    //   })
-    // }
   }
 
 
@@ -106,6 +79,7 @@ export const WeatherProvider = ({ children }) => {
 
         const { latitude: lat, longitude: long } = (await Location.getCurrentPositionAsync({})).coords
         const {city, country} = await getLocationDetails({lat, long})
+        await AsyncStorage.setItem('currentLocation', JSON.stringify({city, country}))
         return { lat, long, city, country }
       } catch (error) {
         console.error('Error getting location:', error);

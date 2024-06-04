@@ -25,7 +25,7 @@ export function BigWidget({weather, location, daily, date, nextDays, locationDet
             </FlexWidget>
             <FlexWidget style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20, width: 'match_parent'}}>
                 <FlexWidget style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <TextWidget style={{color: 'white', fontSize: 30, paddingRight: 5}} text={weather.temp + '°C'}></TextWidget>
+                    <TextWidget style={{color: 'white', fontSize: 30, paddingRight: 5}} text={Math.round(weather.temp) + '°C'}></TextWidget>
                     <ImageWidget 
                         image={`http://openweathermap.org/img/wn/${weather?.weather[0].icon}@2x.png`}
                         imageWidth={50}

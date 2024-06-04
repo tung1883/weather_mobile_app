@@ -11,13 +11,8 @@ export async function widgetTaskHandler (props) {
 
   const getLocation = async () => {
     try {
-        const { status } = await Location.getForegroundPermissionsAsync();
-
-        if (status == 'granted') {
-          const { latitude: lat, longitude: long } = (await Location.getCurrentPositionAsync({})).coords
-          const { city } = await getLocationDetails({lat, long})
-          return city
-        }
+        const currentLocation = JSON.parse(await AsyncStorage.getItem('currentLocation'))
+        if (currentLocation) return currentLocation.city
 
         const favs = JSON.parse(await AsyncStorage.getItem('favoriteLocations'))
         if (favs.length == 0) return null
@@ -112,7 +107,7 @@ export async function widgetTaskHandler (props) {
   if (widgetInfo.widgetName == 'Small') {
     switch (props.widgetAction) {
       default:
-        if (location) props.renderWidget(<SmallWidget location={location} weather={weather.temp + '°C'} icon={weather.weather[0].icon} date={getCurrentDate()}/>);
+        if (location) props.renderWidget(<SmallWidget location={location} weather={Math.round(weather.temp) + '°C'} icon={weather.weather[0].icon} date={getCurrentDate()}/>);
         else props.renderWidget(<SmallWidget location={null} />);
         break;
     }

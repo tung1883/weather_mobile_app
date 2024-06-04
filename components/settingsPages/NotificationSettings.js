@@ -5,6 +5,26 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext } from '../Context';
 
+async function sendPushNotification(expoPushToken) {
+  const message = {
+    to: expoPushToken,
+    sound: 'default',
+    title: 'Original Title',
+    body: 'And here is the body!',
+    data: { someData: 'goes here' },
+  };
+
+  await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Accept-encoding': 'gzip, deflate',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(message),
+  });
+}
+
 const NotificationSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
     const { isDarkMode } = useContext(FunctionalContext);
@@ -23,19 +43,9 @@ const NotificationSettings = ({ navigation }) => {
                 <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Notifications</Text>
             </View>
             <View>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
+                <TouchableOpacity onPress={async () => { await sendPushNotification('ExponentPushToken[-Oka9EILvKsOF_Z3mYvlQd]')}}>
+                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 30}}>
+                        <Text style={{color: 'white', fontSize: 15}}>Push Notifications</Text>
                     </View>
                 </TouchableOpacity>
             </View>

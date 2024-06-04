@@ -1,4 +1,4 @@
-package com.sample1
+package com.vu02102003.sample1
 
 import android.os.Build
 import android.os.Bundle
