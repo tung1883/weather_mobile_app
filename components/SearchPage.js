@@ -14,7 +14,7 @@ const screenWidth = Dimensions.get('window').width;
 const SearchPage = ({navigation}) => {    
     const goBack = navigation?.canGoBack()
     const { isDarkMode, toggleTheme, t, translateText} = useContext(FunctionalContext);
-    let { setLocation, gps, setGps, getGpsLocation, getLocationDetails, getLocationByCity, getWeather, favs, setFavs, setWeather } = useContext(WeatherContext)
+    let { setLocation, gps, setGps, getGpsLocation, getLocationDetails, getLocationByCity, getWeather, location, favs, setFavs, setWeather } = useContext(WeatherContext)
     const [searchQuery, setSearchQuery] = useState('');
     const [mapSearchQuery, setMapSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState(popularCities);
@@ -26,6 +26,12 @@ const SearchPage = ({navigation}) => {
     const [mapFetching, setMapFetching] = useState(false)
 
     useEffect(() => {
+        if (location) {
+            setMapCoordinate({latitude: location.lat - 0.5, longitude: location.long + 0.23})
+            setMarkerCoordinate({latitude: location.lat, longitude: location.long})
+            return
+        }
+
         if (gps?.location?.lat) {
             setMapCoordinate({latitude: gps.location.lat - 0.5, longitude: gps.location.long + 0.23})
             setMarkerCoordinate({latitude: gps.location.lat, longitude: gps.location.long})
@@ -152,7 +158,6 @@ const SearchPage = ({navigation}) => {
                             position: 'absolute', top: 30, left: (screenWidth - 350) / 2, zIndex: 100, width: 350,
                             flexDirection: 'row', alignItems: 'center'
                         }}
-                        onPress={() => setMarkerCoordinate({latitude: 10, longitude: 10})}
                     >
                         <View style={[styles.searchBar]}>
                             <MaterialCommunityIcons name="magnify" size={24} color={"black"} style={{marginLeft: 10}} />
@@ -212,6 +217,8 @@ const SearchPage = ({navigation}) => {
                         provider={PROVIDER_GOOGLE}
                         userInterfaceStyle={isDarkMode ? 'dark' : 'light'}
                         style={{width: '200%', height: '200%'}}
+                        rotateEnabled={false}
+                        showsCompass={false}
                         onPress={(e) => {
                             setMapSearchQuery(`{${e.nativeEvent.coordinate.latitude.toFixed(1)}, ${e.nativeEvent.coordinate.longitude.toFixed(1)}}`)
                             setMarkerCoordinate(e.nativeEvent.coordinate)

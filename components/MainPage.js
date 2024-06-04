@@ -18,11 +18,16 @@ const MainPage = ({ navigation }) => {
   const { isDarkMode } = useContext(FunctionalContext)
   const [isTaskbarOpen, setIsTaskbarOpen] = useState(false);  
   const [formattedTime, setFormattedTime] = useState('');
+  const [bgList, setBgList] = useState(isDarkMode ? [darkBgImg1, darkBgImg2] : [bgImg1, bgImg2, bgImg3])
+  const [bg, setBg] = useState(Math.floor(Math.random() * (bgList.length - 1)))
   const intervals = useRef([])
   const [currentSection, setCurrentSection] = useState(0) //used to move between different weather sections, see sectionList in Footer.js
-  const bgList = (isDarkMode) ? [darkBgImg1, darkBgImg2] : [bgImg1, bgImg2, bgImg3]
-  const [bg, setBg] = useState(Math.floor(Math.random() * (bgList.length - 1)))
   
+  useEffect(() => {
+    setBgList(isDarkMode ? [darkBgImg1, darkBgImg2] : [bgImg1, bgImg2, bgImg3])
+    setBg(Math.floor(Math.random() * (bgList.length - 1)))
+  }, [isDarkMode])
+
   useEffect(() => {
     setNextBg()
   }, [])

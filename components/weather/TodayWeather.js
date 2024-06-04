@@ -34,10 +34,10 @@ export default TodayWeather = ({setCurrentSection, navigation}) => {
                         <MaterialCommunityIcons name={'chevron-right'} color={(isDarkMode) ? 'dodgerblue' : '#2D5DA1'} size={20} style={{paddingTop: 3}}/>
                     </TouchableOpacity>
                     </View>
-                    {/* <Sunrise></Sunrise> */}
+                    <Sunrise></Sunrise>
                 </View>
             </ScrollView>}          
-          {!weather && <View style={styles.noWeather}><Text style={{color: 'white', textAlign: 'center'}}>No Weather to Show</Text></View>}
+            {!weather && <View style={styles.noWeather}><Text style={{color: 'white', textAlign: 'center'}}>No Weather to Show</Text></View>}
         </>
     )
 }

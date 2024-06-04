@@ -94,7 +94,7 @@ export const WeatherProvider = ({ children }) => {
       );
       const data = await response.json();
       if (!data?.coord?.lat) {
-        console.log('getLocationByCity Error');
+        console.log('getLocationByCity Error')
         return null
       }
 

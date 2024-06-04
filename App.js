@@ -132,7 +132,7 @@ const App = () => {
   useEffect(() => {
     (async () => {
       //check if the user uses the app for the first time
-      AsyncStorage.removeItem('notFirstTime') //uncomment this to be first time user
+      // AsyncStorage.removeItem('notFirstTime') //uncomment this to be first time user
       const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
       
       if (notFirstTime === null) {

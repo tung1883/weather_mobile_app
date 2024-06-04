@@ -1,21 +1,37 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useRef } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import logoImg from "../assets/logo.png"
 import { lightStyles, darkStyles } from "./defaultStyles";
-import { FunctionalContext } from "./Context";
+import { FunctionalContext, WeatherContext } from "./Context";
 
 export default LoadingPage = ({navigation}) => {
   const { isDarkMode } = useContext(FunctionalContext);
-  
+  const { location, weather } = useContext(WeatherContext)
+  const notFirstTime = useRef(null)
+  const timer = useRef(null)
+
   useEffect(() => {
-      const timer = setTimeout(async () => {
-          const notFirstTime = await AsyncStorage.getItem('notFirstTime') 
-          navigation.replace((notFirstTime === 'true') ? 'Main' : 'LocationPermission'); // Replace the loading screen with the menu screen
-      }, 2000); // Wait for 2 seconds before navigating to the menu
-      return () => clearTimeout(timer); // Cleanup function to clear the timer
-  }, [navigation]);
+    const navigate = async () => {
+      if (notFirstTime.current === null) {
+        notFirstTime.current = (await AsyncStorage.getItem('notFirstTime')) ? true : false
+      }
+
+      if (notFirstTime.current) {
+        if (JSON.stringify(weather) !== '{}') navigation.replace('Main'); 
+      }
+      else {
+        timer.current =  setTimeout(async () => {
+            navigation.replace('LocationPermission'); 
+        }, 2000);
+      }
+    }
+    
+    navigate()
+
+    return () => clearTimeout(timer.current);
+  }, [navigation, location, weather]);
 
   return (
       <View style={[styles.container, isDarkMode && styles.darkContainer]}>
