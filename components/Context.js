@@ -7,7 +7,6 @@ import * as Localization from 'expo-localization'
 
 import i18n from '../functionalities/language/i18n';
 import config from '../config'
-import { putToFrontFavs } from '../functionalities/favoriteLocations';
 
 export const FunctionalContext = createContext();
 export const WeatherContext = createContext()
@@ -63,7 +62,6 @@ export const WeatherProvider = ({ children }) => {
       console.log('init Error: ' + err)
     }
   }
-
 
   const controller = new AbortController();
   const signal = controller.signal;
