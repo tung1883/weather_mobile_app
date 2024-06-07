@@ -9,8 +9,8 @@ export default Radar = () => {
     const [region, setRegion] = useState({
         latitude: 0,
         longitude: 0,
-        latitudeDelta: 1,
-        longitudeDelta: 1
+        latitudeDelta: 30,
+        longitudeDelta: 30
     });
     const { t, isDarkMode } = useContext(FunctionalContext)
     const [overlayImages, setOverlayImages] = useState([]);
