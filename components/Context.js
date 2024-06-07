@@ -7,7 +7,6 @@ import * as Localization from 'expo-localization'
 
 import i18n from '../functionalities/language/i18n';
 import config from '../config'
-import { putToFrontFavs } from '../functionalities/favoriteLocations';
 
 export const FunctionalContext = createContext();
 export const WeatherContext = createContext()
@@ -62,35 +61,7 @@ export const WeatherProvider = ({ children }) => {
     } catch (err) {
       console.log('init Error: ' + err)
     }
-    //store data to AsyncStorage to reduce api calls
-    // { 
-    //   //key: name from cities -> value: location
-    //   //key: current -> value: current location
-    //   //key: location -> value: weather 
-    //   cities.forEach(async (city) => {
-    //     const location = await getLocationByCity(city)
-    //     if (!location) return 
-
-    //     const weather = await getWeather({location})
-    //     await AsyncStorage.setItem(city, JSON.stringify(location))
-    //     await AsyncStorage.setItem(JSON.stringify(location), JSON.stringify(weather))
-    //   })
-
-    //   const location = await getGpsLocation()
-    //   const weather = await getWeather({location})
-    //   await AsyncStorage.setItem('current', JSON.stringify(location))
-    //   await AsyncStorage.setItem(JSON.stringify(location), JSON.stringify(weather))
-
-    ////print all values
-    //   const keys = await AsyncStorage.getAllKeys()
-    //   keys.forEach(async (key) => {
-    //     if (key !== 'current') return
-    //     console.log("KEY: " + key + " VALUE: " + await AsyncStorage.getItem(key))
-    //     console.log(" -------------------------- ")
-    //   })
-    // }
   }
-
 
   const controller = new AbortController();
   const signal = controller.signal;
@@ -106,6 +77,7 @@ export const WeatherProvider = ({ children }) => {
 
         const { latitude: lat, longitude: long } = (await Location.getCurrentPositionAsync({})).coords
         const {city, country} = await getLocationDetails({lat, long})
+        await AsyncStorage.setItem('currentLocation', JSON.stringify({city, country}))
         return { lat, long, city, country }
       } catch (error) {
         console.error('Error getting location:', error);
@@ -120,7 +92,7 @@ export const WeatherProvider = ({ children }) => {
       );
       const data = await response.json();
       if (!data?.coord?.lat) {
-        console.log('getLocationByCity Error');
+        console.log('getLocationByCity Error')
         return null
       }
 
@@ -145,7 +117,7 @@ export const WeatherProvider = ({ children }) => {
     }
   };
 
-  const getWeather = async ({location, current}) => {
+  const getWeather = async ({location}) => {
     //TRUE API CALL
     if (!location) return null
 
@@ -163,13 +135,6 @@ export const WeatherProvider = ({ children }) => {
       console.log("error", err);
       return null
     });
-
-    //MOCK API CALL
-    // if (current) {
-    //   location = await AsyncStorage.getItem('current')
-    // }
-    
-    // return JSON.parse(await AsyncStorage.getItem(JSON.stringify(location)))
   }
 
   const share = async ({text}) => {
@@ -308,7 +273,7 @@ export const WeatherProvider = ({ children }) => {
 
   return (
     <WeatherContext.Provider value={{location, setLocation, weather, setWeather, favs, setFavs, gps, setGps, fetching, setFetching, share, init,
-      getGpsLocation, getLocationByCity, getWeather, unit, changeUnit, getUnit, health, getIndexColor, getPollen
+      getGpsLocation, getLocationByCity, getWeather, unit, changeUnit, getUnit, health, getIndexColor, getPollen, getLocationDetails
     }}>
       {children}
     </WeatherContext.Provider>

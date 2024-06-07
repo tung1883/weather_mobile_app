@@ -12,6 +12,7 @@
                 "currentLocation": "Use Current Location",
                 "popularSuggestion": "Popular Cities",
                 "searchSuggestion": "Suggestions",
+                "mapPlaceholder": "Enter a location",
                 "fetch": "Fetching weather data.."
             },
             "languageAndUnitsPage": {
@@ -112,6 +113,13 @@
                 "waxing-gibbous": "Waxing Gibbous",
                 "last-quarter": "Last Quarter",
                 "today": "Today"
+            },
+            "widgetSettings": {
+                "title": "Widget Settings",
+                "small": "Small Widget (3x1)",
+                "big": "Big Widget (5x4)",
+                "note1": "To add widgets, go to your home screen",
+                "note2": "Remember to find a location first"
             }
         }
     },
@@ -129,6 +137,7 @@
                 "currentLocation": "Sử dụng vị trí hiện tại",
                 "popularSuggestion": "Các thành phố nổi tiếng",
                 "searchSuggestion": "Gợi ý",
+                "mapPlaceholder": "Nhập tên địa điểm",
                 "fetch": "Đang tải dữ liệu.."
             },
             "languageAndUnitsPage": {
@@ -229,6 +238,13 @@
                 "waxing-gibbous": "Waxing Gibbous",
                 "last-quarter": "Last Quarter",
                 "today": "Hôm nay"
+            },
+            "widgetSettings": {
+                "title": "Cài đặt Widget",
+                "small": "Widget Bé (3x1)",
+                "big": "Widget To (5x4)",
+                "note1": "Để thêm widget, hãy đến màn hình chính của bạn",
+                "note2": "Hãy nhớ tìm một vị trí trước đó"
             }
         }
     }

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { lightStyles, darkStyles } from '../defaultStyles';
@@ -25,19 +25,9 @@ const NotificationSettings = ({ navigation }) => {
                 <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Notifications</Text>
             </View>
             <View>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 20}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Manage Notifications</Text>
+                <TouchableOpacity onPress={async () => { await sendPushNotification('ExponentPushToken[-Oka9EILvKsOF_Z3mYvlQd]')}}>
+                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 30}}>
+                        <Text style={{color: 'white', fontSize: 15}}>Push Notifications</Text>
                     </View>
                 </TouchableOpacity>
             </View>

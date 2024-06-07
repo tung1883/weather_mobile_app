@@ -37,7 +37,7 @@ export default TodayWeather = ({setCurrentSection, navigation}) => {
                     <Sunrise></Sunrise>
                 </View>
             </ScrollView>}          
-          {!weather && <View style={styles.noWeather}><Text style={{color: 'white', textAlign: 'center'}}>No Weather to Show</Text></View>}
+            {!weather && <View style={styles.noWeather}><Text style={{color: 'white', textAlign: 'center'}}>No Weather to Show</Text></View>}
         </>
     )
 }

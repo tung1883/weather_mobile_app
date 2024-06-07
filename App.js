@@ -2,8 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Pressable, Text, Platform } from 'react-native';
-import * as Device from 'expo-device';
+import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 
@@ -29,8 +28,12 @@ Notifications.setNotificationHandler({
   }),
 });
 
+<<<<<<< HEAD
 async function sendPushNotification(expoPushToken) {
 
+=======
+export async function sendPushNotification(expoPushToken) {
+>>>>>>> main
   const message = {
     to: expoPushToken,
     sound: 'default',
@@ -57,7 +60,10 @@ function handleRegistrationError(errorMessage) {
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'android') {
+<<<<<<< HEAD
     
+=======
+>>>>>>> main
     Notifications.setNotificationChannelAsync('default', {
       name: 'default',
       importance: Notifications.AndroidImportance.MAX,
@@ -89,7 +95,6 @@ async function registerForPushNotificationsAsync() {
         projectId,
       })
     ).data;
-    console.log(pushTokenString);
     return pushTokenString;
   } catch (e) {
     console.log('error')
@@ -108,7 +113,7 @@ const App = () => {
   useEffect(() => {
     registerForPushNotificationsAsync()
       .then((token) => {
-        console.log(token)
+        // console.log(token)
         setExpoPushToken(token ?? '')
       })
       .catch((error) => setExpoPushToken(`${error}`));
@@ -149,7 +154,7 @@ const App = () => {
   useEffect(() => {
     (async () => {
       //check if the user uses the app for the first time
-      AsyncStorage.removeItem('notFirstTime') //uncomment this to be first time user
+      // AsyncStorage.removeItem('notFirstTime') //uncomment this to be first time user
       const notFirstTime = await AsyncStorage.getItem('notFirstTime'); // null if the first time, "true" otherwise
       
       if (notFirstTime === null) {
@@ -182,7 +187,7 @@ const App = () => {
     <FunctionalProvider>
       <WeatherProvider>
         <NavigationContainer>
-          <Stack.Navigator initialRouteName="Search">
+          <Stack.Navigator initialRouteName="Loading">
             <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
             <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
             <Stack.Screen name="Search" options={{ headerShown: false }}>{(navigation) => <SearchPage {...navigation}/>}</Stack.Screen>

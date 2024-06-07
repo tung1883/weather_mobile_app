@@ -8,12 +8,6 @@ export default CurrentWeather = ({ currentWeather }) => {
   const { unit, getUnit } = useContext(WeatherContext)
   const { isDarkMode, t } = useContext(FunctionalContext)
 
-  const parseTimezone = (timezone) => {
-    if (!timezone) return 
-
-    return timezone.replace(/_/g, ' ')
-  }
-
   return (
     <View style={styles.currentView}>
       <View style={styles.mainInfoContainer}>
@@ -97,7 +91,7 @@ export default CurrentWeather = ({ currentWeather }) => {
               <Text style={[styles.label, isDarkMode && { color: 'white'}]}>{t('weather.rain')}</Text>
             </View>
             <Text style={[styles.details, isDarkMode && { color: 'white'}]}>
-              {currentWeather?.current?.rain ? currentWeather?.current?.rain : "0"} mm
+              {typeof currentWeather?.current?.rain?.["1h"] === 'number' ? currentWeather.current.rain["1h"].toString() : "0"} mm
             </Text>
           </View>
         </View>

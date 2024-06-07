@@ -2,14 +2,14 @@ import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { WidgetPreview } from 'react-native-android-widget';
 
-import { HelloWidget } from './HelloWidget';
+import { SmallWidget } from './SmallWidget';
 
-export function HelloWidgetPreviewScreen() {
+export function SmallWidgetPreviewScreen() {
   return (
     <View style={styles.container}>
       <WidgetPreview
-        renderWidget={() => <HelloWidget />}
-        width={320}
+        renderWidget={() => <SmallWidget />}
+        width={200}
         height={200}
       />
     </View>
