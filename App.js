@@ -126,7 +126,7 @@ const App = () => {
         const currentDate = new Date();
         if (currentDate.getHours() === 10 && currentDate.getMinutes() === 56) {
           // Gửi thông báo
-          await sendPushNotification("ExponentPushToken[r1o3YBOKagEY8FPOyC7_f0]");
+          await sendPushNotification("ExponentPushToken[x0Rgn_Ozz8h3tonrGkwKZ-]");
         }
       };
 
@@ -167,7 +167,7 @@ const App = () => {
     const sendImmediateNotification = async () => {
       try {
         // Gửi thông báo ngay lập tức khi ứng dụng được mở
-        await sendPushNotification("ExponentPushToken[r1o3YBOKagEY8FPOyC7_f0]");
+        await sendPushNotification("ExponentPushToken[x0Rgn_Ozz8h3tonrGkwKZ-]");
       } catch (error) {
         console.error("Error sending immediate notification:", error);
       }

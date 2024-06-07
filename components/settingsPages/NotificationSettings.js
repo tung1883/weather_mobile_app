@@ -3,12 +3,13 @@ import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, A
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { lightStyles, darkStyles } from '../defaultStyles';
-import { FunctionalContext } from '../Context';
+import { FunctionalContext, WeatherContext } from "../Context";
 
 const NotificationSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
     const { isDarkMode, toggleTheme } = useContext(FunctionalContext);
     const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
+    const { location, weather } = useContext(WeatherContext)
 
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
