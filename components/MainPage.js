@@ -8,6 +8,8 @@ import bgImg3 from '../assets/light_bg_3.jpg'
 import darkBgImg1 from '../assets/dark_bg_1.png'
 import darkBgImg2 from '../assets/dark_bg_2.png'
 import darkBgImg3 from '../assets/dark_bg_3.png'
+import radarDarkBg from '../assets/radar_dark_bg.png'
+import radarWhiteBg from '../assets/radar_light_bg.png'
 import Footer from "./ui/Footer";
 import WeatherPage from "./ui/WeatherPage";
 import Taskbar from "./ui/Taskbar";
@@ -24,13 +26,17 @@ const MainPage = ({ navigation }) => {
   const [currentSection, setCurrentSection] = useState(0) //used to move between different weather sections, see sectionList in Footer.js
   
   useEffect(() => {
+    if (currentSection == 3) return 
+
     setBgList(isDarkMode ? [darkBgImg1, darkBgImg2] : [bgImg1, bgImg2, bgImg3])
     setBg(Math.floor(Math.random() * (bgList.length - 1)))
-  }, [isDarkMode])
+  }, [isDarkMode, currentSection])
 
   useEffect(() => {
+    if (currentSection == 3) return 
+    
     setNextBg()
-  }, [])
+  }, [currentSection])
 
   useEffect(() => {
     getTime()
@@ -62,10 +68,15 @@ const MainPage = ({ navigation }) => {
     setTimeout(setNextBg, 60 * 1000)
   }
   
+  const getBg = () => {
+    if (currentSection == 3) return (isDarkMode) ? radarDarkBg : radarWhiteBg
+    return bgList[bg]
+  }
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => setIsTaskbarOpen(false)} style={{ width: "100%", height: "100%" }} activeOpacity={1}>
-        <ImageBackground source={bgList[bg]} style={{ width: "100%", height: "100%" }}>
+        <ImageBackground source={getBg()} style={{ width: "100%", height: "100%" }}>
           {/* header */}
           <View style={styles.header}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
