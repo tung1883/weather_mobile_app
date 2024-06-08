@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect  } from "react";
-import { View, Text, Modal, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import MapView, { PROVIDER_GOOGLE, Overlay } from 'react-native-maps';
 import Slider from "@react-native-community/slider";
@@ -7,22 +7,22 @@ import Checkbox from 'expo-checkbox'
 import { LinearGradient } from "expo-linear-gradient";
 
 import config from "../../config";
-import { FunctionalContext } from "../Context";
+import { FunctionalContext, WeatherContext } from "../Context";
 import { TouchableOpacity } from "react-native";
 
 export default Radar = () => {
+    const { location } = useContext(WeatherContext)
     const [region, setRegion] = useState({
-        latitude: 0,
-        longitude: 0,
-        latitudeDelta: 30,
-        longitudeDelta: 30
+        latitude: location?.lat ? location.lat : 0,
+        longitude: location?.long ? location.long : 0,
+        latitudeDelta: 0.5,
+        longitudeDelta: 1
     });
     const [opacity, setOpacity] = useState(1)
     const { t, isDarkMode } = useContext(FunctionalContext)
-    const [overlayImages, setOverlayImages] = useState([]);
-    const [isFetching, setIsFetching] = useState(false)
+    const [overlayImages, setOverlayImages] = useState([])
     const [menuPressed, setMenuPressed] = useState(false)
-    const [mapIndex, setMapIndex] = useState(4)
+    const [mapIndex, setMapIndex] = useState(0)
 
     const mapList = [
         {name: t('radar.temp'), layer: 'temp_new'},
@@ -85,25 +85,13 @@ export default Radar = () => {
 
     const fetchOverlayImages = async (tiles, zoom) => {
         try {
-            setIsFetching(true)
             const images = await Promise.all(tiles.map(async ({ x, y }) => {
-                // const response = await fetch(
-                //     `https://tile.openweathermap.org/map/clouds_new/${3}/${3}/${3}.png?appid=${config.API_KEY}`
-                // );
-                // const blob = await response.blob();
-                // const reader = new FileReader();
-                // reader.onloadend = () => {
-                //     // setOverlayImage(reader.result);
-                // };
-                // reader.readAsDataURL(blob);
                 const url = `https://tile.openweathermap.org/map/${mapList[mapIndex].layer}/${zoom}/${x}/${y}.png?appid=${config.API_KEY}`
                 return { x, y, zoom, url };
             }));
             
             setOverlayImages(images);
-            setTimeout(() => setIsFetching(false), 2 * 1000)
         } catch (error) {
-            setIsFetching(false)
             console.error('Error fetching overlay images:', error);
         }
     }
@@ -130,7 +118,7 @@ export default Radar = () => {
 
         return tiles;
     }
-
+    
     useEffect(() => {
         const zoom = getZoomLevel(region.latitudeDelta)
         const {ne, nw, se, sw} = getMapBoundaries(region)
@@ -168,11 +156,11 @@ export default Radar = () => {
                     style={{width: '100%', flex: 1}}
                     rotateEnabled={false}
                     showsCompass={false}
-                    mapType='satellite'
+                    mapType='standard'
                     initialRegion={region}
                     onRegionChangeComplete={setRegion}
                 >
-                    {overlayImages.map((tile, index) => (
+                    {overlayImages?.map((tile, index) => (
                         <Overlay
                             key={index}
                             bounds={getBounds(tile.x, tile.y, tile.zoom)}
@@ -225,7 +213,16 @@ export default Radar = () => {
                             mapList.map((map, index) => {
                                 return <View key={index} style={{flexDirection: 'row', alignItems: 'center', marginBottom: 15}}>
                                     <Checkbox color={!isDarkMode ? "#068FFF" : '#2D5DA1'} value={index == mapIndex}
-                                        onValueChange={() => setMapIndex(index)}
+                                        onValueChange={() => {
+                                            setMapIndex(index)
+                                            const temp = overlayImages.map((image) => {
+                                                const { x, y, zoom } = image
+                                                const url = `https://tile.openweathermap.org/map/${mapList[index].layer}/${zoom}/${x}/${y}.png?appid=${config.API_KEY}`
+                                                return {x, y, zoom, url}
+                                            })
+                                            
+                                            setOverlayImages(temp)
+                                        }}
                                     ></Checkbox>
                                     <Text style={{marginLeft: 5, color: isDarkMode ? 'white' : 'black'}}>{map.name}</Text>
                                 </View>
@@ -239,15 +236,6 @@ export default Radar = () => {
                     </TouchableOpacity>
                 </View> 
             }
-            {/* <Modal visible={isFetching} transparent animationType="fade">
-                <Text>testing</Text>
-                    <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <ActivityIndicator size="large" color="black" />
-                        <Text style={styles.loadingText}>{t('searchPage.fetch')}</Text>
-                    </View>
-                    </View>
-            </Modal> */}
         </View>
     )
 }

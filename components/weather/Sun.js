@@ -40,14 +40,6 @@ export default Sun = () => {
         const formattedMonth = month < 10 ? '0' + month : month;
         return `${formattedDay}/${formattedMonth}`;
     }
-    // "new-moon": "New Moon",
-    //             "waning-crescent": "Trăng lưỡi liềm cuối",
-    //             "first-quarter": "Trăng thượng huyền",
-    //             "waning-gibbous": "Trăng khuyết cuối",
-    //             "full-moon": "Trăng tròn",
-    //             "waxing-crescent": "Trăng lưỡi liềm đầu",
-    //             "waxing-gibbous": "Trăng khuyết đầu",
-    //             "last-quarter": "Trăng hạ huyền",
 
     const getMoon = (daily, index) => {
         if ((index != 8 && daily[index + 1] > daily[index]) || (index == 8 && daily[index - 1] < daily[index])) {
