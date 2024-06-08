@@ -120,6 +120,15 @@
                 "big": "Big Widget (5x4)",
                 "note1": "To add widgets, go to your home screen",
                 "note2": "Remember to find a location first"
+            },
+            "radar": {
+                "temp": "Temperature",
+                "precip": "Precipitation",
+                "wind": "Wind Speed",
+                "cloud": "Clouds",
+                "pressure": "Sea-level Pressure",
+                "opacity": "Weather Layer Opacity",
+                "layer": "Weather Layers"
             }
         }
     },
@@ -133,7 +142,7 @@
                 "rejectButton": "Không đồng ý sử dụng"
             },
             "searchPage": {
-                "placeholder": "Nhập tên thành phố bạn muốn tìm",
+                "placeholder": "Nhập tên thành phố của bạn",
                 "currentLocation": "Sử dụng vị trí hiện tại",
                 "popularSuggestion": "Các thành phố nổi tiếng",
                 "searchSuggestion": "Gợi ý",
@@ -230,13 +239,13 @@
                 "sunrise": "Mặt trời mọc",
                 "sunset": "Mặt trời lặn",
                 "new-moon": "New Moon",
-                "waning-crescent": "Waning Crescent",
-                "first-quarter": "First Quarter",
-                "waning-gibbous": "Waning Gibbous",
-                "full-moon": "Full Moon",
-                "waxing-crescent": "Waxing Crescent",
-                "waxing-gibbous": "Waxing Gibbous",
-                "last-quarter": "Last Quarter",
+                "waning-crescent": "Lưỡi liềm cuối",
+                "first-quarter": "Thượng huyền",
+                "waning-gibbous": "Khuyết cuối",
+                "full-moon": "Trăng tròn",
+                "waxing-crescent": "Lưỡi liềm đầu",
+                "waxing-gibbous": "Khuyết đầu",
+                "last-quarter": "Hạ huyền",
                 "today": "Hôm nay"
             },
             "widgetSettings": {
@@ -245,6 +254,15 @@
                 "big": "Widget To (5x4)",
                 "note1": "Để thêm widget, hãy đến màn hình chính của bạn",
                 "note2": "Hãy nhớ tìm một vị trí trước đó"
+            },
+            "radar": {
+                "temp": "Nhiệt độ",
+                "precip": "Lượng mưa",
+                "wind": "Tốc độ gió",
+                "cloud": "Mây",
+                "pressure": "Áp suất mực nước biển",
+                "opacity": "Độ mờ lớp thời tiết",
+                "layer": "Các lớp thời tiết"
             }
         }
     }

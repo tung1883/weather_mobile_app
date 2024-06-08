@@ -40,20 +40,28 @@ export default Sun = () => {
         const formattedMonth = month < 10 ? '0' + month : month;
         return `${formattedDay}/${formattedMonth}`;
     }
+    // "new-moon": "New Moon",
+    //             "waning-crescent": "Trăng lưỡi liềm cuối",
+    //             "first-quarter": "Trăng thượng huyền",
+    //             "waning-gibbous": "Trăng khuyết cuối",
+    //             "full-moon": "Trăng tròn",
+    //             "waxing-crescent": "Trăng lưỡi liềm đầu",
+    //             "waxing-gibbous": "Trăng khuyết đầu",
+    //             "last-quarter": "Trăng hạ huyền",
 
     const getMoon = (daily, index) => {
         if ((index != 8 && daily[index + 1] > daily[index]) || (index == 8 && daily[index - 1] < daily[index])) {
-            if (daily[index].moon_phase == 0) return {name: 'New Moon', img: 0}
-            if (daily[index].moon_phase < 0.5) return {name: 'Waxing Crescent', img: 1}
-            if (daily[index].moon_phase == 0.5) return {name: 'First Quarter', img: 2}
-            if (daily[index].moon_phase < 1) return {name: 'Waxing Gibbous', img: 3}
-            if (daily[index].moon_phase == 1) return {name: 'Full Moon', img: 4}
+            if (daily[index].moon_phase == 0) return {name: t('sun.new-moon'), img: 0}
+            if (daily[index].moon_phase < 0.5) return {name:  t('sun.waxing-crescent'), img: 1}
+            if (daily[index].moon_phase == 0.5) return {name: t('sun.first-quarter'), img: 2}
+            if (daily[index].moon_phase < 1) return {name: t('sun.waxing-gibbous'), img: 3}
+            if (daily[index].moon_phase == 1) return {name: t('sun.full-moon'), img: 4}
         } else {
-            if (daily[index].moon_phase == 0) return {name: 'New Moon', img: 0}
-            if (daily[index].moon_phase < 0.5) return {name: 'Waning Crescent', img: 7}
-            if (daily[index].moon_phase == 0.5) return {name: 'Last Quarter', img: 6}
-            if (daily[index].moon_phase < 1) return {name: 'Waning Gibbous', img: 5}
-            if (daily[index].moon_phase == 1) return {name: 'Full Moon', img: 4}
+            if (daily[index].moon_phase == 0) return {name: t('sun.new-moon'), img: 0}
+            if (daily[index].moon_phase < 0.5) return {name: t('sun.waning-crescent'), img: 7}
+            if (daily[index].moon_phase == 0.5) return {name: t('sun.last-quarter'), img: 6}
+            if (daily[index].moon_phase < 1) return {name: t('sun.waning-gibbous'), img: 5}
+            if (daily[index].moon_phase == 1) return {name: t('sun.full-moon'), img: 4}
         }
     }
 

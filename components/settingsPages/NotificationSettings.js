@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -28,7 +28,7 @@ async function sendPushNotification(expoPushToken) {
 const NotificationSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
     const { isDarkMode } = useContext(FunctionalContext);
-
+    
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
             <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 10, borderBottomColor: 'grey', borderBottomWidth: 0.5}}>

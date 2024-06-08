@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState, useRef } from 'react'
-import { StyleSheet, View, FlatList, TouchableOpacity, Image, Text, Share } from 'react-native'
+import { useContext, useEffect, useState } from 'react'
+import { StyleSheet, View, FlatList, TouchableOpacity, Image, Text } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 import logoImg from '../../assets/logo.png'
@@ -43,10 +43,6 @@ export default Taskbar = ({navigation}) => {
   ]
 
   const renderLocation = ( {item, index} ) => {
-    // if (!item.location.city || (index !== 0 && item.location.city == location.city)) {
-    //   return <></>
-    // }
-
     if (!item.location.city) {
       return <></>
     }

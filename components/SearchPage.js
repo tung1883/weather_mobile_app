@@ -239,55 +239,55 @@ const SearchPage = ({navigation}) => {
                     </MapView>
                 </> :
                 <View style={[styles.container, isDarkMode && styles.darkContainer]}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    {
-                        goBack &&
-                        <MaterialCommunityIcons 
-                            name="arrow-left" size={24} color={isDarkMode ? "white" : "black"}
-                            style={{margin: -3, padding: -3, marginRight: 15}}
-                            onPress={() => {navigation?.goBack()}}
-                        />
-                    }
-                    <View style={[styles.searchBar, isDarkMode && styles.darkSearchBar]}>
-                        <MaterialCommunityIcons name="magnify" size={24} color={isDarkMode ? "white" : "black"} style={{marginLeft: 10}} />
-                        <TextInput
-                            style={styles.input}
-                            placeholder={t('searchPage.placeholder')}
-                            value={searchQuery}
-                            onChangeText={handleSearch}
-                            onSubmitEditing={enterSearch}
-                            placeholderTextColor={isDarkMode ? 'white' : 'black'}
-                        />
-                        {searchQuery.length > 0 && (
-                            <MaterialCommunityIcons name="close" size={20} color={isDarkMode ? "white" : "black"} 
-                                style={{marginRight: 10}} onPress={clearSearch} />
-                        )}
-                        {searchQuery.length === 0 && (
-                            <MaterialCommunityIcons name="map-marker" size={20} color={isDarkMode ? "white" : "black"} 
-                                style={{marginRight: 10}} onPress={() => setOpenMap(true)} />
-                        )}
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                        {
+                            goBack &&
+                            <MaterialCommunityIcons 
+                                name="arrow-left" size={24} color={isDarkMode ? "white" : "black"}
+                                style={{margin: -3, padding: -3, marginRight: 15}}
+                                onPress={() => {navigation?.goBack()}}
+                            />
+                        }
+                        <View style={[styles.searchBar, isDarkMode && styles.darkSearchBar]}>
+                            <MaterialCommunityIcons name="magnify" size={24} color={isDarkMode ? "white" : "black"} style={{marginLeft: 10}} />
+                            <TextInput
+                                style={styles.input}
+                                placeholder={t('searchPage.placeholder')}
+                                value={searchQuery}
+                                onChangeText={handleSearch}
+                                onSubmitEditing={enterSearch}
+                                placeholderTextColor={isDarkMode ? 'white' : 'black'}
+                            />
+                            {searchQuery.length > 0 && (
+                                <MaterialCommunityIcons name="close" size={20} color={isDarkMode ? "white" : "black"} 
+                                    style={{marginRight: 10}} onPress={clearSearch} />
+                            )}
+                            {searchQuery.length === 0 && (
+                                <MaterialCommunityIcons name="map-marker" size={20} color={isDarkMode ? "white" : "black"} 
+                                    style={{marginRight: 10}} onPress={() => setOpenMap(true)} />
+                            )}
+                        </View>
                     </View>
-                </View>
-                <TouchableOpacity   
-                    onPress={requestLocationPermission}
-                    style={[styles.button, isDarkMode && styles.darkButton]}
-                >
-                    <MaterialCommunityIcons name="navigation-variant" size={20} color="white" style={{margin: -3, padding: -3, marginRight: 5}}/>
-                    <Text style={styles.buttonText}>{t('searchPage.currentLocation')}</Text>
-                </TouchableOpacity>
-                <Text style={[{marginTop: 20, marginBottom: 5, fontSize: 16, fontWeight: 'bold', color: 'black'}, isDarkMode && { color: 'white' }]}>{listTitle}</Text>
-                <FlatList
-                    data={suggestions}
-                    renderItem={({item, index}) => renderItem({ item, index })}
-                    keyExtractor={(item) => item}
-                    style={styles.list}
-                    />
-                <Modal visible={isFetching} transparent animationType="fade">
-                    <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <ActivityIndicator size="large" color="black" />
-                        <Text style={styles.loadingText}>{t('searchPage.fetch')}</Text>
-                    </View>
+                    <TouchableOpacity   
+                        onPress={requestLocationPermission}
+                        style={[styles.button, isDarkMode && styles.darkButton]}
+                    >
+                        <MaterialCommunityIcons name="navigation-variant" size={20} color="white" style={{margin: -3, padding: -3, marginRight: 5}}/>
+                        <Text style={styles.buttonText}>{t('searchPage.currentLocation')}</Text>
+                    </TouchableOpacity>
+                    <Text style={[{marginTop: 20, marginBottom: 5, fontSize: 16, fontWeight: 'bold', color: 'black'}, isDarkMode && { color: 'white' }]}>{listTitle}</Text>
+                    <FlatList
+                        data={suggestions}
+                        renderItem={({item, index}) => renderItem({ item, index })}
+                        keyExtractor={(item) => item}
+                        style={styles.list}
+                        />
+                    <Modal visible={isFetching} transparent animationType="fade">
+                        <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <ActivityIndicator size="large" color="black" />
+                            <Text style={styles.loadingText}>{t('searchPage.fetch')}</Text>
+                        </View>
                     </View>
                 </Modal>
 
