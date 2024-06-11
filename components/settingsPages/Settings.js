@@ -1,9 +1,9 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator, Pressable } from 'react-native';
+import React, { useContext, useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, PanResponder, TouchableWithoutFeedback } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { lightStyles, darkStyles } from '../defaultStyles';
-import { FunctionalContext, WeatherContext } from '../Context';
+import { FunctionalContext } from '../Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SettingsPage = ({ navigation }) => {    
@@ -60,41 +60,73 @@ const SettingsPage = ({ navigation }) => {
             </View>
 
             {isSettingTheme && <Modal visible={isSettingTheme} transparent animationType="fade">
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text style={{fontSize: 15, paddingBottom: 10, fontWeight: 'bold'}}>Select Theme</Text>
-                        <TouchableOpacity 
-                            onPress={async () => {
-                                setIsAuto(true)
-                                const theme = getAutoTheme()
-                                if (theme === 'light') setIsDarkMode(false)
-                                else setIsDarkMode(true)
+                    <OutsideTouchableComponent style={styles.modalContainer} onPressOutside={() => setIsSettingTheme(false)}>
+                        <View style={styles.modalContent}>
+                            <Text style={{fontSize: 15, paddingBottom: 10, fontWeight: 'bold'}}>Select Theme</Text>
+                            <TouchableOpacity 
+                                onPress={async () => {
+                                    setIsAuto(true)
+                                    const theme = getAutoTheme()
+                                    if (theme === 'light') setIsDarkMode(false)
+                                    else setIsDarkMode(true)
 
-                                await AsyncStorage.setItem('theme', 'auto')
-                                setIsSettingTheme(false)
-                            }}
-                            style={{borderBottomWidth: 0.5, borderBottomColor: 'grey', paddingRight: 100, paddingVertical: 10}}>
-                            <Text style={{fontSize: 15}}>Default</Text></TouchableOpacity>
-                        <TouchableOpacity 
-                            onPress={async () => {
-                                setIsDarkMode(false)
-                                await AsyncStorage.setItem('theme', 'light')
-                                setIsSettingTheme(false)
-                            }}
-                            style={{borderBottomWidth: 0.5, borderBottomColor: 'grey', paddingRight: 100, paddingVertical: 10}}><Text>Light</Text></TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={async () => {
-                                setIsDarkMode(true)
-                                await AsyncStorage.setItem('theme', 'dark')
-                                setIsSettingTheme(false)
-                            }}
-                            style={{paddingRight: 100, paddingVertical: 5}}><Text>Dark</Text></TouchableOpacity>
-                    </View>
-                </View>
+                                    await AsyncStorage.setItem('theme', 'auto')
+                                    setIsSettingTheme(false)
+                                }}
+                                style={{borderBottomWidth: 0.5, borderBottomColor: 'grey', paddingRight: 100, paddingVertical: 10}}>
+                                <Text style={{fontSize: 15}}>Default</Text></TouchableOpacity>
+                            <TouchableOpacity 
+                                onPress={async () => {
+                                    setIsDarkMode(false)
+                                    await AsyncStorage.setItem('theme', 'light')
+                                    setIsSettingTheme(false)
+                                }}
+                                style={{borderBottomWidth: 0.5, borderBottomColor: 'grey', paddingRight: 100, paddingVertical: 10}}><Text>Light</Text></TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={async () => {
+                                    setIsDarkMode(true)
+                                    await AsyncStorage.setItem('theme', 'dark')
+                                    setIsSettingTheme(false)
+                                }}
+                                style={{paddingRight: 100, paddingVertical: 5}}><Text>Dark</Text></TouchableOpacity>
+                        </View>
+                    </OutsideTouchableComponent>
             </Modal>}
         </>
     );
 };
+
+const OutsideTouchableComponent = ({ children, onPressOutside, style }) => {
+    const [panResponder, setPanResponder] = useState(null)
+    const [childPosition, setChildPosition] = useState(null)
+    
+    useEffect(() => {
+        if (!childPosition) return
+
+        setPanResponder(
+            PanResponder.create({
+                onStartShouldSetPanResponder: () => true,
+                onPanResponderRelease: (e) => {
+                    const { locationX, locationY } = e.nativeEvent
+
+                    if (locationX < childPosition.x || locationX > childPosition.x + childPosition.width || 
+                        locationY < childPosition.y ||locationY > childPosition.y + childPosition.height) {
+                        onPressOutside();
+                    }
+                },
+            })
+        )
+    }, [childPosition]);
+
+    return (
+        <View {...panResponder?.panHandlers} style={style}>
+            {React.cloneElement(children, { 
+                onLayout: (e) => { setChildPosition(e.nativeEvent.layout)}         
+            })}
+        </View>
+    );
+};
+
 
 const styles = StyleSheet.create({
     container: {

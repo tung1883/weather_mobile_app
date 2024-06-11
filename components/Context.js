@@ -22,6 +22,7 @@ export const WeatherProvider = ({ children }) => {
   const [health, setHealth] = useState(null)
 
   useEffect(() => {
+    if (!lang.lang) return
     init()
   }, [unit, lang])
 
@@ -62,9 +63,6 @@ export const WeatherProvider = ({ children }) => {
       console.log('init Error: ' + err)
     }
   }
-
-  const controller = new AbortController();
-  const signal = controller.signal;
 
   const getGpsLocation = async () => {
       try {
@@ -118,12 +116,10 @@ export const WeatherProvider = ({ children }) => {
   };
 
   const getWeather = async ({location}) => {
-    //TRUE API CALL
     if (!location) return null
 
     return fetch(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=minutely&units=${unit}&lang=${parsedLang(lang.lang)}&appid=${config.API_KEY}`,
-      { signal }
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=minutely&units=${unit}&lang=${parsedLang(lang.lang)}&appid=${config.API_KEY}`
     )
     .then((res) => {
       return res.json()
@@ -139,19 +135,7 @@ export const WeatherProvider = ({ children }) => {
 
   const share = async ({text}) => {
     try {
-      const result = await Share.share({
-        message: text,
-      });
-
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
-        }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
-      }
+      await Share.share({ message: text });
     } catch (error) {
       console.log(error)
     }
