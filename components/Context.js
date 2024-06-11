@@ -419,8 +419,11 @@ export const NotificationProvider = ({ children }) => {
     const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId
     if (!projectId) console.log('Project ID not found')
 
-    try { return (await Notifications.getExpoPushTokenAsync({ projectId })).data } 
-    catch (e) { console.log('error')}
+    try { 
+      const token = (await Notifications.getExpoPushTokenAsync({ projectId })).data 
+      return token
+    } 
+    catch (e) { console.log('Notification Register Error: ' + e)}
   }
 
   return (

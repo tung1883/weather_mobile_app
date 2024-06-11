@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "sample1",
-    "slug": "sample1",
+    "name": "1Weather",
+    "slug": "one-weather",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,10 +13,6 @@
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
       "permissions": [],
       "package": "com.vu02102003.sample1",
       "googleServicesFile": "./android/app/google-services.json"

@@ -1,5 +1,4 @@
 <resources>
-  <string name="app_name">sample1</string>
-  <string name="expo_system_ui_user_interface_style" translatable="false">automatic</string>
+  <string name="app_name">1Weather</string>
   <string name="ExpoLocalization_supportsRTL" translatable="false">undefined</string>
 </resources>
