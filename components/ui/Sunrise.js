@@ -5,7 +5,6 @@ import { FunctionalContext, WeatherContext } from '../Context';
 
 export default Sunrise = ({animationDuration}) => {
   const [tempDeg, setTempDeg] = useState('0deg');
-  const [ setTempHeight] = useState(0);
   const { weather } = useContext(WeatherContext)
   const { isDarkMode, t} = useContext(FunctionalContext)
   const ballAnimatedValue = useRef(new Animated.Value(0)).current;
@@ -48,7 +47,6 @@ export default Sunrise = ({animationDuration}) => {
       ballAnimatedValue.addListener((val) => {
         setTempDeg((angleTilt * val.value) + 'deg');
         let r = ((angleTilt * val.value) * Math.PI)/180;
-        setTempHeight(170 - (170 * Math.cos(r)));
       });
   
       startAnimation(sunPercent);

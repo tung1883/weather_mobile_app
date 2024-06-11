@@ -40,7 +40,6 @@ export const WeatherProvider = ({ children }) => {
   
       const location = await getGpsLocation() 
       const weather = await getWeather({location})
-      console.log(weather)
       setLocation(location)
       setWeather(weather)
       setGps({location, weather})
