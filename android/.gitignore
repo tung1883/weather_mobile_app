@@ -5,7 +5,7 @@
 # Android/IntelliJ
 #
 build/
-src/debug/main/AndroidManifest.xml
+src/debug/main/AndroidManifest
 .idea
 .gradle
 local.properties
