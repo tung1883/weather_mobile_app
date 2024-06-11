@@ -1,13 +1,14 @@
-import React from 'react';
-import * as Location from 'expo-location'
+import React, { useContext } from 'react';
+import { Appearance } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Localization from 'expo-localization'
+
 import { SmallWidget } from './SmallWidget';
 import { BigWidget } from './BigWidget'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import config from '../../config'
 
 export async function widgetTaskHandler (props) {
-  const widgetInfo = props.widgetInfo;
+  const widgetInfo = props.widgetInfo
 
   const getLocation = async () => {
     try {
@@ -44,12 +45,12 @@ export async function widgetTaskHandler (props) {
     return formattedDate;
   };
 
-  const getWeather = async ({location}) => {
+  const getWeather = async ({location, unit}) => {
     //TRUE API CALL
     if (!location) return null
 
     return fetch(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&units=metric&exclude=minutely&appid=${config.API_KEY}`
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&units=${unit}&exclude=minutely&appid=${config.API_KEY}`
     )
     .then((res) => {
       return res.json()
@@ -95,20 +96,42 @@ export async function widgetTaskHandler (props) {
     }
   };
 
+  const getUnit = (unit) => {
+    switch (unit) {
+      case 'standard':
+        return 'K'
+      case 'metric':
+        return '°C'
+      case 'imperial':
+        return '°F'
+      default: return ''
+    }
+  }
+
+  //unit, language, theme
+  let theme = await AsyncStorage.getItem('theme')
+  if (!theme || theme == 'auto') theme = Appearance.getColorScheme()
+  const isDarkMode = (theme == 'dark') ? true : false
+  let unit = await AsyncStorage.getItem('unit')
+  if (!unit) unit = 'metric'
+  let lang = await AsyncStorage.getItem('lang') 
+  if (!lang || lang == 'auto') lang = Localization.getLocales()[0].languageCode
+
   const location = await getLocation()
   let weatherInfo = null
-  let weather = null
+  let currentWeather = null
 
   if (location) {
     weatherInfo = await getWeather({location: await getLocationByCity(location)})
-    weather = weatherInfo.current
+    currentWeather = weatherInfo.current
   }
   
   if (widgetInfo.widgetName == 'Small') {
     switch (props.widgetAction) {
       default:
-        if (location) props.renderWidget(<SmallWidget location={location} weather={Math.round(weather.temp) + '°C'} icon={weather.weather[0].icon} date={getCurrentDate()}/>);
-        else props.renderWidget(<SmallWidget location={null} />);
+        if (location) props.renderWidget(<SmallWidget location={location} weather={Math.round(currentWeather.temp) + getUnit(unit)} isDarkMode={isDarkMode} 
+          lang={lang} icon={currentWeather.weather[0].icon} date={getCurrentDate()}/>);
+        else props.renderWidget(<SmallWidget location={null} isDarkMode={isDarkMode} lang={lang} />);
         break;
     }
 
@@ -142,11 +165,10 @@ export async function widgetTaskHandler (props) {
 
     switch (props.widgetAction) {  
       default:
-        if (location) props.renderWidget(<BigWidget location={location} weather={weather} daily={daily} date={getCurrentDate()} nextDays={getNextThreeDays()} locationDetails={locationDetails}/>);
-        else props.renderWidget(<BigWidget location={null} />);
+        if (location) props.renderWidget(<BigWidget location={location} weather={currentWeather} daily={daily} unit={getUnit(unit)} date={getCurrentDate()} 
+          nextDays={getNextThreeDays()} locationDetails={locationDetails}isDarkMode={isDarkMode} lang={lang}/>);
+        else props.renderWidget(<BigWidget location={null} isDarkMode={isDarkMode} lang={lang}/>);
         break;
     }
-
-    return
   }
 }

@@ -1,12 +1,20 @@
 import { FlexWidget, ImageWidget, TextWidget } from 'react-native-android-widget';
 
-export function SmallWidget({weather, location, icon, date}) {
+
+export function SmallWidget({weather, location, icon, lang, date, isDarkMode}) {
+  const getText = (text) => {
+    switch (text) {
+      case 'error':
+        if (lang == 'en') return 'Find a location in the app first'
+        if (lang == 'vn') return 'Hãy tìm một vị trí bằng ứng dụng'
+    }
+  }
+
   return (
     <FlexWidget
       style={{
         height: 'match_parent',
         width: 'match_parent',
-        backgroundColor: '#1E1E1E',
         borderRadius: 16,
       }}
     >
@@ -16,7 +24,7 @@ export function SmallWidget({weather, location, icon, date}) {
           style={{
             height: 'match_parent',
             width: 'match_parent',
-            backgroundColor: '#1E1E1E',
+            backgroundColor: isDarkMode ? '#1E1E1E' : '#FFFFFF',
             borderRadius: 16,
             flexDirection: 'row'
           }}
@@ -25,13 +33,13 @@ export function SmallWidget({weather, location, icon, date}) {
             style={{padding: 10, paddingRight: 40}}
           >
             <TextWidget text={weather}
-              style={{fontSize: 24, color: 'white'}}
+              style={{fontSize: 24, color: isDarkMode ? '#FFFFFF' : '#000000'}}
             ></TextWidget>
             <TextWidget text={location}
-              style={{color: 'white', fontWeight: 'bold', marginVertical: 5}}
+              style={{color: isDarkMode ? '#FFFFFF' : '#000000', fontWeight: 'bold', marginVertical: 5}}
             ></TextWidget>
             <TextWidget text={date}
-              style={{color: 'white'}}
+              style={{color: isDarkMode ? '#FFFFFF' : '#000000'}}
             ></TextWidget>
           </FlexWidget>
           <ImageWidget
@@ -46,14 +54,14 @@ export function SmallWidget({weather, location, icon, date}) {
           style={{
             height: 'match_parent',
             width: 'match_parent',
-            backgroundColor: '#1E1E1E',
+            backgroundColor: isDarkMode ? '#1E1E1E' : 'rgba(255, 255, 255, 0.6)',
             borderRadius: 16,
             flexDirection: 'row',
             alignItems: 'center'
           }}
         >
           <ImageWidget image={require('../../assets/warning_sign.png')} imageWidth={50} imageHeight={50} style={{marginLeft: 20, marginRight: 10}}></ImageWidget>
-          <TextWidget  style={{color: 'white', paddingHorizontal: 10, width: 120}} text='Find a location in the app first '>
+          <TextWidget  style={{color: isDarkMode ? '#FFFFFF' : '#000000', paddingHorizontal: 10, width: 120}} text={getText('error')}>
           </TextWidget>
         </FlexWidget>
       }

@@ -283,7 +283,7 @@ export const WeatherProvider = ({ children }) => {
 export const FunctionalProvider = ({ children }) => {
   const [isAuto, setIsAuto] = useState()
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const {t, i18n} = useTranslation(); 
+  const { t } = useTranslation(); 
   const [lang, setLang] = useState ({auto: false, lang: null}); 
 
   useEffect(() => {
