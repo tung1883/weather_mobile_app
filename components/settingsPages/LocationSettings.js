@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location'
@@ -6,13 +6,12 @@ import * as Location from 'expo-location'
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext, WeatherContext } from '../Context';
 import Checkbox from 'expo-checkbox';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { putToFrontFavs, removeLocation } from '../../functionalities/favoriteLocations';
 
 const LocationSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, setIsAuto, getAutoTheme, setIsDarkMode, t } = useContext(FunctionalContext);
-    const { location, favs, setFavs, setGps, getGpsLocation, getWeather, gps, setFetching } = useContext(WeatherContext)
+    const { isDarkMode, t } = useContext(FunctionalContext);
+    const { location, favs, setFavs, setGps, getGpsLocation, getWeather, gps } = useContext(WeatherContext)
     const [checked, setChecked ] = useState(gps != null)
     const [isFetching, setIsFetching] = useState(false)
 

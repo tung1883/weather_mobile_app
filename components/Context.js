@@ -8,7 +8,6 @@ import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 
-
 import i18n from '../functionalities/language/i18n';
 import config from '../config'
 
@@ -39,8 +38,9 @@ export const WeatherProvider = ({ children }) => {
         return 
       }
   
-      const location = await getGpsLocation()
+      const location = await getGpsLocation() 
       const weather = await getWeather({location})
+      console.log(weather)
       setLocation(location)
       setWeather(weather)
       setGps({location, weather})
@@ -108,7 +108,7 @@ export const WeatherProvider = ({ children }) => {
     }
   };
 
-   const getLocationDetails = async ({lat, long}) => {
+  const getLocationDetails = async ({lat, long}) => {
     try {
       const response = await fetch(
         `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${long}&limit=1&appid=${config.API_KEY}`

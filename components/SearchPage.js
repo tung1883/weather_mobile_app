@@ -13,8 +13,9 @@ const screenWidth = Dimensions.get('window').width;
 
 const SearchPage = ({navigation}) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, toggleTheme, t, translateText} = useContext(FunctionalContext);
-    let { setLocation, gps, setGps, getGpsLocation, getLocationDetails, getLocationByCity, getWeather, location, favs, setFavs, setWeather } = useContext(WeatherContext)
+    const { isDarkMode, t} = useContext(FunctionalContext);
+    let { setLocation, gps, setGps, getGpsLocation, getLocationDetails, getLocationByCity, getWeather, 
+        location, favs, setFavs, setWeather } = useContext(WeatherContext)
     const [searchQuery, setSearchQuery] = useState('');
     const [mapSearchQuery, setMapSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState(popularCities);

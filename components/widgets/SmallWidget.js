@@ -1,6 +1,5 @@
 import { FlexWidget, ImageWidget, TextWidget } from 'react-native-android-widget';
 
-
 export function SmallWidget({weather, location, icon, lang, date, isDarkMode}) {
   const getText = (text) => {
     switch (text) {

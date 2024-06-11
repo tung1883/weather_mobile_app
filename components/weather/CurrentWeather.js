@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { StyleSheet, View, Text, Image } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { MaterialCommunityIcons, FontAwesome6 } from '@expo/vector-icons';
 
 import { FunctionalContext, WeatherContext } from "../Context";

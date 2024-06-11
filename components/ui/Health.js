@@ -1,12 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
+import React, { useContext } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons, FontAwesome6} from '@expo/vector-icons';
 
 import { FunctionalContext, WeatherContext } from "../Context";
-import config from "../../config";
 
 export default Health = ({navigation}) => {
-    const { isDarkMode, t, lang, parsedLang } = useContext(FunctionalContext)
+    const { isDarkMode, t } = useContext(FunctionalContext)
     const { location, health, getIndexColor, getPollen } = useContext(WeatherContext)
     
     return (

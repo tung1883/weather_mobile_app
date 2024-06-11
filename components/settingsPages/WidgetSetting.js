@@ -9,7 +9,7 @@ const screenWidth = Dimensions.get('window').width;
 
 const WidgetSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, t, translateText} = useContext(FunctionalContext);
+    const { isDarkMode, t } = useContext(FunctionalContext);
 
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>

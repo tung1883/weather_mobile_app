@@ -7,7 +7,6 @@ import bgImg2 from '../assets/light_bg_2.jpg'
 import bgImg3 from '../assets/light_bg_3.jpg'
 import darkBgImg1 from '../assets/dark_bg_1.png'
 import darkBgImg2 from '../assets/dark_bg_2.png'
-import darkBgImg3 from '../assets/dark_bg_3.png'
 import radarDarkBg from '../assets/radar_dark_bg.png'
 import radarWhiteBg from '../assets/radar_light_bg.png'
 import Footer from "./ui/Footer";

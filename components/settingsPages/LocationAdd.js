@@ -1,17 +1,16 @@
 import React, { useContext, useState } from 'react';
 import { View, TextInput, FlatList, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
-import { MaterialCommunityIcons, createIconSet } from '@expo/vector-icons';
-import * as Location from 'expo-location'
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { cities, popularCities } from '../../assets/citiList';
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext, WeatherContext } from '../Context';
-import { addCounter, addFavorite, putToFrontFavs } from '../../functionalities/favoriteLocations';
+import { addFavorite } from '../../functionalities/favoriteLocations';
 
 const LocationAdd = ({navigation}) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, toggleTheme, t, translateText} = useContext(FunctionalContext);
-    let { setLocation, gps, setGps, getGpsLocation, getLocationByCity, getWeather, favs, setFavs, setWeather } = useContext(WeatherContext)
+    const { isDarkMode, t } = useContext(FunctionalContext);
+    let { getLocationByCity, getWeather, favs, setFavs } = useContext(WeatherContext)
     const [searchQuery, setSearchQuery] = useState('');
     const [suggestions, setSuggestions] = useState(popularCities);
     const [listTitle, setListTitle] = useState(t('searchPage.popularSuggestion'))

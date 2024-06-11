@@ -5,7 +5,7 @@ import { FunctionalContext, WeatherContext } from '../Context';
 
 export default Sunrise = ({animationDuration}) => {
   const [tempDeg, setTempDeg] = useState('0deg');
-  const [tempHeight, setTempHeight] = useState(0);
+  const [ setTempHeight] = useState(0);
   const { weather } = useContext(WeatherContext)
   const { isDarkMode, t} = useContext(FunctionalContext)
   const ballAnimatedValue = useRef(new Animated.Value(0)).current;

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Image, StyleSheet, Text, TouchableOpacity, Modal, ActivityIndicator } from "react-native";
 import * as Location from 'expo-location';
 import MapImg from "../assets/google_map_icon.png"
