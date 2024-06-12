@@ -5,6 +5,16 @@ With this app, you can view the current weather stats, weather in the upcoming d
 Framework: React Native and Expo  
 APIs: Open Weather App (huge help!), Google Air Quality and Google Pollen API
 
+## Main Features
+1. Get current and upcoming weather data (data includes temperature, humididy, wind speed, air pressure, precipitation, air quality, sun and moon cycle, ...)
+2. Use current location through GPS or search location by name and Google Map 
+3. Provide a list of favorite locations to help users find locations faster 
+4. Provide heatmaps for different weather data for better visualization
+5. Push live and daily notifications about weather
+6. Create weather widgets in the main screen
+7. Share the app with others through social media
+8. Choose the preferred language, measurement unit and color theme
+
 ## How to set up?
 - Create a .env file and put the API keys inside, here the example:
 ```
