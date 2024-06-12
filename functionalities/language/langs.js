@@ -1,3 +1,3 @@
 export const langs = [
-    'auto', 'en', 'vn'
+    'auto', 'vn', 'en'
 ]
