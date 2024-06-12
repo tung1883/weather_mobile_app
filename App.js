@@ -1,11 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
-
 import MainPage from "./components/MainPage";
 import SearchPage from './components/SearchPage';
 import LoadingPage from './components/LoadingPage';
@@ -27,83 +24,6 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
-
-async function sendPushNotification(expoPushToken, weatherData, location) {
-  const message = {
-      to: expoPushToken,
-      sound: 'default',
-      title: `${Math.round(weatherData.current.temp)}° ${location.city}`,
-      body: `${weatherData.current.weather[0].description}`,
-      data: { someData: 'goes here' },
-  };
-
-  try {
-      const response = await fetch('https://exp.host/--/api/v2/push/send', {
-          method: 'POST',
-          headers: {
-              Accept: 'application/json',
-              'Accept-encoding': 'gzip, deflate',
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(message),
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-          console.log('Failed to send push notification', result);
-      } else {
-          console.log('Push notification sent successfully', result);
-      }
-  } catch (error) {
-      console.error('Error sending push notification', error);
-  }
-}
-
-function handleRegistrationError(errorMessage) {
-  alert(errorMessage);
-  throw new Error(errorMessage);
-}
-
-async function registerForPushNotificationsAsync() {
-  if (Platform.OS === 'android') {
-    
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  const { status: existingStatus } =
-    await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-  if (finalStatus !== 'granted') {
-    handleRegistrationError('Permission not granted to get push token for push notification!');
-    return;
-  }
-  const projectId =
-    Constants?.expoConfig?.extra?.eas?.projectId ??
-    Constants?.easConfig?.projectId;
-  if (!projectId) {
-    handleRegistrationError('Project ID not found');
-  }
-  try {
-    const pushTokenString = (
-      await Notifications.getExpoPushTokenAsync({
-        projectId,
-      })
-    ).data;
-    return pushTokenString;
-  } catch (e) {
-    console.log('error')
-    handleRegistrationError(`${e}`);
-  }
-}
 
 const Stack = createStackNavigator();
 
