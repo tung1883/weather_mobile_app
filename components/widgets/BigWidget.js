@@ -57,7 +57,7 @@ export function BigWidget({weather, location, daily, date, nextDays, locationDet
                     </FlexWidget>
                 </FlexWidget>
             </FlexWidget>
-            <FlexWidget style={{borderWidth: 0.2, borderColor: isDarkMode ? 'grey' : '#000000', borderRadius: 10, height: 80, marginTop: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: 'match_parent'}}>
+            <FlexWidget style={{borderWidth: isDarkMode ? 0.2 : 1, borderColor: isDarkMode ? 'grey' : '#000000', borderRadius: 10, height: 80, marginTop: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: 'match_parent'}}>
                 {
                     nextDays?.map((date, index) => {
                         return <FlexWidget key={index} style={{paddingHorizontal: 8}}>

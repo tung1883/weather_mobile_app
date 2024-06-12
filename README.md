@@ -1,5 +1,5 @@
 ## Introduction
-In this school project, we develop a mobile weather app
+In this school project, we develop a mobile weather app  
 With this app, you can view the current weather stats, weather in the upcoming days and much more
 
 Framework: React Native and Expo  

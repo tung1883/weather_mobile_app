@@ -46,7 +46,7 @@ export async function widgetTaskHandler (props) {
   };
 
   const getWeather = async ({location, unit}) => {
-    //TRUE API CALL
+    console.log(1 + unit)
     if (!location) return null
 
     return fetch(
@@ -116,13 +116,13 @@ export async function widgetTaskHandler (props) {
   if (!unit) unit = 'metric'
   let lang = await AsyncStorage.getItem('lang') 
   if (!lang || lang == 'auto') lang = Localization.getLocales()[0].languageCode
-
+  
   const location = await getLocation()
   let weatherInfo = null
   let currentWeather = null
 
   if (location) {
-    weatherInfo = await getWeather({location: await getLocationByCity(location)})
+    weatherInfo = await getWeather({location: await getLocationByCity(location), unit})
     currentWeather = weatherInfo.current
   }
   
