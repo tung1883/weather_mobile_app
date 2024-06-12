@@ -1,39 +1,48 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { lightStyles, darkStyles } from '../defaultStyles';
-import { FunctionalContext, NotificationContext } from '../Context';
-
+import { FunctionalContext, NotificationContext, WeatherContext } from "../Context";
 
 const NotificationSettings = ({ navigation }) => {    
-    const goBack = navigation?.canGoBack()
+    const goBack = navigation?.canGoBack();
     const { isDarkMode } = useContext(FunctionalContext);
+    const { location, weather } = useContext(WeatherContext);
     const { sendPushNotification } = useContext(NotificationContext)
-    
+
+    const handleSendNotification = async () => {
+        if (weather && location) {
+            await sendPushNotification(weather, location);
+        } else {
+            console.log('Weather data or location is missing');
+        }
+    };
+
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
-            <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 10, borderBottomColor: 'grey', borderBottomWidth: 0.5}}>
-                {
-                    goBack &&
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingBottom: 10, borderBottomColor: 'grey', borderBottomWidth: 0.5 }}>
+                {goBack &&
                     <MaterialCommunityIcons 
                         name="arrow-left" size={24} color={isDarkMode ? "white" : "black"}
-                        style={{margin: -3, padding: -3, marginRight: 15, paddingLeft: 20}}
-                        onPress={() => {navigation.goBack()}}
+                        style={{ margin: -3, padding: -3, marginRight: 15, paddingLeft: 20 }}
+                        onPress={() => { navigation.goBack() }}
                     />
                 }
-                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Notifications</Text>
+                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Notifications</Text>
             </View>
             <View>
-                <TouchableOpacity onPress={async () => { await sendPushNotification()}}>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 30}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Push Notifications</Text>
+                <TouchableOpacity onPress={handleSendNotification}>
+                    <View style={{ borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20, marginHorizontal: 30 }}>
+                        <Text style={{ color: 'white', fontSize: 15 }}>Push Notifications</Text>
                     </View>
                 </TouchableOpacity>
             </View>
         </View>
     );
 };
+
+
 
 const styles = StyleSheet.create({
     container: {
