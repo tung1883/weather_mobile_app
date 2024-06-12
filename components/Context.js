@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import { Appearance, Share } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location'
@@ -366,6 +366,9 @@ export const FunctionalProvider = ({ children }) => {
 };
 
 export const NotificationProvider = ({ children }) => {
+  const { location, weather } = useContext(WeatherContext)
+  const immediateMarker = useRef(null)
+  
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
@@ -381,27 +384,74 @@ export const NotificationProvider = ({ children }) => {
       .then((token) => {
         setExpoPushToken(token ?? '')
       })
-      .catch((error) => { console.log(error) });
-  }, []);
+      .catch((error) => setExpoPushToken(`${error}`));
 
-  async function sendPushNotification() {
+    const sendMorningNotification = async () => {
+      const currentDate = new Date();
+      if (currentDate.getHours() === 10 && currentDate.getMinutes() === 43) {
+        await sendPushNotification("ExponentPushToken[x0Rgn_Ozz8h3tonrGkwKZ-]");
+      }
+    };
+    
+    const intervalId = setInterval(sendMorningNotification, 60000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  useEffect(() => {
+    if (immediateMarker || !location || !weather) return
+
+    const sendImmediateNotification = async () => {
+      try {
+        await sendPushNotification();
+      } catch (error) {
+        console.error("Error sending immediate notification:", error);
+      }
+    };
+    
+    sendImmediateNotification(weather, location);
+  }, [location, weather]);  
+
+  async function sendPushNotification(weather, location) {
+    const weatherIcon = `☀️`;  
+    const degreeSymbol = '°';
+    const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); 
+    const updateTime = ` ${currentTime} ⟳`;
+    const weatherDescription = weather.current.weather[0].description.charAt(0).toUpperCase() + weather.current.weather[0].description.slice(1);
+    const viewDailyText = 'View Daily';
+    const spaces = ' '.repeat(23);
+    const spaces1 = ' '.repeat(32);
+    
     const message = {
       to: expoPushToken,
       sound: 'default',
-      title: 'Original Title',
-      body: 'And here is the body!',
-      data: { someData: 'goes here' },
+      title: `${Math.round(weather.current.temp)}${degreeSymbol} ${location.city} ${spaces1}${updateTime} `,
+      body: ` ${weatherIcon} ${weatherDescription} ${spaces}${viewDailyText}`,
+      data: {
+        someData: 'goes here',
+      },
     };
 
-    await fetch('https://exp.host/--/api/v2/push/send', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Accept-encoding': 'gzip, deflate',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(message),
-    });
+    try {
+      const response = await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Accept-encoding': 'gzip, deflate',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(message),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        console.log('Failed to send push notification', result);
+      } else {
+        console.log('Push notification sent successfully', result);
+      }
+    } catch (error) {
+      console.error('Error sending push notification', error);
+    }
   }
 
   async function registerForPushNotificationsAsync() {

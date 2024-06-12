@@ -15,7 +15,7 @@ import WidgetSettings from './components/settingsPages/WidgetSetting';
 import LocationSettings from './components/settingsPages/LocationSettings';
 import NotificationSettings from './components/settingsPages/NotificationSettings'
 import LanguageUnitsPage, { Language } from './components/settingsPages/LanguageUnits';
-import { FunctionalProvider, WeatherProvider } from './components/Context';
+import { FunctionalProvider, NotificationProvider, WeatherProvider } from './components/Context';
 import LocationAdd from './components/settingsPages/LocationAdd';
 import Indicator from './components/ui/Indicator';
 import HealthPage from './components/weather/HealthPage';
@@ -108,54 +108,6 @@ async function registerForPushNotificationsAsync() {
 const Stack = createStackNavigator();
 
 const App = () => {
-  const [expoPushToken, setExpoPushToken] = useState('');
-  const [notification, setNotification] = useState(undefined);
-  const notificationListener = useRef();
-  const responseListener = useRef();
-
-  useEffect(() => {
-    registerForPushNotificationsAsync()
-      .then((token) => {
-        console.log(token)
-        setExpoPushToken(token ?? '')
-      })
-      .catch((error) => setExpoPushToken(`${error}`));
-
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
-        setNotification(notification);
-      });
-
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
-      });
-      const sendMorningNotification = async () => {
-        const currentDate = new Date();
-        if (currentDate.getHours() === 10 && currentDate.getMinutes() === 43) {
-          // Gửi thông báo
-          await sendPushNotification("ExponentPushToken[x0Rgn_Ozz8h3tonrGkwKZ-]");
-        }
-      };
-
-
-      
-    
-      // Kiểm tra mỗi phút
-      const intervalId = setInterval(sendMorningNotification, 60000);
-
-    return () => {
-      notificationListener.current &&
-        Notifications.removeNotificationSubscription(
-          notificationListener.current,
-        );
-      responseListener.current &&
-        Notifications.removeNotificationSubscription(responseListener.current);
-      clearInterval(intervalId);
-    };
-  
-  }, []);
-
   useEffect(() => {
     (async () => {
       //check if the user uses the app for the first time
@@ -172,45 +124,31 @@ const App = () => {
 
   }, [])
 
-  useEffect(() => {
-    // Gửi thông báo khi ứng dụng được mở
-    const sendImmediateNotification = async () => {
-      try {
-        // Gửi thông báo ngay lập tức khi ứng dụng được mở
-        await sendPushNotification("ExponentPushToken[x0Rgn_Ozz8h3tonrGkwKZ-]");
-      } catch (error) {
-        console.error("Error sending immediate notification:", error);
-      }
-    };
-  
-
-    // Gọi hàm gửi thông báo ngay khi component App được render
-    sendImmediateNotification();
-  }, []);
-
   return (
     <FunctionalProvider>
       <WeatherProvider>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Loading">
-            <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
-            <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
-            <Stack.Screen name="Search" options={{ headerShown: false }}>{(navigation) => <SearchPage {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name="Main" options={{ headerShown: false }}>{(navigation) => <>
-              <MainPage {...navigation}/>
-              <Indicator></Indicator>
-            </>}</Stack.Screen>
-            <Stack.Screen name='HealthPage' options={{headerShown: false}}>{(navigation) => <HealthPage {...navigation}></HealthPage>}</Stack.Screen>
-            <Stack.Screen name='Settings' options={{headerShown: false}}>{(navigation) => <Settings {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='WidgetSettings' options={{headerShown: false}}>{(navigation) => <WidgetSettings {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='LocationSettings' options={{headerShown: false}}>{(navigation) => <LocationSettings {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='LocationAdd' options={{headerShown: false}}>{(navigation) => <LocationAdd {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='NotificationSettings' options={{headerShown: false}}>{(navigation) => <NotificationSettings {...navigation}/>}</Stack.Screen>
-            <Stack.Screen name='LanguageUnits' options={{headerShown: false}}>{(navigation) => <LanguageUnitsPage {...navigation}></LanguageUnitsPage>}</Stack.Screen>
-            <Stack.Screen name='Language' options={{headerShown: false}}>{(navigation) => <Language {...navigation}></Language>}</Stack.Screen>
-            <Stack.Screen name='PushNotification' options={{headerShown: false}}>{(navigation) => <PushNotification {...navigation}></PushNotification>}</Stack.Screen>
-          </Stack.Navigator>
-        </NavigationContainer>
+        <NotificationProvider>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="Loading">
+              <Stack.Screen name="Loading" component={LoadingPage} options={{ headerShown: false }} />
+              <Stack.Screen name="LocationPermission" component={LocationPermissionPage} options={{ headerShown: false }} />
+              <Stack.Screen name="Search" options={{ headerShown: false }}>{(navigation) => <SearchPage {...navigation}/>}</Stack.Screen>
+              <Stack.Screen name="Main" options={{ headerShown: false }}>{(navigation) => <>
+                <MainPage {...navigation}/>
+                <Indicator></Indicator>
+              </>}</Stack.Screen>
+              <Stack.Screen name='HealthPage' options={{headerShown: false}}>{(navigation) => <HealthPage {...navigation}></HealthPage>}</Stack.Screen>
+              <Stack.Screen name='Settings' options={{headerShown: false}}>{(navigation) => <Settings {...navigation}/>}</Stack.Screen>
+              <Stack.Screen name='WidgetSettings' options={{headerShown: false}}>{(navigation) => <WidgetSettings {...navigation}/>}</Stack.Screen>
+              <Stack.Screen name='LocationSettings' options={{headerShown: false}}>{(navigation) => <LocationSettings {...navigation}/>}</Stack.Screen>
+              <Stack.Screen name='LocationAdd' options={{headerShown: false}}>{(navigation) => <LocationAdd {...navigation}/>}</Stack.Screen>
+              <Stack.Screen name='NotificationSettings' options={{headerShown: false}}>{(navigation) => <NotificationSettings {...navigation}/>}</Stack.Screen>
+              <Stack.Screen name='LanguageUnits' options={{headerShown: false}}>{(navigation) => <LanguageUnitsPage {...navigation}></LanguageUnitsPage>}</Stack.Screen>
+              <Stack.Screen name='Language' options={{headerShown: false}}>{(navigation) => <Language {...navigation}></Language>}</Stack.Screen>
+              <Stack.Screen name='PushNotification' options={{headerShown: false}}>{(navigation) => <PushNotification {...navigation}></PushNotification>}</Stack.Screen>
+            </Stack.Navigator>
+          </NavigationContainer>
+        </NotificationProvider>
       </WeatherProvider>
     </FunctionalProvider>
   );
