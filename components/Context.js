@@ -4,12 +4,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location'
 import { useTranslation } from 'react-i18next';
 import * as Localization from 'expo-localization'
+import { Platform } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+
 
 import i18n from '../functionalities/language/i18n';
 import config from '../config'
 
 export const FunctionalContext = createContext();
 export const WeatherContext = createContext()
+export const NotificationContext = createContext()
 
 export const WeatherProvider = ({ children }) => {
   const { lang, parsedLang, t } = useContext(FunctionalContext)
@@ -22,6 +27,7 @@ export const WeatherProvider = ({ children }) => {
   const [health, setHealth] = useState(null)
 
   useEffect(() => {
+    if (!lang.lang) return
     init()
   }, [unit, lang])
 
@@ -62,9 +68,6 @@ export const WeatherProvider = ({ children }) => {
       console.log('init Error: ' + err)
     }
   }
-
-  const controller = new AbortController();
-  const signal = controller.signal;
 
   const getGpsLocation = async () => {
       try {
@@ -118,12 +121,10 @@ export const WeatherProvider = ({ children }) => {
   };
 
   const getWeather = async ({location}) => {
-    //TRUE API CALL
     if (!location) return null
 
     return fetch(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=minutely&units=${unit}&lang=${parsedLang(lang.lang)}&appid=${config.API_KEY}`,
-      { signal }
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=minutely&units=${unit}&lang=${parsedLang(lang.lang)}&appid=${config.API_KEY}`
     )
     .then((res) => {
       return res.json()
@@ -139,19 +140,7 @@ export const WeatherProvider = ({ children }) => {
 
   const share = async ({text}) => {
     try {
-      const result = await Share.share({
-        message: text,
-      });
-
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
-        }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
-      }
+      await Share.share({ message: text });
     } catch (error) {
       console.log(error)
     }
@@ -283,7 +272,7 @@ export const WeatherProvider = ({ children }) => {
 export const FunctionalProvider = ({ children }) => {
   const [isAuto, setIsAuto] = useState()
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const {t, i18n} = useTranslation(); 
+  const { t } = useTranslation(); 
   const [lang, setLang] = useState ({auto: false, lang: null}); 
 
   useEffect(() => {
@@ -359,22 +348,6 @@ export const FunctionalProvider = ({ children }) => {
       .catch(err => console.log(err)); 
   }; 
 
-  const translateText = async ({src, dest, text}) => {
-    const res = await fetch("https://libretranslate.com/translate", {
-      method: "POST",
-      body: JSON.stringify({
-        q: text,
-        source: (src) ? src : 'auto',
-        target: dest,
-        format: "text",
-        api_key: ""
-      }),
-      headers: { "Content-Type": "application/json" }
-    });
-
-    return await res.json()
-  }
-
   const getAutoLang = () => {
     return { auto: true, lang: Localization.getLocales()[0].languageCode}
   }
@@ -385,9 +358,75 @@ export const FunctionalProvider = ({ children }) => {
   }
 
   return (
-    <FunctionalContext.Provider value={{ isDarkMode, isAuto, setIsAuto, setIsDarkMode, getAutoTheme, changeTheme, lang, setLang, t, i18n, changeLanguage, getAutoLang,
-      parsedLang }}>
+    <FunctionalContext.Provider value={{ isDarkMode, isAuto, setIsAuto, setIsDarkMode, getAutoTheme, changeTheme, lang, setLang, t, 
+      changeLanguage, getAutoLang, parsedLang }}>
       {children}
     </FunctionalContext.Provider>
+  );
+};
+
+export const NotificationProvider = ({ children }) => {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  })
+
+  const [expoPushToken, setExpoPushToken] = useState('')
+
+  useEffect(() => {
+    registerForPushNotificationsAsync()
+      .then((token) => {
+        setExpoPushToken(token ?? '')
+      })
+      .catch((error) => { console.log(error) });
+  }, []);
+
+  async function sendPushNotification() {
+    const message = {
+      to: expoPushToken,
+      sound: 'default',
+      title: 'Original Title',
+      body: 'And here is the body!',
+      data: { someData: 'goes here' },
+    };
+
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
+  }
+
+  async function registerForPushNotificationsAsync() {
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    const { status } = await Notifications.getPermissionsAsync()
+    if (status !== 'granted') await Notifications.requestPermissionsAsync()
+    
+    const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId
+    if (!projectId) console.log('Project ID not found')
+
+    try { return (await Notifications.getExpoPushTokenAsync({ projectId })).data } 
+    catch (e) { console.log('error')}
+  }
+
+  return (
+    <NotificationContext.Provider value={{ sendPushNotification }}>
+      {children}
+    </NotificationContext.Provider>
   );
 };

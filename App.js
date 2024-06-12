@@ -28,29 +28,35 @@ Notifications.setNotificationHandler({
   }),
 });
 
-<<<<<<< HEAD
-async function sendPushNotification(expoPushToken) {
-
-=======
-export async function sendPushNotification(expoPushToken) {
->>>>>>> main
+async function sendPushNotification(expoPushToken, weatherData, location) {
   const message = {
-    to: expoPushToken,
-    sound: 'default',
-    title: 'Original Title',
-    body: 'And here is the body!',
-    data: { someData: 'goes here' },
+      to: expoPushToken,
+      sound: 'default',
+      title: `${Math.round(weatherData.current.temp)}° ${location.city}`,
+      body: `${weatherData.current.weather[0].description}`,
+      data: { someData: 'goes here' },
   };
 
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
+  try {
+      const response = await fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: {
+              Accept: 'application/json',
+              'Accept-encoding': 'gzip, deflate',
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(message),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+          console.log('Failed to send push notification', result);
+      } else {
+          console.log('Push notification sent successfully', result);
+      }
+  } catch (error) {
+      console.error('Error sending push notification', error);
+  }
 }
 
 function handleRegistrationError(errorMessage) {
@@ -60,10 +66,7 @@ function handleRegistrationError(errorMessage) {
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'android') {
-<<<<<<< HEAD
     
-=======
->>>>>>> main
     Notifications.setNotificationChannelAsync('default', {
       name: 'default',
       importance: Notifications.AndroidImportance.MAX,
@@ -113,7 +116,7 @@ const App = () => {
   useEffect(() => {
     registerForPushNotificationsAsync()
       .then((token) => {
-        // console.log(token)
+        console.log(token)
         setExpoPushToken(token ?? '')
       })
       .catch((error) => setExpoPushToken(`${error}`));
@@ -129,12 +132,14 @@ const App = () => {
       });
       const sendMorningNotification = async () => {
         const currentDate = new Date();
-        if (currentDate.getHours() === 10 && currentDate.getMinutes() === 56) {
+        if (currentDate.getHours() === 10 && currentDate.getMinutes() === 43) {
           // Gửi thông báo
           await sendPushNotification("ExponentPushToken[x0Rgn_Ozz8h3tonrGkwKZ-]");
         }
       };
 
+
+      
     
       // Kiểm tra mỗi phút
       const intervalId = setInterval(sendMorningNotification, 60000);

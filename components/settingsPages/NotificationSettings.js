@@ -5,35 +5,74 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext, WeatherContext } from "../Context";
 
+async function sendPushNotification(expoPushToken, weatherData, location) {
+    const message = {
+        to: expoPushToken,
+        sound: 'default',
+        title: `${Math.round(weatherData.current.temp)}° ${location.city}`,
+        body: `${weatherData.current.weather[0].description}`,
+        data: { someData: 'goes here' },
+    };
+
+    try {
+        const response = await fetch('https://exp.host/--/api/v2/push/send', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Accept-encoding': 'gzip, deflate',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(message),
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            console.log('Failed to send push notification', result);
+        } else {
+            console.log('Push notification sent successfully', result);
+        }
+    } catch (error) {
+        console.error('Error sending push notification', error);
+    }
+}
 const NotificationSettings = ({ navigation }) => {    
-    const goBack = navigation?.canGoBack()
-    const { isDarkMode, toggleTheme } = useContext(FunctionalContext);
-    const [isFetching, setIsFetching] = useState(false) //to render pop-up while waiting for search page AND main page to fetch data
-    const { location, weather } = useContext(WeatherContext)
+    const goBack = navigation?.canGoBack();
+    const { isDarkMode } = useContext(FunctionalContext);
+    const [isFetching, setIsFetching] = useState(false); // to render pop-up while waiting for search page AND main page to fetch data
+    const { location, weather } = useContext(WeatherContext);
+
+    const handleSendNotification = async () => {
+        if (weather && location) {
+            await sendPushNotification('ExponentPushToken[x0Rgn_Ozz8h3tonrGkwKZ-]', weather, location);
+        } else {
+            console.log('Weather data or location is missing');
+        }
+    };
 
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
-            <View style={{flexDirection: 'row', alignItems: 'center', paddingBottom: 10, borderBottomColor: 'grey', borderBottomWidth: 0.5}}>
-                {
-                    goBack &&
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingBottom: 10, borderBottomColor: 'grey', borderBottomWidth: 0.5 }}>
+                {goBack &&
                     <MaterialCommunityIcons 
                         name="arrow-left" size={24} color={isDarkMode ? "white" : "black"}
-                        style={{margin: -3, padding: -3, marginRight: 15, paddingLeft: 20}}
-                        onPress={() => {navigation.goBack()}}
+                        style={{ margin: -3, padding: -3, marginRight: 15, paddingLeft: 20 }}
+                        onPress={() => { navigation.goBack() }}
                     />
                 }
-                <Text style={{color: 'white', fontSize: 18, fontWeight: 'bold'}}>Notifications</Text>
+                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Notifications</Text>
             </View>
             <View>
-                <TouchableOpacity onPress={async () => { await sendPushNotification('ExponentPushToken[-Oka9EILvKsOF_Z3mYvlQd]')}}>
-                    <View style={{borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20,  marginHorizontal: 30}}>
-                        <Text style={{color: 'white', fontSize: 15}}>Push Notifications</Text>
+                <TouchableOpacity onPress={handleSendNotification}>
+                    <View style={{ borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20, marginHorizontal: 30 }}>
+                        <Text style={{ color: 'white', fontSize: 15 }}>Push Notifications</Text>
                     </View>
                 </TouchableOpacity>
             </View>
         </View>
     );
 };
+
+
 
 const styles = StyleSheet.create({
     container: {
