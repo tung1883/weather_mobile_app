@@ -6,13 +6,27 @@ import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext, WeatherContext } from "../Context";
 
 async function sendPushNotification(expoPushToken, weatherData, location) {
+    const weatherIcon = `☀️`;  
+    const degreeSymbol = '°';
+    const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); // Lấy giờ hiện tại
+    const updateTime = ` ${currentTime} ⟳`;
+    const weatherDescription = weatherData.current.weather[0].description.charAt(0).toUpperCase() + weatherData.current.weather[0].description.slice(1);
+    const viewDailyText = 'View Daily';
+    const spaces = ' '.repeat(23);
+    const spaces1 = ' '.repeat(32);
+    
     const message = {
         to: expoPushToken,
         sound: 'default',
-        title: `${Math.round(weatherData.current.temp)}° ${location.city}`,
-        body: `${weatherData.current.weather[0].description}`,
-        data: { someData: 'goes here' },
+        title: `${Math.round(weatherData.current.temp)}${degreeSymbol} ${location.city} ${spaces1}${updateTime} `,
+        body: ` ${weatherIcon} ${weatherDescription} ${spaces}${viewDailyText}`,
+        data: {
+            someData: 'goes here',
+        
+        },
     };
+
+    // Gửi thông báo bằng cách sử dụng dịch vụ thông báo của bạn
 
     try {
         const response = await fetch('https://exp.host/--/api/v2/push/send', {
