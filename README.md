@@ -44,4 +44,4 @@ And lastly, to run the project, you use:
 3. splashscreen_background not found: add color with the name 'splashscreen_background' to colors.xml
 
 ##
-The app is developed during a very short amount of time so bugs are inevitable. If you encounter any bugs, feel free to contact us!
+The app is developed during a very short amount of time so bugs are inevitable. If you encounter any bugs, feel free to contact us via GitHub or email (nguyenductung1883@gmail.com)
