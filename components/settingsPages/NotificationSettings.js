@@ -1,23 +1,114 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
+import * as BackgroundFetch from 'expo-background-fetch';
+import * as TaskManager from 'expo-task-manager';
+import Checkbox from 'expo-checkbox'
 import { lightStyles, darkStyles } from '../defaultStyles';
-import { FunctionalContext, NotificationContext, WeatherContext } from "../Context";
+import { FunctionalContext, WeatherContext } from "../Context";
+import { getWeather, getLocationByCity, getStoredLocation, sendDailyNotification, sendLiveNotification } from '../Context';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import DatePicker from 'react-native-date-picker'
+import { useFocusEffect } from '@react-navigation/native';
+
+const DAILY = 'daily-notification'
+const LIVE = 'live-notification'
+
+TaskManager.defineTask(DAILY, async () => {
+    let targetTime = await AsyncStorage.getItem('dailyTarget')
+    if (!targetTime) targetTime = '06:00'
+    const timeDifference = timeUntil(targetTime)
+    if (timeDifference.hours != 0) return
+    if (timeDifference.minutes > 5) return
+
+    setTimeout(async () => {
+        let location = await getStoredLocation('notification')
+        let weather = null 
+    
+        if (!location.lat) location = await getLocationByCity(location.city)
+        if (location) weather = await getWeather({location})
+        if (location && weather) sendDailyNotification(location, weather)
+    }, timeDifference.milli)
+
+    return BackgroundFetch.BackgroundFetchResult.NewData;
+});
+
+TaskManager.defineTask(LIVE, async () => {
+    let location = await getStoredLocation('notification')
+    let weather = null 
+
+    if (!location.lat) location = await getLocationByCity(location.city)
+    if (location) weather = await getWeather({location})
+    if (location && weather) sendLiveNotification(location, weather)
+
+    return BackgroundFetch.BackgroundFetchResult.NewData;
+});
+
+async function registerBackgroundFetchAsync(TASK) {
+    return BackgroundFetch.registerTaskAsync(TASK, {
+        minimumInterval: 1 * 60, 
+        stopOnTerminate: false,
+        startOnBoot: true,
+    });
+}
+
+async function unregisterBackgroundFetchAsync(TASK) {
+    return BackgroundFetch.unregisterTaskAsync(TASK);
+}
 
 const NotificationSettings = ({ navigation }) => {    
-    const goBack = navigation?.canGoBack();
-    const { isDarkMode } = useContext(FunctionalContext);
-    const { location, weather } = useContext(WeatherContext);
-    const { sendPushNotification } = useContext(NotificationContext)
+    const goBack = navigation?.canGoBack()
+    const { isDarkMode, t } = useContext(FunctionalContext)
+    const { location } = useContext(WeatherContext)
+    const [dailyRegisterd, setDailyRegistered] = useState(false)
+    const [liveRegisterd, setLiveRegistered] = useState(false)
+    const [targetTime, setTargetTime] = useState(new Date())
+    const [isDateModalOpen, setIsDateModalOpen] = useState(false)
+    const [notificationLocation, setNotificationLocation] = useState() 
 
-    const handleSendNotification = async () => {
-        if (weather && location) {
-            await sendPushNotification(weather, location);
-        } else {
-            console.log('Weather data or location is missing');
+    useFocusEffect(
+        useCallback(() => {
+            const getLocation = async () => {
+                const storedLocation = await getStoredLocation('notification')
+                if (storedLocation) setNotificationLocation(storedLocation)
+                else {
+                    await AsyncStorage.setItem('notificationLocation', JSON.stringify(location))
+                    setNotificationLocation(location)
+                }
+            }
+
+            getLocation()
+        }, [])
+    )
+
+    const textToTime = (text) => {
+        let target = new Date()
+        const [targetHours, targetMinutes] = text.split(':').map(Number)
+        target.setHours(targetHours , targetMinutes, 0, 0)
+        if (new Date() > target) target.setDate(target.getDate() + 1)
+        return target
+    }
+
+    const timeToText = (time) => {
+        if (!time) return '00:00'
+        const hours = time.getHours().toString().padStart(2, '0')
+        const minutes = time.getMinutes().toString().padStart(2, '0')
+        return `${hours}:${minutes}`
+    }
+
+    useEffect(() => {
+        const init = async () => {
+            const storedDaily = JSON.parse(await AsyncStorage.getItem('dailyRegistered'))
+            if (storedDaily) setDailyRegistered(true)
+            const storedLive = JSON.parse(await AsyncStorage.getItem('liveRegistered'))
+            if (storedLive) setLiveRegistered(true)
+            let target = await AsyncStorage.getItem('dailyTarget')
+            if (target) setTargetTime(textToTime(target))
+            else setTargetTime(textToTime('06:00'))
         }
-    };
+
+        init()
+    }, [])
 
     return (
         <View style={[styles.container, isDarkMode && styles.darkContainer]}>
@@ -29,20 +120,92 @@ const NotificationSettings = ({ navigation }) => {
                         onPress={() => { navigation.goBack() }}
                     />
                 }
-                <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>Notifications</Text>
+                <Text style={{ color: isDarkMode ? 'white' : 'black', fontSize: 18, fontWeight: 'bold' }}>{t('notification.title')}</Text>
             </View>
             <View>
-                <TouchableOpacity onPress={handleSendNotification}>
-                    <View style={{ borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20, marginHorizontal: 30 }}>
-                        <Text style={{ color: 'white', fontSize: 15 }}>Push Notifications</Text>
+                <TouchableOpacity>
+                    <View style={{ borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20, marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{color: isDarkMode ? 'white' : 'black', fontSize: 15}}>{t('notification.daily')}</Text>
+                        <Checkbox color='dodgerblue' value={dailyRegisterd} onValueChange={async () => {
+                            if (!dailyRegisterd) {
+                                sendDailyNotification(notificationLocation, await getWeather({location: notificationLocation}))
+                                registerBackgroundFetchAsync(DAILY)
+                            } else unregisterBackgroundFetchAsync(DAILY)
+
+                            setDailyRegistered(!dailyRegisterd)
+                            AsyncStorage.setItem('dailyRegistered', JSON.stringify(!dailyRegisterd))
+                        }}></Checkbox>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <View style={{ borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20, marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{color: isDarkMode ? 'white' : 'black', fontSize: 15}}>{t('notification.live')}</Text>
+                        <Checkbox color='dodgerblue' value={liveRegisterd} onValueChange={async () => {
+                            if (!liveRegisterd) {
+                                sendLiveNotification(notificationLocation, await getWeather({location: notificationLocation}))
+                                registerBackgroundFetchAsync(LIVE)
+                            } else unregisterBackgroundFetchAsync(LIVE)
+
+                            setLiveRegistered(!liveRegisterd)
+                            AsyncStorage.setItem('liveRegistered', JSON.stringify(!liveRegisterd))
+                        }}></Checkbox>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <View style={{ borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20, marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{color: isDarkMode ? 'white' : 'black', fontSize: 15}}>{t('notification.location')}</Text>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <Text style={{fontWeight: 'bold', color: isDarkMode ? 'white' : 'black', fontSize: 15}}>{notificationLocation?.city}</Text>
+                            <TouchableOpacity onPress={() => {
+                                navigation.navigate('Search', { forNotification: true })
+                            }}>
+                                <MaterialCommunityIcons name='chevron-right' color={isDarkMode ? 'white' : 'black'} size={20} style={{marginLeft: 3}}></MaterialCommunityIcons>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <View style={{ borderBottomColor: 'grey', borderBottomWidth: 0.2, paddingVertical: 20, marginHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{color: isDarkMode ? 'white' : 'black', fontSize: 15}}>{t('notification.time')}</Text>
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                           <Text style={{fontWeight: 'bold', color: isDarkMode ? 'white' : 'black', fontSize: 15}}>{timeToText(targetTime)}</Text>
+                           <TouchableOpacity onPress={() => setIsDateModalOpen(true)}>
+                            <MaterialCommunityIcons name='chevron-right' color={isDarkMode ? 'white' : 'black'} size={20} style={{marginLeft: 3}}></MaterialCommunityIcons>
+                           </TouchableOpacity>
+                        </View>
                     </View>
                 </TouchableOpacity>
             </View>
+            <DatePicker date={targetTime} mode='time' modal={true} open={isDateModalOpen} title={null} dividerColor='dodgerblue'
+                onConfirm={async (date) => {
+                    const hours = date.getHours().toString().padStart(2, '0');
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    AsyncStorage.setItem('dailyTarget', `${hours}:${minutes}`)
+                    setTargetTime(textToTime(`${hours}:${minutes}`))
+                    setIsDateModalOpen(false)
+                }}
+            ></DatePicker>
         </View>
     );
 };
 
+function timeUntil(targetTime) {
+    const [targetHours, targetMinutes] = targetTime.split(':').map(Number)
+    const now = (new Date())
+    
+    let target = new Date()
+    target.setHours(targetHours , targetMinutes, 0, 0);
+    
+    if (now >= target) {
+        target.setDate(target.getDate() + 1);
+    }
+    
+    const timeDifference = target - now;
+    const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
 
+    return { hours, minutes, milli: timeDifference };
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -52,94 +215,7 @@ const styles = StyleSheet.create({
     },
     darkContainer: {
         backgroundColor: darkStyles.bgColor
-    },
-    searchBar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1,
-        borderWidth: 1,
-        borderColor: 'white',
-        borderRadius: 10,
-        backgroundColor: lightStyles.secondaryBgColor,
-    },
-    darkSearchBar: {
-        borderColor: 'black',
-        backgroundColor: darkStyles.secondaryBgColor,
-    },
-    input: {
-        flex: 1,
-        height: 40,
-        marginLeft: 10,
-        marginTop: 5,
-        marginBottom: 5,
-        fontSize: 16,
-        color: lightStyles.contentColor
-    },
-    darkInput: {
-        color: darkStyles.contentColor
-    },
-    list: {
-        width: '100%',
-    },
-    item: {
-        padding: 15,
-        paddingLeft: 0,
-        marginLeft: 5,
-        fontSize: 14,
-        color: 'black',
-    },
-    darkItem: {
-        color: 'white'
-    },
-    itemContainer: {
-        flexDirection: 'row',
-        borderBottomWidth: 0.5,
-        borderBottomColor: '#444444',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-    },
-    darkItemContainer: {
-        borderBottomColor: '#ccc',
-    },
-    lastItemContainer: {
-        borderBottomWidth: 0
-    },
-    button: {
-        backgroundColor: '#085db4',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        paddingLeft: 10,
-        borderRadius: 10, // Set corner radius to 10
-        minWidth: 200,
-        marginBottom: 10, 
-        marginTop: 30,
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    darkButton: {
-        backgroundColor: '#6495ED', 
-    },
-    buttonText: {
-        textAlign: 'center',
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 16
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        alignItems: 'center',
-    },
-    loadingText: {
-        marginTop: 10,
-    },
+    }
 });
 
 export default NotificationSettings;

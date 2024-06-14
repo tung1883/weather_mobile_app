@@ -29,7 +29,23 @@ const SettingsPage = ({ navigation }) => {
                 </View>
                 <View>
                     <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 20,
-                        borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}>
+                        borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}
+                        onPress={() => {
+                            navigation.navigate('WidgetSettings')
+                        }}    
+                    >
+                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <MaterialCommunityIcons name='widgets' color='#87CEEB' size={18} style={{paddingRight: 10}}/>
+                            <Text style={[{fontSize: 16}, isDarkMode && { color: 'white' }]}>{t('settings.widget')}</Text>
+                        </View>
+                        <MaterialCommunityIcons name='chevron-right' size={18} color={(isDarkMode) ? 'white' : 'black'}></MaterialCommunityIcons>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 20,
+                        borderBottomColor: 'grey', borderBottomWidth: 0.5, marginHorizontal: 20}}
+                        onPress={() => {
+                            navigation.navigate('NotificationSettings')
+                        }}    
+                    >
                         <View style={{flexDirection: 'row', alignItems: 'center'}}>
                             <MaterialCommunityIcons name='bell' color={isDarkMode ? '#FCDC2A' : '#FFD23F'} size={18} style={{paddingRight: 10}}/>
                             <Text style={[{fontSize: 16}, isDarkMode && { color: 'white' }]}>{t('settings.noti')}</Text>

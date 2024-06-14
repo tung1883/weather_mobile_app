@@ -115,7 +115,7 @@ export default Taskbar = ({navigation}) => {
           {item.icon}
           <Text style={[{paddingLeft: 5}, isDarkMode && { color: 'white' }]}>{item.title}</Text>
           </View>
-          <MaterialCommunityIcons color={isDarkMode && 'white'} name='chevron-right' size={20}></MaterialCommunityIcons>
+          <MaterialCommunityIcons color={isDarkMode ? 'white' : 'black'} name='chevron-right' size={20}></MaterialCommunityIcons>
       </TouchableOpacity>
     )
   }
@@ -128,7 +128,7 @@ export default Taskbar = ({navigation}) => {
           style={{width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
               paddingVertical: 10}}>
           <Text style={[{fontSize: 15}, isDarkMode && { color: 'white' }]}>{item}</Text>
-          <MaterialCommunityIcons color={isDarkMode && 'white'} name='chevron-right' size={20}></MaterialCommunityIcons>
+          <MaterialCommunityIcons color={isDarkMode ? 'white' : 'black'} name='chevron-right' size={20}></MaterialCommunityIcons>
       </TouchableOpacity>
       )
   }
@@ -178,7 +178,7 @@ export default Taskbar = ({navigation}) => {
                 <Text style={[{fontSize: 15}, isDarkMode && { color: 'white' }]}>
                   {(isViewingMore) ? 'View fewer locations' : 
                     `View more locations`}</Text>
-                <MaterialCommunityIcons color={isDarkMode && 'white'} name={(isViewingMore) ? 'chevron-up' : 'chevron-down'} size={20}></MaterialCommunityIcons>
+                <MaterialCommunityIcons color={isDarkMode ? 'white' : 'black'} name={(isViewingMore) ? 'chevron-up' : 'chevron-down'} size={20}></MaterialCommunityIcons>
               </>
             </View>
           </TouchableOpacity>}

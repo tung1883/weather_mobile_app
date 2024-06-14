@@ -7,8 +7,6 @@ import * as Localization from 'expo-localization'
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
-
-
 import i18n from '../functionalities/language/i18n';
 import config from '../config'
 
@@ -39,7 +37,7 @@ export const WeatherProvider = ({ children }) => {
         return 
       }
   
-      const location = await getGpsLocation()
+      const location = await getGpsLocation() 
       const weather = await getWeather({location})
       setLocation(location)
       setWeather(weather)
@@ -68,57 +66,6 @@ export const WeatherProvider = ({ children }) => {
       console.log('init Error: ' + err)
     }
   }
-
-  const getGpsLocation = async () => {
-      try {
-        const { status } = await Location.getForegroundPermissionsAsync();
-
-        if (status !== 'granted') {
-          console.log('Permission to access location was denied');
-          return null;
-        }
-
-        const { latitude: lat, longitude: long } = (await Location.getCurrentPositionAsync({})).coords
-        const {city, country} = await getLocationDetails({lat, long})
-        await AsyncStorage.setItem('currentLocation', JSON.stringify({city, country}))
-        return { lat, long, city, country }
-      } catch (error) {
-        console.error('Error getting location:', error);
-        return null
-      }
-    }
-
-  const getLocationByCity = async (city) => {
-    try {
-      const response = await fetch(
-        `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${config.API_KEY}`
-      );
-      const data = await response.json();
-      if (!data?.coord?.lat) {
-        console.log('getLocationByCity Error')
-        return null
-      }
-
-      const {lat, lon: long} = data.coord
-      const details = await getLocationDetails({lat, long})
-      return {lat, long, city: details.city, country: details.country}
-    } catch (error) {
-      console.error('getLocationByCity Error:', error);
-      return null
-    }
-  };
-
-   const getLocationDetails = async ({lat, long}) => {
-    try {
-      const response = await fetch(
-        `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${long}&limit=1&appid=${config.API_KEY}`
-      );
-      const data = (await response.json()).sort((a, b) => b.name.length - a.name.length)
-      return {city: data[0].name, country: data[0].country}
-    } catch (error) {
-      console.error('Error fetching location info:', error);
-    }
-  };
 
   const getWeather = async ({location}) => {
     if (!location) return null
@@ -150,43 +97,6 @@ export const WeatherProvider = ({ children }) => {
     if (newU == unit) return
     setUnit(newU)
     await AsyncStorage.setItem('unit', newU)
-  }
-
-  const getUnit = (type, unit) => {
-    switch (unit) {
-      case 'standard':
-        switch (type) {
-          case 'temp':
-            return 'K'
-          case 'wind':
-            return 'm/s'
-          case 'pressure':
-            return 'hPa'
-          default: break
-        }
-        break
-      case 'metric':
-        switch (type) {
-          case 'temp':
-            return '°C'
-          case 'wind':
-            return 'm/s'
-          case 'pressure':
-            return 'hPa'
-          default: break
-        }
-      case 'imperial':
-        switch (type) {
-          case 'temp':
-            return '°F'
-          case 'wind':
-            return 'mph'
-          case 'pressure':
-            return 'in'
-          default: break
-        }
-      default: break
-    }
   }
 
   //health functionalities
@@ -352,11 +262,6 @@ export const FunctionalProvider = ({ children }) => {
     return { auto: true, lang: Localization.getLocales()[0].languageCode}
   }
 
-  const parsedLang = (lang) => {
-    if (lang == 'vn') return 'vi'
-    return lang
-  }
-
   return (
     <FunctionalContext.Provider value={{ isDarkMode, isAuto, setIsAuto, setIsDarkMode, getAutoTheme, changeTheme, lang, setLang, t, 
       changeLanguage, getAutoLang, parsedLang }}>
@@ -366,8 +271,8 @@ export const FunctionalProvider = ({ children }) => {
 };
 
 export const NotificationProvider = ({ children }) => {
-  const { location, weather } = useContext(WeatherContext)
-  const immediateMarker = useRef(null)
+  const { lang } = useContext(FunctionalContext)
+  const notificationListener = useRef()
   
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -377,82 +282,28 @@ export const NotificationProvider = ({ children }) => {
     }),
   })
 
-  const [expoPushToken, setExpoPushToken] = useState('')
-
   useEffect(() => {
     registerForPushNotificationsAsync()
-      .then((token) => {
-        setExpoPushToken(token ?? '')
-      })
-      .catch((error) => setExpoPushToken(`${error}`));
+    .then(async (token) => {
+      await AsyncStorage.setItem('pushToken', token)
+    })
+    .catch((error) => setExpoPushToken(`${error}`))
 
-    const sendMorningNotification = async () => {
-      const currentDate = new Date();
-      if (currentDate.getHours() === 10 && currentDate.getMinutes() === 43) {
-        await sendPushNotification("ExponentPushToken[x0Rgn_Ozz8h3tonrGkwKZ-]");
+    notificationListener.current = Notifications.addNotificationReceivedListener(async (notification) => {
+      let lang = await AsyncStorage.getItem('lang') 
+      if (!lang || lang == 'auto') lang = Localization.getLocales()[0].languageCode
+
+      if (notification?.request?.content.title?.startsWith(notificationMessageTranslator('daily', lang, 'title'))) {
+        await AsyncStorage.setItem('dailyNotification', notification.request.identifier)
       }
-    };
-    
-    const intervalId = setInterval(sendMorningNotification, 60000);
 
-    return () => clearInterval(intervalId);
+      if (notification?.request?.content.title?.startsWith(notificationMessageTranslator('live', lang, 'title'))) {
+        await AsyncStorage.setItem('liveNotification', notification.request.identifier)
+      }
+    });
+
+    return () => notificationListener.current && Notifications.removeNotificationSubscription(notificationListener.current)
   }, []);
-  
-  useEffect(() => {
-    if (immediateMarker || !location || !weather) return
-
-    const sendImmediateNotification = async () => {
-      try {
-        await sendPushNotification();
-      } catch (error) {
-        console.error("Error sending immediate notification:", error);
-      }
-    };
-    
-    sendImmediateNotification(weather, location);
-  }, [location, weather]);  
-
-  async function sendPushNotification(weather, location) {
-    const weatherIcon = `☀️`;  
-    const degreeSymbol = '°';
-    const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); 
-    const updateTime = ` ${currentTime} ⟳`;
-    const weatherDescription = weather.current.weather[0].description.charAt(0).toUpperCase() + weather.current.weather[0].description.slice(1);
-    const viewDailyText = 'View Daily';
-    const spaces = ' '.repeat(23);
-    const spaces1 = ' '.repeat(32);
-    
-    const message = {
-      to: expoPushToken,
-      sound: 'default',
-      title: `${Math.round(weather.current.temp)}${degreeSymbol} ${location.city} ${spaces1}${updateTime} `,
-      body: ` ${weatherIcon} ${weatherDescription} ${spaces}${viewDailyText}`,
-      data: {
-        someData: 'goes here',
-      },
-    };
-
-    try {
-      const response = await fetch('https://exp.host/--/api/v2/push/send', {
-        method: 'POST',
-        headers: {
-            Accept: 'application/json',
-            'Accept-encoding': 'gzip, deflate',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(message),
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        console.log('Failed to send push notification', result);
-      } else {
-        console.log('Push notification sent successfully', result);
-      }
-    } catch (error) {
-      console.error('Error sending push notification', error);
-    }
-  }
 
   async function registerForPushNotificationsAsync() {
     if (Platform.OS === 'android') {
@@ -475,8 +326,267 @@ export const NotificationProvider = ({ children }) => {
   }
 
   return (
-    <NotificationContext.Provider value={{ sendPushNotification }}>
+    <NotificationContext.Provider value={{ }}>
       {children}
     </NotificationContext.Provider>
   );
 };
+
+export const getGpsLocation = async () => {
+  try {
+    const { status } = await Location.getForegroundPermissionsAsync();
+
+    if (status !== 'granted') {
+      console.log('Permission to access location was denied');
+      return null;
+    }
+
+    const { latitude: lat, longitude: long } = (await Location.getCurrentPositionAsync({})).coords
+    const {city, country} = await getLocationDetails({lat, long})
+    await AsyncStorage.setItem('currentLocation', JSON.stringify({city, country}))
+    return { lat, long, city, country }
+  } catch (error) {
+    console.error('Error getting location:', error);
+    return null
+  }
+}
+
+export const getLocationByCity = async (city) => {
+  try {
+    const response = await fetch(
+      `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${config.API_KEY}`
+    );
+    const data = await response.json();
+    if (!data?.coord?.lat) {
+      console.log('getLocationByCity Error')
+      return null
+    }
+
+    const {lat, lon: long} = data.coord
+    const details = await getLocationDetails({lat, long})
+    return {lat, long, city: details.city, country: details.country}
+  } catch (error) {
+    console.error('getLocationByCity Error:', error);
+    return null
+  }
+};
+
+const parsedLang = (lang) => {
+  if (lang == 'vn') return 'vi'
+  return lang
+}
+
+export const getLocationDetails = async ({lat, long}) => {
+  try {
+    const response = await fetch(
+      `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${long}&limit=1&appid=${config.API_KEY}`
+    );
+    const data = (await response.json()).sort((a, b) => b.name.length - a.name.length)
+    return {city: data[0].name, country: data[0].country}
+  } catch (error) {
+    console.error('Error fetching location info:', error);
+  }
+};
+
+export const getWeather = async ({location}) => {
+  if (!location) return null
+  
+  let unit = await AsyncStorage.getItem('unit')
+  if (!unit) unit = 'metric'
+  let lang = await AsyncStorage.getItem('lang') 
+  if (!lang || lang == 'auto') lang = Localization.getLocales()[0].languageCode
+ 
+  return fetch(
+    `https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.long}&exclude=minutely&units=${unit}&lang=${parsedLang(lang)}&appid=${config.API_KEY}`
+  )
+  .then((res) => {
+    return res.json()
+  })
+  .then((data) => {
+    return data
+  })
+  .catch((err) => {
+    console.log("error", err);
+    return null
+  });
+}
+
+export const getUnit = (type, unit) => {
+  switch (unit) {
+    case 'standard':
+      switch (type) {
+        case 'temp':
+          return 'K'
+        case 'wind':
+          return 'm/s'
+        case 'pressure':
+          return 'hPa'
+        default: break
+      }
+      break
+    case 'metric':
+      switch (type) {
+        case 'temp':
+          return '°C'
+        case 'wind':
+          return 'm/s'
+        case 'pressure':
+          return 'hPa'
+        default: break
+      }
+    case 'imperial':
+      switch (type) {
+        case 'temp':
+          return '°F'
+        case 'wind':
+          return 'mph'
+        case 'pressure':
+          return 'in'
+        default: break
+      }
+    default: break
+  }
+}
+
+export const getStoredLocation = async (feature) => {
+  try {
+      let storedLocation = null
+      if (feature == 'notification') {
+        storedLocation =  JSON.parse(await AsyncStorage.getItem(feature + 'Location'))
+        if (storedLocation) return storedLocation
+      }
+
+      if (feature == 'widget') {
+        storedLocation =  JSON.parse(await AsyncStorage.getItem(feature + 'Location'))
+        if (storedLocation) return storedLocation
+      }
+
+      const currentLocation = JSON.parse(await AsyncStorage.getItem('currentLocation'))
+      if (currentLocation) return currentLocation
+
+      const favs = JSON.parse(await AsyncStorage.getItem('favoriteLocations'))
+      if (favs.length == 0) return null
+
+      return favs[0].location
+    } catch (error) {
+      console.error('Error getting location:', error);
+      const favs = JSON.parse(await AsyncStorage.getItem('favoriteLocations'))
+      if (favs.length == 0) return null
+
+      return favs[0].location
+    }
+}
+
+export async function sendDailyNotification(location, weather) {
+  const expoPushToken = await AsyncStorage.getItem('pushToken')
+  if (!expoPushToken) return 
+
+  const oldIdentifier = await AsyncStorage.getItem('dailyNotification')
+  if (oldIdentifier) {
+    try { await Notifications.dismissNotificationAsync(oldIdentifier) }
+    catch (err) { console.log(err) }
+  }
+
+  let unit = await AsyncStorage.getItem('unit')
+  if (!unit) unit = 'metric'
+  let lang = await AsyncStorage.getItem('lang') 
+  if (!lang || lang == 'auto') lang = Localization.getLocales()[0].languageCode
+
+  const weatherDescription = `☁️ ${weather.current.weather[0].description.charAt(0).toUpperCase() + weather.current.weather[0].description.slice(1)} | `
+    + `${notificationMessageTranslator('daily', lang, 'feels')}${Math.round(weather.current.feels_like)}${getUnit('temp', unit)}`
+  
+  try {
+    const response = await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+          Accept: 'application/json',
+          'Accept-encoding': 'gzip, deflate',
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: expoPushToken,
+        sound: 'default',
+        title: `${notificationMessageTranslator('daily', lang, 'title')}${Math.round(weather.current.temp)}${getUnit('temp', unit)} - ${location.city}`,
+        body: `⏰${notificationMessageTranslator('daily', lang, 'time')}${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}\n${weatherDescription}`,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) console.error('Failed to send daily notification', result)
+  } catch (error) {
+    console.error('Error sending daily notification', error);
+  }
+}
+
+export async function sendLiveNotification(location, weather) {
+  const expoPushToken = await AsyncStorage.getItem('pushToken')
+  if (!expoPushToken) return 
+
+  const oldIdentifier = await AsyncStorage.getItem('liveNotification')
+  if (oldIdentifier) {
+    try { await Notifications.dismissNotificationAsync(oldIdentifier) }
+    catch (err) { console.log(err) }
+  }
+  
+  let unit = await AsyncStorage.getItem('unit')
+  if (!unit) unit = 'metric'
+  let lang = await AsyncStorage.getItem('lang') 
+  if (!lang || lang == 'auto') lang = Localization.getLocales()[0].languageCode
+
+  const weatherDescription = `☁️ ${weather.current.weather[0].description.charAt(0).toUpperCase() + weather.current.weather[0].description.slice(1)} | `
+    + `${notificationMessageTranslator('live', lang, 'feels')}${Math.round(weather.current.feels_like)}${getUnit('temp', unit)}`
+  
+  try {
+    const response = await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+          Accept: 'application/json',
+          'Accept-encoding': 'gzip, deflate',
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: expoPushToken,
+        sound: 'default',
+        title: `${notificationMessageTranslator('live', lang, 'title')}${Math.round(weather.current.temp)}${getUnit('temp', unit)} - ${location.city}`,
+        body: `⏰${notificationMessageTranslator('live', lang, 'time')}${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}\n${weatherDescription}`,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) console.error('Failed to send live notification', result)
+  } catch (error) {
+    console.error('Error sending live notification', error);
+  }
+}
+
+const notificationMessageTranslator = (type, lang, text) => {
+  if (type == 'live') {
+      switch (text) {
+        case 'title':
+          if (lang == 'en') return 'Live Weather: '
+          if (lang == 'vn') return 'Hiện tại: '
+        case 'feels':
+          if (lang == 'en') return 'Feels like '
+          if (lang == 'vn') return 'Cảm giác như '
+        case 'time':
+          if (lang == 'en') return 'Time: '
+          if (lang == 'vn') return 'Thời gian: '
+      }
+  }
+
+  if (type == 'daily') {
+      switch (text) {
+        case 'title':
+          if (lang == 'en') return 'Today: '
+          if (lang == 'vn') return 'Hôm nay: '
+        case 'feels':
+          if (lang == 'en') return 'Feels like '
+          if (lang == 'vn') return 'Cảm giác như '
+        case 'time':
+          if (lang == 'en') return 'Time: '
+          if (lang == 'vn') return 'Thời gian: '
+      }
+  }
+}

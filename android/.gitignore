@@ -6,6 +6,7 @@
 #
 build/
 app/src/main/AndroidManifest.xml
+
 .idea
 .gradle
 local.properties

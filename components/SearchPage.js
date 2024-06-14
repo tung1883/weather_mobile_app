@@ -3,15 +3,20 @@ import { View, TextInput, Text, StyleSheet, FlatList, TouchableOpacity, Dimensio
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Location from 'expo-location'
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import { useRoute } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { cities, popularCities } from '../assets/citiList';
 import { lightStyles, darkStyles } from './defaultStyles';
 import { FunctionalContext, WeatherContext } from './Context';
 import { addCounter, putToFrontFavs } from '../functionalities/favoriteLocations';
+import { widgetLocationUpdate } from './widgets/widgetTaskHandler';
 
 const screenWidth = Dimensions.get('window').width;
 
-const SearchPage = ({navigation}) => {    
+const SearchPage = ({navigation}) => {
+    const route = useRoute()
+    const { forWidget, forNotification } = route.params
     const goBack = navigation?.canGoBack()
     const { isDarkMode, t} = useContext(FunctionalContext);
     let { setLocation, gps, setGps, getGpsLocation, getLocationDetails, getLocationByCity, getWeather, 
@@ -54,6 +59,17 @@ const SearchPage = ({navigation}) => {
                 setIsFetching(true) 
 
                 if (gps?.location) {
+                    if (forWidget) {
+                        await AsyncStorage.setItem('widgetLocation', JSON.stringify(gps.location))
+                        await widgetLocationUpdate()
+                        return navigation?.goBack()
+                    }
+
+                    if (forNotification) {
+                        await AsyncStorage.setItem('notificationLocation', JSON.stringify(gps.location))
+                        return navigation?.goBack()
+                    }
+
                     setLocation(gps.location)
                     setWeather(gps.weather)
                     putToFrontFavs({favs, setFavs, fav: {...gps, gps: true}})
@@ -63,6 +79,17 @@ const SearchPage = ({navigation}) => {
 
                 const location = await getGpsLocation()
                 if (location) {
+                    if (forWidget) {
+                        await AsyncStorage.setItem('widgetLocation', JSON.stringify(gps.location))
+                        await widgetLocationUpdate()
+                        return navigation?.goBack()
+                    }
+
+                    if (forNotification) {
+                        await AsyncStorage.setItem('notificationLocation', JSON.stringify(gps.location))
+                        return navigation?.goBack()
+                    }
+
                     const weather = await getWeather({location})
                     setLocation(location)
                     setWeather(weather)
@@ -108,6 +135,17 @@ const SearchPage = ({navigation}) => {
         .then(async (result) => {
             if (!result) return setIsFetching(false)
 
+            if (forWidget) {
+                await AsyncStorage.setItem('widgetLocation', JSON.stringify(result))
+                await widgetLocationUpdate()
+                return navigation?.goBack()
+            }
+
+            if (forNotification) {
+                await AsyncStorage.setItem('notificationLocation', JSON.stringify(result))
+                return navigation?.goBack()
+            }
+
             setIsFetching(true)
             const weather = await getWeather({location: result})
             setLocation(result)
@@ -133,6 +171,17 @@ const SearchPage = ({navigation}) => {
                     
                     const location = await getLocationByCity(item)
                     if (!location) return setIsFetching(false)
+
+                    if (forWidget) {
+                        await AsyncStorage.setItem('widgetLocation', JSON.stringify(location))
+                        await widgetLocationUpdate()
+                        return navigation?.goBack()
+                    }
+
+                    if (forNotification) {
+                        await AsyncStorage.setItem('notificationLocation', JSON.stringify(location))
+                        return navigation?.goBack()
+                    }
 
                     const weather = await getWeather({location})
                     setLocation(location)
@@ -196,6 +245,17 @@ const SearchPage = ({navigation}) => {
                                 getLocationByCity(city)
                                 .then(async (result) => {
                                     if (!result) return setMapFetching(false)
+
+                                    if (forWidget) {
+                                        await AsyncStorage.setItem('widgetLocation', JSON.stringify(result))
+                                        await widgetLocationUpdate()
+                                        return navigation?.goBack()
+                                    }
+
+                                    if (forNotification) {
+                                        await AsyncStorage.setItem('notificationLocation', JSON.stringify(result))
+                                        return navigation?.goBack()
+                                    }
 
                                     setMapFetching(true)
                                     const weather = await getWeather({location: result})

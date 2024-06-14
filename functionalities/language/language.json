@@ -59,7 +59,8 @@
                 "title": "Settings",
                 "noti": "Manage Notifications", 
                 "lu": "Language and Units",
-                "theme": "Change App Theme"
+                "theme": "Change App Theme",
+                "widget": "Configure Widget"
             },
             "weather": {
                 "feels": "Feels like",
@@ -116,6 +117,8 @@
             },
             "widgetSettings": {
                 "title": "Widget Settings",
+                "location": "Location",
+                "preview": "Widget Preview",
                 "small": "Small Widget (3x1)",
                 "big": "Big Widget (5x4)",
                 "note1": "To add widgets, go to your home screen",
@@ -129,6 +132,13 @@
                 "pressure": "Sea-level Pressure",
                 "opacity": "Weather Layer Opacity",
                 "layer": "Weather Layers"
+            },
+            "notification": {
+                "title": "Notifications",
+                "daily": "Send Daily Notification",
+                "live": "Get Live Weather Notifications",
+                "time": "Daily Time",
+                "location": "Location"
             }
         }
     },
@@ -193,7 +203,8 @@
                 "title": "Cài đặt",
                 "noti": "Cài đặt thông báo", 
                 "lu": "Ngôn ngữ và đơn vị",
-                "theme": "Chế độ sáng tối "
+                "theme": "Chế độ sáng tối",
+                "widget": "Thiết lập Widget"
             },
             "weather": {
                 "feels": "Cảm giác như",
@@ -250,6 +261,8 @@
             },
             "widgetSettings": {
                 "title": "Cài đặt Widget",
+                "location": "Vị trí lấy dữ liệu",
+                "preview": "Xem trước các mẫu Widget",
                 "small": "Widget Bé (3x1)",
                 "big": "Widget To (5x4)",
                 "note1": "Để thêm widget, hãy đến màn hình chính của bạn",
@@ -263,6 +276,13 @@
                 "pressure": "Áp suất mực nước biển",
                 "opacity": "Độ mờ lớp thời tiết",
                 "layer": "Các lớp thời tiết"
+            },
+            "notification": {
+                "title": "Thông báo",
+                "daily": "Gửi thông báo hằng ngày",
+                "live": "Cập nhật theo thời gian thực",
+                "time": "Thời gian gửi thông báo",
+                "location": "Vị trí lấy dữ liệu"
             }
         }
     }
