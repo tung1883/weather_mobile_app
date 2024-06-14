@@ -53,7 +53,8 @@
                 "help": "Help",
                 "ads": "Remove Ads",
                 "privacy": "Privacy Settings",
-                "about": "About"
+                "about": "About",
+                "referText": "Hello,\nHow's the weather there? I'd recommend you to check out 1Weather for accurate weather forecasts, helpful weather alerts and tips, live weather widgets, and detailed and easy-to-navigate radar tracking.\n\nThe app also features Shorts, a rail of fact-checked weather news cards with 60-word summaries. This keeps you updated on major weather and environmental news across the US and the world.\n\nDownload the app using my referral link here: \nhttps://openweather.com"
             },
             "settings": {
                 "title": "Settings",
@@ -139,6 +140,10 @@
                 "live": "Get Live Weather Notifications",
                 "time": "Daily Time",
                 "location": "Location"
+            },
+            "main": {
+                "referText1": " is currently ",
+                "referText2": " | Get you up-to-date with the current weather now!"
             }
         }
     },
@@ -197,7 +202,8 @@
                 "help": "Trợ giúp",
                 "ads": "Bỏ quảng cáo",
                 "privacy": "Cài đặt riêng tư",
-                "about": "Về chúng tôi"
+                "about": "Về chúng tôi",
+                "referText": "Xin chào,\nThời tiết ở đó như thế nào? Tôi khuyên bạn nên kiểm tra 1Weather để có dự báo thời tiết chính xác, cảnh báo thời tiết hữu ích và mẹo, tiện ích thời tiết trực tiếp và theo dõi radar chi tiết và dễ dàng điều hướng.\n\nỨng dụng cũng có tính năng Shorts, một thanh các thẻ tin tức thời tiết được kiểm tra thực tế với các bản tóm tắt 60 từ. Điều này giúp bạn cập nhật những tin tức lớn về thời tiết và môi trường trên khắp Hoa Kỳ và thế giới.\n\nTải xuống ứng dụng bằng liên kết giới thiệu của tôi tại đây: \nhttps://openweather.com"
             },
             "settings": {
                 "title": "Cài đặt",
@@ -283,6 +289,10 @@
                 "live": "Cập nhật theo thời gian thực",
                 "time": "Thời gian gửi thông báo",
                 "location": "Vị trí lấy dữ liệu"
+            },
+            "main": {
+                "referText1": " hiện đang là ",
+                "referText2": " | Cập nhật thông tin thời tiết chuẩn xác nhất!"
             }
         }
     }

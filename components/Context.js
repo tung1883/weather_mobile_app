@@ -15,7 +15,7 @@ export const WeatherContext = createContext()
 export const NotificationContext = createContext()
 
 export const WeatherProvider = ({ children }) => {
-  const { lang, parsedLang, t } = useContext(FunctionalContext)
+  const { lang, parsedLang, t, isDarkMode } = useContext(FunctionalContext)
   const [location, setLocation] = useState({});
   const [weather, setWeather] = useState({})
   const [gps, setGps] = useState({})
@@ -100,16 +100,16 @@ export const WeatherProvider = ({ children }) => {
   }
 
   //health functionalities
-  const getIndexColor = (index) => {
-        switch (true) {
-            case index <= 50: return '#83A95C'
-            case index <= 100: return '#3E7C17'
-            case index <= 150: return '#125C13'
-            case index <= 200: return '#DC6B19'
-            case index <= 300: return '#B80000'
-            case index > 300: return '#820300'
-            default: return (isDarkMode ? 'white' : 'black')
-        }
+    const getIndexColor = (index) => {
+      switch (true) {
+          case index <= 50: return '#83A95C'
+          case index <= 100: return '#3E7C17'
+          case index <= 150: return '#125C13'
+          case index <= 200: return '#DC6B19'
+          case index <= 300: return '#B80000'
+          case index > 300: return '#820300'
+          default: return (isDarkMode ? 'white' : 'black')
+      }
     }
 
     const getPollen = (type) => {

@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext, WeatherContext } from '../Context';
 import { langs } from '../../functionalities/language/langs';
+import { widgetLocationUpdate } from '../widgets/widgetTaskHandler';
 
 const LanguageUnitsPage = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
@@ -36,9 +37,7 @@ const LanguageUnitsPage = ({ navigation }) => {
             <View>
                 <TouchableOpacity 
                     onPress={() => navigation.navigate('Language')}
-                    style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20,
-                        // borderBottomColor: 'grey', borderBottomWidth: 0.5, 
-                        marginHorizontal: 20}}>
+                    style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20, marginHorizontal: 20}}>
                     <View>
                         <Text style={[{fontSize: 16}, isDarkMode && {color: 'white'}]}>{t('languageAndUnitsPage.item1')}</Text>
                         <Text style={{color: 'white', fontSize: 14, color: 'grey', paddingTop: 8, paddingBottom: 12}}>{lang.auto ? t('map.auto') : t('map.' + lang.lang)}</Text>
@@ -63,10 +62,11 @@ const LanguageUnitsPage = ({ navigation }) => {
                                 <Text style={[{fontSize: 16}, isDarkMode && {color: 'white'}]}>{u.title}</Text>
                                 <Text style={{color: 'white', fontSize: 14, color: 'grey', paddingTop: 8, paddingBottom: 12}}>{u.details}</Text>
                             </View>
-                            <Checkbox color='dodgerblue' value={u.name === selected} onValueChange={() => {
+                            <Checkbox color='dodgerblue' value={u.name === selected} onValueChange={async () => {
                                 setFetching(true)
                                 setSelected(u.name)
-                                changeUnit({newU: u.name})
+                                await changeUnit({newU: u.name})
+                                await widgetLocationUpdate()
                             }}></Checkbox>
                         </View>
                     )
@@ -113,11 +113,12 @@ export const Language = ({navigation}) => {
                 </View>
                 { isSaving && 
                     <TouchableOpacity
-                        onPress={() => {
+                        onPress={async () => {
                             setFetching(true)
                             setIsSaving(false)
-                            if (selected === 'auto') changeLanguage(getAutoLang())
-                            else changeLanguage({auto: false, lang: selected})
+                            if (selected === 'auto') await changeLanguage(getAutoLang())
+                            else await changeLanguage({auto: false, lang: selected})
+                            await widgetLocationUpdate()
                         }}
                     >
                         <Text style={[{fontSize: 18, paddingRight: 20}, isDarkMode && {color: 'white'}]}>{t('languagePage.saveBtn')}</Text>

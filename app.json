@@ -44,6 +44,13 @@
             }
           ]
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./local/assets/notification-logo.png",
+          "defaultChannel": "Default",
+        }
       ]
     ],
     "extra": {

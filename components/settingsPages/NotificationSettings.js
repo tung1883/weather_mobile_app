@@ -10,11 +10,13 @@ import { getWeather, getLocationByCity, getStoredLocation, sendDailyNotification
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DatePicker from 'react-native-date-picker'
 import { useFocusEffect } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
 
 const DAILY = 'daily-notification'
 const LIVE = 'live-notification'
 
 TaskManager.defineTask(DAILY, async () => {
+    console.log("DAILY NOTIFICATION")
     let targetTime = await AsyncStorage.getItem('dailyTarget')
     if (!targetTime) targetTime = '06:00'
     const timeDifference = timeUntil(targetTime)
@@ -34,6 +36,7 @@ TaskManager.defineTask(DAILY, async () => {
 });
 
 TaskManager.defineTask(LIVE, async () => {
+    console.log("LIVE NOTIFICATION")
     let location = await getStoredLocation('notification')
     let weather = null 
 
@@ -46,7 +49,7 @@ TaskManager.defineTask(LIVE, async () => {
 
 async function registerBackgroundFetchAsync(TASK) {
     return BackgroundFetch.registerTaskAsync(TASK, {
-        minimumInterval: 1 * 60, 
+        minimumInterval: 1, 
         stopOnTerminate: false,
         startOnBoot: true,
     });

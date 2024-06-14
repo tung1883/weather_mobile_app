@@ -103,7 +103,7 @@ export default Taskbar = ({navigation}) => {
       <TouchableOpacity 
         onPress={() => {
           if (index == 2) {
-            share({text: referText})
+            share({text: t('taskbar.referText')})
             return
           }
 
@@ -244,12 +244,3 @@ const styles = StyleSheet.create({
   }
 })
 
-const referText = `
-Hello,
-How's the weather there? I'd recommend you to check out 1Weather for accurate weather forecasts, helpful weather alerts and tips, live weather widgets, and detailed and easy-to-navigate radar tracking.
-
-The app also features Shorts, a rail of fact-checked weather news cards with 60-word summaries. This keeps you updated on major weather and environmental news across the US and the world.
-
-Download the app using my referral link here: 
-https://openweather.com
-`

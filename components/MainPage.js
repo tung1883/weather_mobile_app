@@ -15,8 +15,8 @@ import Taskbar from "./ui/Taskbar";
 import { FunctionalContext, WeatherContext } from "./Context";
 
 const MainPage = ({ navigation }) => {
-  const { location, weather, setWeather, getWeather, share } = useContext(WeatherContext)
-  const { isDarkMode } = useContext(FunctionalContext)
+  const { location, weather, setWeather, getWeather, share, unit, getUnit} = useContext(WeatherContext)
+  const { isDarkMode, t } = useContext(FunctionalContext)
   const [isTaskbarOpen, setIsTaskbarOpen] = useState(false);  
   const [formattedTime, setFormattedTime] = useState('');
   const [bgList, setBgList] = useState(isDarkMode ? [darkBgImg1, darkBgImg2] : [bgImg1, bgImg2, bgImg3])
@@ -94,7 +94,7 @@ const MainPage = ({ navigation }) => {
                 <MaterialCommunityIcons name='magnify' color='white' size={25}></MaterialCommunityIcons>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => {
-                share({text: `${location?.city} is currently ${Math.round(weather?.current?.temp)}°C | Get you up-to-date with the current weather now!`})
+                share({text: `${location?.city}${t('main.referText1')}${Math.round(weather?.current?.temp)}${getUnit('temp', unit)}${t('main.referText2')}`})
               }}>
                 <MaterialCommunityIcons name='share-variant' color='white' size={25}></MaterialCommunityIcons>
               </TouchableOpacity>

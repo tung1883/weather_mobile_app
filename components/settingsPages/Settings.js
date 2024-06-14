@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext } from '../Context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { widgetLocationUpdate } from '../widgets/widgetTaskHandler';
 
 const SettingsPage = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
@@ -85,8 +86,8 @@ const SettingsPage = ({ navigation }) => {
                                     const theme = getAutoTheme()
                                     if (theme === 'light') setIsDarkMode(false)
                                     else setIsDarkMode(true)
-
                                     await AsyncStorage.setItem('theme', 'auto')
+                                    widgetLocationUpdate()
                                     setIsSettingTheme(false)
                                 }}
                                 style={{borderBottomWidth: 0.5, borderBottomColor: 'grey', paddingRight: 100, paddingVertical: 10}}>
@@ -95,6 +96,7 @@ const SettingsPage = ({ navigation }) => {
                                 onPress={async () => {
                                     setIsDarkMode(false)
                                     await AsyncStorage.setItem('theme', 'light')
+                                    await widgetLocationUpdate()
                                     setIsSettingTheme(false)
                                 }}
                                 style={{borderBottomWidth: 0.5, borderBottomColor: 'grey', paddingRight: 100, paddingVertical: 10}}><Text>Light</Text></TouchableOpacity>
@@ -102,6 +104,7 @@ const SettingsPage = ({ navigation }) => {
                                 onPress={async () => {
                                     setIsDarkMode(true)
                                     await AsyncStorage.setItem('theme', 'dark')
+                                    widgetLocationUpdate()
                                     setIsSettingTheme(false)
                                 }}
                                 style={{paddingRight: 100, paddingVertical: 5}}><Text>Dark</Text></TouchableOpacity>

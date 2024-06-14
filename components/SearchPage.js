@@ -16,7 +16,12 @@ const screenWidth = Dimensions.get('window').width;
 
 const SearchPage = ({navigation}) => {
     const route = useRoute()
-    const { forWidget, forNotification } = route.params
+    let forWidget, forNotification
+    if (route?.params) {
+        forWidget = route?.params?.forWidget
+        forNotification = route?.params?.forNotification
+    }
+    
     const goBack = navigation?.canGoBack()
     const { isDarkMode, t} = useContext(FunctionalContext);
     let { setLocation, gps, setGps, getGpsLocation, getLocationDetails, getLocationByCity, getWeather, 
