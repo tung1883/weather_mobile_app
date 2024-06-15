@@ -9,6 +9,7 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import i18n from '../functionalities/language/i18n';
 import config from '../config'
+import { use } from 'i18next';
 
 export const FunctionalContext = createContext();
 export const WeatherContext = createContext()
@@ -28,6 +29,7 @@ export const WeatherProvider = ({ children }) => {
     if (!lang.lang) return
     init()
   }, [unit, lang])
+
 
   const init = async () => {
     try {
@@ -181,9 +183,9 @@ export const WeatherProvider = ({ children }) => {
 
 export const FunctionalProvider = ({ children }) => {
   const [isAuto, setIsAuto] = useState()
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(null);
   const { t } = useTranslation(); 
-  const [lang, setLang] = useState ({auto: false, lang: null}); 
+  const [lang, setLang] = useState ({auto: false, lang: null})
 
   useEffect(() => {
     const init = async () => {
@@ -191,19 +193,20 @@ export const FunctionalProvider = ({ children }) => {
       let theme = await AsyncStorage.getItem('theme')
 
       if (!theme) {
-        AsyncStorage.setItem('theme', 'auto')
-        theme = 'auto'
+        await AsyncStorage.setItem('theme', 'auto')
       }
   
       if (theme === 'auto') {
         setIsAuto(true)
-        if (getAutoTheme() === 'light') setIsDarkMode(false)
+        if (getAutoTheme() === 'light') {
+          setIsDarkMode(false)
+        }
+        else setIsDarkMode(true)
+      } else {
+        if (theme == 'light') setIsDarkMode(false)
         else setIsDarkMode(true)
       }
   
-      if (theme == 'light') setIsDarkMode(false)
-      else setIsDarkMode(true)
-
       //set language
       let lang = await AsyncStorage.getItem('lang')
       let auto = false
@@ -229,7 +232,6 @@ export const FunctionalProvider = ({ children }) => {
         else setIsDarkMode(true)
       });
     }
-
     return () => subscription?.remove();
   }, [isAuto]);
 

@@ -64,7 +64,7 @@ const MainPage = ({ navigation }) => {
 
   const setNextBg = () => {
     setBg(bg => (bg + 1) % bgList.length)
-    setTimeout(setNextBg, 60 * 1000)
+    setTimeout(setNextBg, 1000)
   }
   
   const getBg = () => {
