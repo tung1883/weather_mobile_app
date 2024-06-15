@@ -271,7 +271,6 @@ export const FunctionalProvider = ({ children }) => {
 };
 
 export const NotificationProvider = ({ children }) => {
-  const { lang } = useContext(FunctionalContext)
   const notificationListener = useRef()
   
   Notifications.setNotificationHandler({
@@ -561,7 +560,7 @@ export async function sendLiveNotification(location, weather) {
   }
 }
 
-const notificationMessageTranslator = (type, lang, text) => {
+export const notificationMessageTranslator = (type, lang, text) => {
   if (type == 'live') {
       switch (text) {
         case 'title':

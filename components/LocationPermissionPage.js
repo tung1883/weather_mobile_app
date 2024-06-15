@@ -16,8 +16,8 @@ export default LocationPermissionPage = ({navigation}) => {
 
         if (status == 'granted') {
             await AsyncStorage.setItem('notFirstTime', 'true')
-            
-            if (location == {} || weather == {}) {
+
+            if (!location || !weather || Object.keys(location).length == 0 || Object.keys(weather).length == 0 ) {
               setIsFetching(true)
               await init()
               setIsFetching(false)

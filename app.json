@@ -5,6 +5,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "notification":{
+      "icon":"./assets/notification-logo.png"
+    },
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": [
       "**/*"
@@ -48,8 +51,8 @@
       [
         "expo-notifications",
         {
-          "icon": "./local/assets/notification-logo.png",
-          "defaultChannel": "Default",
+          "icon": "./assets/notification-logo.png",
+          "defaultChannel": "Default"
         }
       ]
     ],

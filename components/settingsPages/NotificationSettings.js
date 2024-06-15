@@ -6,11 +6,12 @@ import * as TaskManager from 'expo-task-manager';
 import Checkbox from 'expo-checkbox'
 import { lightStyles, darkStyles } from '../defaultStyles';
 import { FunctionalContext, WeatherContext } from "../Context";
-import { getWeather, getLocationByCity, getStoredLocation, sendDailyNotification, sendLiveNotification } from '../Context';
+import { getWeather, getLocationByCity, getStoredLocation, sendDailyNotification, sendLiveNotification, notificationMessageTranslator } from '../Context';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DatePicker from 'react-native-date-picker'
 import { useFocusEffect } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
+import * as Localization from'expo-localization'
 
 const DAILY = 'daily-notification'
 const LIVE = 'live-notification'
@@ -21,22 +22,42 @@ TaskManager.defineTask(DAILY, async () => {
     if (!targetTime) targetTime = '06:00'
     const timeDifference = timeUntil(targetTime)
     if (timeDifference.hours != 0) return
-    if (timeDifference.minutes > 5) return
+    if (timeDifference.minutes > 10) return
 
-    setTimeout(async () => {
-        let location = await getStoredLocation('notification')
-        let weather = null 
-    
-        if (!location.lat) location = await getLocationByCity(location.city)
-        if (location) weather = await getWeather({location})
-        if (location && weather) sendDailyNotification(location, weather)
-    }, timeDifference.milli)
+    let lang = await AsyncStorage.getItem('lang') 
+    if (!lang || lang == 'auto') lang = Localization.getLocales()[0].languageCode
+
+    const notificationList = await Notifications.getPresentedNotificationsAsync()
+    notificationList.forEach((async (notif) => {
+        console.log(notif)
+        if (notif.request.content.title.startsWith(notificationMessageTranslator('daily', lang, 'title'))) {
+            await Notifications.dismissNotificationAsync(notif.request.identifier)
+        }
+    }))
+
+    let location = await getStoredLocation('notification')
+    let weather = null 
+
+    if (!location.lat) location = await getLocationByCity(location.city)
+    if (location) weather = await getWeather({location})
+    if (location && weather) sendDailyNotification(location, weather)
+
 
     return BackgroundFetch.BackgroundFetchResult.NewData;
 });
 
 TaskManager.defineTask(LIVE, async () => {
     console.log("LIVE NOTIFICATION")
+    let lang = await AsyncStorage.getItem('lang') 
+    if (!lang || lang == 'auto') lang = Localization.getLocales()[0].languageCode
+
+    const notificationList = await Notifications.getPresentedNotificationsAsync()
+    notificationList.forEach((async (notif) => {
+        if (notif.request.content.title.startsWith(notificationMessageTranslator('live', lang, 'title'))) {
+            await Notifications.dismissNotificationAsync(notif.request.identifier)
+        }
+    }))
+    
     let location = await getStoredLocation('notification')
     let weather = null 
 
@@ -61,7 +82,7 @@ async function unregisterBackgroundFetchAsync(TASK) {
 
 const NotificationSettings = ({ navigation }) => {    
     const goBack = navigation?.canGoBack()
-    const { isDarkMode, t } = useContext(FunctionalContext)
+    const { isDarkMode, lang, t } = useContext(FunctionalContext)
     const { location } = useContext(WeatherContext)
     const [dailyRegisterd, setDailyRegistered] = useState(false)
     const [liveRegisterd, setLiveRegistered] = useState(false)
@@ -73,7 +94,7 @@ const NotificationSettings = ({ navigation }) => {
         useCallback(() => {
             const getLocation = async () => {
                 const storedLocation = await getStoredLocation('notification')
-                if (storedLocation) setNotificationLocation(storedLocation)
+                if (storedLocation && Object.keys(storedLocation).length !== 0) setNotificationLocation(storedLocation)
                 else {
                     await AsyncStorage.setItem('notificationLocation', JSON.stringify(location))
                     setNotificationLocation(location)
@@ -131,7 +152,7 @@ const NotificationSettings = ({ navigation }) => {
                         <Text style={{color: isDarkMode ? 'white' : 'black', fontSize: 15}}>{t('notification.daily')}</Text>
                         <Checkbox color='dodgerblue' value={dailyRegisterd} onValueChange={async () => {
                             if (!dailyRegisterd) {
-                                sendDailyNotification(notificationLocation, await getWeather({location: notificationLocation}))
+                                sendDailyNotification(notificationLocation, await getWeather({location: await getLocationByCity(notificationLocation.city)}))
                                 registerBackgroundFetchAsync(DAILY)
                             } else unregisterBackgroundFetchAsync(DAILY)
 
@@ -145,7 +166,7 @@ const NotificationSettings = ({ navigation }) => {
                         <Text style={{color: isDarkMode ? 'white' : 'black', fontSize: 15}}>{t('notification.live')}</Text>
                         <Checkbox color='dodgerblue' value={liveRegisterd} onValueChange={async () => {
                             if (!liveRegisterd) {
-                                sendLiveNotification(notificationLocation, await getWeather({location: notificationLocation}))
+                                sendLiveNotification(notificationLocation, await getWeather({location: await getLocationByCity(notificationLocation.city)}))
                                 registerBackgroundFetchAsync(LIVE)
                             } else unregisterBackgroundFetchAsync(LIVE)
 
