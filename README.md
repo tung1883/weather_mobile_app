@@ -43,5 +43,8 @@ And lastly, to run the project, you use:
 2. "RNSS Screen" was not found: search for all the necessary modules and download them
 3. splashscreen_background not found: add color with the name 'splashscreen_background' to colors.xml
 
+## Demo
+- Youtube Link: https://www.youtube.com/watch?v=ocPzqFEoPYw
+
 ##
 The app is developed during a very short amount of time so bugs are inevitable. If you encounter any bugs, feel free to contact us via GitHub or email (nguyenductung1883@gmail.com)
